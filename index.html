@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffffff">
+<title>JAS</title>
+
+<style>
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont;
+  background:#ffffff;
+}
+
+.header{
+  text-align:center;
+  font-size:38px;
+  font-weight:bold;
+  color:#ff6a00;
+  margin-top:20px;
+}
+
+.date{
+  text-align:center;
+  margin:10px 0;
+}
+
+.mode{
+  text-align:center;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.container{
+  width:95%;
+  margin:auto;
+}
+
+.card{
+  margin-bottom:25px;
+  border-radius:8px;
+  overflow:hidden;
+}
+
+.row{
+  padding:10px;
+  border-bottom:2px solid #000;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.memo textarea{
+  width:100%;
+  height:60px;
+}
+
+.time-btn{
+  border:2px solid #000;
+  padding:6px 12px;
+  min-width:70px;
+  text-align:center;
+}
+</style>
+</head>
+
+<body onclick="handleBackgroundTap(event)">
+
+<div class="header">JAS</div>
+<div class="date" id="todayDate"></div>
+<div class="mode" id="modeLabel">1조</div>
+
+<div class="container">
+<div id="scheduleArea"></div>
+</div>
+
+<script>
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
+const today = new Date();
+const todayStr =
+today.getFullYear()+"년 "+(today.getMonth()+1)+"월 "+today.getDate()+"일";
+
+document.getElementById("todayDate").innerText = todayStr;
+
+if(localStorage.getItem("savedDate") !== todayStr){
+  localStorage.clear();
+  localStorage.setItem("savedDate", todayStr);
+}
+
+let schedules = JSON.parse(localStorage.getItem("data")||"[]");
+
+let showAll=false;
+let currentTeam="1조";
+let lastTap=0;
+
+function saveData(){
+  localStorage.setItem("data", JSON.stringify(schedules));
+}
+
+function addSample(){
+  schedules.push({
+    arrFlight:"7C1302",
+    arrTime:"11:50",
+    arrGate:"127",
+    arrAirport:"KIX",
+    depFlight:"7C1703",
+    depTime:"15:10",
+    depAirport:"NGO",
+    hl:"HL8592",
+    note:"PUSH 교대",
+    team:"1/2",
+    arrStamp:"",
+    depStamp:"",
+    memo:""
+  });
+  saveData();
+}
+
+if(schedules.length===0){
+  addSample();
+}
+
+function getTeamStyle(team){
+
+  const num=parseInt(team);
+
+  if(num>=1&&num<=8)
+    return{header:"#1565c0",bg:"#e3f2fd"};
+  if(num>=9&&num<=16)
+    return{header:"#f9a825",bg:"#fff8e1"};
+  if(num>=17&&num<=24)
+    return{header:"#ef6c00",bg:"#fff3e0"};
+
+  return{header:"#616161",bg:"#eeeeee"};
+}
+
+function getFiltered(){
+
+  if(showAll) return schedules;
+
+  return schedules.filter(s=>{
+    if(s.team.includes("/")){
+      return s.team.split("/").includes(currentTeam.replace("조",""));
+    }
+    return s.team===currentTeam.replace("조","");
+  });
+}
+
+function stamp(type,index){
+
+  const now=new Date();
+  const time=now.getHours().toString().padStart(2,"0")+":"+
+             now.getMinutes().toString().padStart(2,"0");
+
+  const s=schedules[index];
+
+  if(type==="arr"){
+    if(!s.arrStamp){
+      s.arrStamp=time;
+    }else{
+      return;
+    }
+  }
+
+  if(type==="dep"){
+    if(!s.depStamp){
+      s.depStamp=time;
+    }else{
+      return;
+    }
+  }
+
+  if(navigator.vibrate) navigator.vibrate(80);
+
+  saveData();
+  render();
+}
+
+function handleBackgroundTap(e){
+
+  if(e.target.tagName==="TEXTAREA"||
+     e.target.classList.contains("time-btn")) return;
+
+  const now=new Date().getTime();
+
+  if(now-lastTap<300){
+    showAll=!showAll;
+    document.getElementById("modeLabel").innerText=
+      showAll?"전체":currentTeam;
+
+    if(navigator.vibrate) navigator.vibrate(100);
+
+    render();
+  }
+
+  lastTap=now;
+}
+
+function render(){
+
+  const area=document.getElementById("scheduleArea");
+  area.innerHTML="";
+
+  const list=getFiltered();
+
+  list.forEach((s,i)=>{
+
+    const displayTeam=showAll ? s.team : currentTeam.replace("조","");
+    const style=getTeamStyle(displayTeam);
+
+    const arrColor=s.arrStamp?"#d32f2f":"black";
+    const arrWeight=s.arrStamp?"bold":"normal";
+
+    const depColor=s.depStamp?"#d32f2f":"black";
+    const depWeight=s.depStamp?"bold":"normal";
+
+    area.innerHTML+=`
+    <div class="card" style="background:${style.bg}">
+      <div style="background:${style.header};color:white;padding:6px;text-align:center;font-weight:bold;">
+        ${displayTeam}조
+      </div>
+
+      <div class="row">
+        ${s.arrFlight} ${s.arrTime}
+        <span class="time-btn"
+        style="color:${arrColor};font-weight:${arrWeight}"
+        onclick="stamp('arr',${i})">
+        ${s.arrStamp||""}
+        </span>
+        ${s.arrGate} ${s.arrAirport}
+      </div>
+
+      <div class="memo">
+        <textarea onchange="schedules[${i}].memo=this.value;saveData()">
+${s.memo||""}</textarea>
+      </div>
+
+      <div class="row">
+        ${s.depFlight} ${s.depTime}
+        <span class="time-btn"
+        style="color:${depColor};font-weight:${depWeight}"
+        onclick="stamp('dep',${i})">
+        ${s.depStamp||""}
+        </span>
+        ${s.depAirport}
+      </div>
+
+      <div class="row">
+        ${s.hl} | 특이: ${s.note}
+      </div>
+    </div>
+    `;
+  });
+}
+
+render();
+
+</script>
+</body>
+</html>
