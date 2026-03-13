@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>AIRASIA MEMO VER 1.0</title>
+<title>AIRASIA MEMO VER 1.1</title>
 
 <style>
   :root{
@@ -190,7 +190,12 @@
   }
 
   .flash{animation:flash .55s;}
-  @keyframes flash{50%{transform:scale(1.01); filter:brightness(1.05)}}
+  @keyframes flash{
+    50%{
+      transform:scale(1.01);
+      filter:brightness(1.05);
+    }
+  }
 
   .modal{
     position:fixed;
@@ -490,7 +495,7 @@
     grid-template-columns:
       calc(26px * var(--ui)) 1.1fr
       calc(20px * var(--ui)) 1fr
-      calc(14px * var(--ui)) .95fr;
+      calc(20px * var(--ui)) .95fr;
     gap:calc(10px * var(--ui));
     align-items:center;
     margin:calc(10px * var(--ui)) 0;
@@ -556,13 +561,13 @@
 <header>
   <div class="titleWrap">
     <div class="titleMain">AIRASIA MEMO</div>
-    <div class="titleVer">VER 1.0</div>
+    <div class="titleVer">VER 1.1</div>
   </div>
 </header>
 
 <div class="controls">
-  <button type="button" onclick="newMemo()">메모 생성</button>
-  <button type="button" onclick="deleteSelected()">메모 삭제</button>
+  <button type="button" onclick="newMemo()">ADD</button>
+  <button type="button" onclick="deleteSelected()">DELETE</button>
 </div>
 
 <div id="memoList"></div>
@@ -594,7 +599,7 @@
   const sections = document.getElementById("sections");
   const memoList = document.getElementById("memoList");
 
-  let memos = JSON.parse(localStorage.getItem("airasia_memos_v1") || "[]");
+  let memos = JSON.parse(localStorage.getItem("airasia_memos_v11") || "[]");
   let editId = null;
 
   const EXTRA_KEYS = ["CREW","C","W","TS","TRASH"];
@@ -670,8 +675,8 @@
   }
 
   function addExtraRow(type){
-    const root = sections.querySelector(\`.section[data-type="\${type}"]\`);
-    const box = root ? root.querySelector(\`#\${type}-EXTRAS\`) : null;
+    const root = sections.querySelector(`.section[data-type="${type}"]`);
+    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
     if(!box) return;
     box.appendChild(makeExtraRow(type, "CREW", ""));
   }
@@ -681,82 +686,82 @@
     d.className = "section";
     d.dataset.type = type;
 
-    const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
+    const savedTime = memoData ? (memoData[type + "-TIME"] || "") : "";
     const sharedNine = memoData ? (memoData.sharedNine || "") : "";
     const sharedAk = memoData ? (memoData.sharedAk || "") : "";
-    const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
-    const noteV = memoData ? (memoData[type+"-note"] || "") : "";
+    const v = (k)=> memoData ? (memoData[type + "-" + k] || "") : "";
+    const noteV = memoData ? (memoData[type + "-note"] || "") : "";
     const staStdLabel = type === "INBOUND" ? "STA" : "STD";
     const staStdKey = type === "INBOUND" ? "STA" : "STD";
     const fixedAkText = type === "INBOUND" ? "AK1623" : "AK1624";
-    const cmpt1Value = memoData ? (memoData[type+"-cmpt1"] || "") : "";
+    const cmpt1Value = memoData ? (memoData[type + "-cmpt1"] || "") : "";
 
     d.innerHTML = `
       <div class="sectionHead">
-        <div class="sectionTitle">\${type}</div>
+        <div class="sectionTitle">${type}</div>
         <div class="headRight">
           <div class="staStdWrap">
-            <div class="staStdLab">\${staStdLabel}</div>
-            <input class="numBox staStdInput" inputmode="numeric" maxlength="4" placeholder="0000" data-k="\${type}-\${staStdKey}" value="\${v(staStdKey)}">
+            <div class="staStdLab">${staStdLabel}</div>
+            <input class="numBox staStdInput" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-${staStdKey}" value="${v(staStdKey)}">
           </div>
           <div class="timeWrap">
-            <button type="button" class="timeBtn" data-timebtn="\${type}">TIME</button>
-            <div class="timeVal" id="\${type}-TIMESHOWN">\${savedTime}</div>
+            <button type="button" class="timeBtn" data-timebtn="${type}">TIME</button>
+            <div class="timeVal" id="${type}-TIMESHOWN">${savedTime}</div>
           </div>
         </div>
       </div>
 
       <div class="rowGrid3">
         <div class="lab">AK</div>
-        <input class="long fixedField" value="\${fixedAkText}" readonly tabindex="-1">
+        <input class="long fixedField" value="${fixedAkText}" readonly tabindex="-1">
         <div class="lab">9</div>
-        <input class="numBox" inputmode="numeric" maxlength="5" placeholder="00000" data-k="SHARED-9" value="\${sharedNine}">
+        <input class="numBox" inputmode="numeric" maxlength="5" placeholder="00000" data-k="SHARED-9" value="${sharedNine}">
         <div class="lab">AK</div>
-        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-AK" value="\${sharedAk}">
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-AK" value="${sharedAk}">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <input class="long" data-k="\${type}-cmpt1" value="\${cmpt1Value}" placeholder="TEXT">
+        <input class="long" data-k="${type}-cmpt1" value="${cmpt1Value}" placeholder="TEXT">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 3</div>
-        <input class="long" data-k="\${type}-cmpt2" placeholder="TEXT" value="\${memoData ? (memoData[type+"-cmpt2"] || "") : ""}">
+        <input class="long" data-k="${type}-cmpt2" placeholder="TEXT" value="${memoData ? (memoData[type + "-cmpt2"] || "") : ""}">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 4</div>
-        <input class="long" data-k="\${type}-cmpt3" placeholder="TEXT" value="\${memoData ? (memoData[type+"-cmpt3"] || "") : ""}">
+        <input class="long" data-k="${type}-cmpt3" placeholder="TEXT" value="${memoData ? (memoData[type + "-cmpt3"] || "") : ""}">
       </div>
 
       <div class="row">
         <div class="lab" style="min-width:96px;">CMPT 5</div>
-        <input class="long" data-k="\${type}-cmpt4" placeholder="TEXT" value="\${memoData ? (memoData[type+"-cmpt4"] || "") : ""}">
+        <input class="long" data-k="${type}-cmpt4" placeholder="TEXT" value="${memoData ? (memoData[type + "-cmpt4"] || "") : ""}">
       </div>
 
       <div class="rowGridTDBB">
         <div class="lab">T</div>
-        <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="\${type}-t" value="\${v("t")}">
+        <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="${type}-t" value="${v("t")}">
         <div class="lab">D</div>
-        <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="\${type}-d" value="\${v("d")}">
+        <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-d" value="${v("d")}">
         <div class="lab">BB</div>
-        <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="\${type}-bb" value="\${v("bb")}">
+        <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-bb" value="${v("bb")}">
       </div>
 
       <div class="extraBox">
         <div class="extraHead">
           <div class="extraTitle">EXTRA</div>
-          <button type="button" class="iconBtn" onclick="addExtraRow('\${type}')">+</button>
+          <button type="button" class="iconBtn" onclick="addExtraRow('${type}')">+</button>
         </div>
-        <div id="\${type}-EXTRAS"></div>
+        <div id="${type}-EXTRAS"></div>
       </div>
 
-      <textarea data-k="\${type}-note" placeholder="NOTE (\${type})">\${noteV}</textarea>
+      <textarea data-k="${type}-note" placeholder="NOTE (${type})">${noteV}</textarea>
     `;
 
-    const timeBtn = d.querySelector(\`[data-timebtn="\${type}"]\`);
-    const timeShown = d.querySelector(\`#\${type}-TIMESHOWN\`);
+    const timeBtn = d.querySelector(`[data-timebtn="${type}"]`);
+    const timeShown = d.querySelector(`#${type}-TIMESHOWN`);
 
     timeBtn.addEventListener("click", ()=>{
       timeShown.textContent = nowTime();
@@ -768,8 +773,8 @@
       if(t) timeShown.textContent = normalizeTimeInput(t);
     });
 
-    const extrasBox = d.querySelector(\`#\${type}-EXTRAS\`);
-    const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
+    const extrasBox = d.querySelector(`#${type}-EXTRAS`);
+    const extras = memoData ? (memoData[type + "-EXTRAS"] || []) : [];
     extras.forEach(ex => extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
 
     return d;
@@ -786,7 +791,7 @@
         <div class="timeDividerTitle">TIME</div>
         <div class="timeDividerRight">
           <button type="button" class="timeBtn" id="centerTimeBtn">TIME</button>
-          <div class="timeVal" id="CENTER-TIMESHOWN">\${saved}</div>
+          <div class="timeVal" id="CENTER-TIMESHOWN">${saved}</div>
         </div>
       </div>
     `;
@@ -841,40 +846,40 @@
     data["CENTER-TIME"] = document.getElementById("CENTER-TIMESHOWN")?.textContent || "";
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
-      const root = sections.querySelector(\`.section[data-type="\${type}"]\`);
+      const root = sections.querySelector(`.section[data-type="${type}"]`);
       if(!root) return;
 
-      const gi = (k)=> root.querySelector(\`input[data-k="\${type}-\${k}"]\`);
-      const cm = (n)=> root.querySelector(\`input[data-k="\${type}-cmpt\${n}"]\`);
-      const note = root.querySelector(\`textarea[data-k="\${type}-note"]\`);
+      const gi = (k)=> root.querySelector(`input[data-k="${type}-${k}"]`);
+      const cm = (n)=> root.querySelector(`input[data-k="${type}-cmpt${n}"]`);
+      const note = root.querySelector(`textarea[data-k="${type}-note"]`);
 
-      data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
-      data[type+"-STD"] = type==="OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
+      data[type + "-STA"] = type === "INBOUND" ? pad(gi("STA")?.value, 4) : "";
+      data[type + "-STD"] = type === "OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
 
-      data[type+"-t"]  = pad(gi("t")?.value, 3);
-      data[type+"-d"]  = pad(gi("d")?.value, 2);
-      data[type+"-bb"] = pad(gi("bb")?.value, 2);
+      data[type + "-t"] = pad(gi("t")?.value, 3);
+      data[type + "-d"] = pad(gi("d")?.value, 2);
+      data[type + "-bb"] = pad(gi("bb")?.value, 2);
 
-      data[type+"-cmpt1"] = (cm(1)?.value || "").trim();
-      data[type+"-cmpt2"] = cm(2)?.value || "";
-      data[type+"-cmpt3"] = cm(3)?.value || "";
-      data[type+"-cmpt4"] = cm(4)?.value || "";
+      data[type + "-cmpt1"] = (cm(1)?.value || "").trim();
+      data[type + "-cmpt2"] = cm(2)?.value || "";
+      data[type + "-cmpt3"] = cm(3)?.value || "";
+      data[type + "-cmpt4"] = cm(4)?.value || "";
 
-      data[type+"-note"] = note ? (note.value || "") : "";
+      data[type + "-note"] = note ? (note.value || "") : "";
 
-      const shown = document.getElementById(type+"-TIMESHOWN");
-      data[type+"-TIME"] = shown ? (shown.textContent || "") : "";
+      const shown = document.getElementById(type + "-TIMESHOWN");
+      data[type + "-TIME"] = shown ? (shown.textContent || "") : "";
 
       const extras = [];
-      const box = root.querySelector(\`#\${type}-EXTRAS\`);
+      const box = root.querySelector(`#${type}-EXTRAS`);
       if(box){
         [...box.querySelectorAll(".extraRow")].forEach(r=>{
           const key = (r.querySelector("select")?.value || "").toUpperCase();
           const val = pad(r.querySelector("input")?.value || "", 3);
-          if(key && val) extras.push({key, val});
+          if(key && val) extras.push({ key, val });
         });
       }
-      data[type+"-EXTRAS"] = extras;
+      data[type + "-EXTRAS"] = extras;
     });
 
     if(editId){
@@ -884,7 +889,7 @@
       memos.push(data);
     }
 
-    localStorage.setItem("airasia_memos_v1", JSON.stringify(memos));
+    localStorage.setItem("airasia_memos_v11", JSON.stringify(memos));
     closeModal();
     renderList(data.id);
   }
@@ -898,18 +903,18 @@
       ? (m["INBOUND-STA"] || "").trim()
       : (m["OUTBOUND-STD"] || "").trim();
 
-    const cmpt1 = (m[type+"-cmpt1"] || "").trim();
-    const cmpt2 = (m[type+"-cmpt2"] || "").trim();
-    const cmpt3 = (m[type+"-cmpt3"] || "").trim();
-    const cmpt4 = (m[type+"-cmpt4"] || "").trim();
+    const cmpt1 = (m[type + "-cmpt1"] || "").trim();
+    const cmpt2 = (m[type + "-cmpt2"] || "").trim();
+    const cmpt3 = (m[type + "-cmpt3"] || "").trim();
+    const cmpt4 = (m[type + "-cmpt4"] || "").trim();
 
     const td = [
-      (m[type+"-t"] || "").trim(),
-      (m[type+"-d"] || "").trim(),
-      (m[type+"-bb"] || "").trim()
+      (m[type + "-t"] || "").trim(),
+      (m[type + "-d"] || "").trim(),
+      (m[type + "-bb"] || "").trim()
     ].filter(Boolean).join("/");
 
-    const extras = (m[type+"-EXTRAS"] || [])
+    const extras = (m[type + "-EXTRAS"] || [])
       .map(x => `${x.key}${x.val}`)
       .join(" ");
 
@@ -972,11 +977,11 @@
     const checks = document.querySelectorAll('.selBox:checked');
     const ids = [...checks].map(c=>Number(c.dataset.id));
     if(!ids.length){
-      alert("메모를 선택해");
+      alert("SELECT MEMO");
       return;
     }
     memos = memos.filter(m=>!ids.includes(m.id));
-    localStorage.setItem("airasia_memos_v1", JSON.stringify(memos));
+    localStorage.setItem("airasia_memos_v11", JSON.stringify(memos));
     renderList();
   }
 
@@ -1010,8 +1015,8 @@
   }
 
   dragArea.addEventListener("touchstart", (e)=> onStart(e.touches[0].clientY), {passive:true});
-  dragArea.addEventListener("touchmove",  (e)=> onMove(e.touches[0].clientY),  {passive:true});
-  dragArea.addEventListener("touchend",   ()=> onEnd());
+  dragArea.addEventListener("touchmove", (e)=> onMove(e.touches[0].clientY), {passive:true});
+  dragArea.addEventListener("touchend", ()=> onEnd());
 
   dragArea.addEventListener("mousedown", (e)=> onStart(e.clientY));
   window.addEventListener("mousemove", (e)=> onMove(e.clientY));
