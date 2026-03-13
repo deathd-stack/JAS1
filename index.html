@@ -3,16 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<title>AIRASIA MEMO VER 1.1</title>
+<title>AIRASIA MEMO VER 1.2</title>
 
 <style>
   :root{
     --bg1:#d91f26;
     --bg2:#b51218;
-    --blue:#ffffff;
-    --red:#ff3b30;
     --line:#d0d0d0;
     --ui:.8;
+    --red:#ff3b30;
   }
 
   *{box-sizing:border-box}
@@ -81,7 +80,9 @@
     cursor:pointer;
   }
 
-  button:active{transform:scale(.99)}
+  button:active{
+    transform:scale(.99);
+  }
 
   #memoList{
     padding:calc(10px * var(--ui)) calc(14px * var(--ui)) calc(40px * var(--ui));
@@ -189,7 +190,10 @@
     text-transform:uppercase;
   }
 
-  .flash{animation:flash .55s;}
+  .flash{
+    animation:flash .55s;
+  }
+
   @keyframes flash{
     50%{
       transform:scale(1.01);
@@ -248,8 +252,15 @@
     text-transform:uppercase;
   }
 
-  .modalTitleTap .m1{font-size:calc(18px * var(--ui));}
-  .modalTitleTap .m2{font-size:calc(12px * var(--ui)); opacity:.55; margin-top:2px;}
+  .modalTitleTap .m1{
+    font-size:calc(18px * var(--ui));
+  }
+
+  .modalTitleTap .m2{
+    font-size:calc(12px * var(--ui));
+    opacity:.55;
+    margin-top:2px;
+  }
 
   .section{
     background:#f2f2f2;
@@ -324,7 +335,9 @@
     text-transform:uppercase;
   }
 
-  .timeBtn:active{background:rgba(226,27,27,.08);}
+  .timeBtn:active{
+    background:rgba(226,27,27,.08);
+  }
 
   .timeVal{
     font-weight:1000;
@@ -514,33 +527,15 @@
     min-width:0;
   }
 
-  .timeDivider{
-    background:#fff;
-    border:2px solid #e2e2e2;
-    border-radius:calc(16px * var(--ui));
-    padding:calc(12px * var(--ui));
-    margin:calc(10px * var(--ui)) 0;
-  }
-
-  .timeDividerHead{
-    display:flex;
-    justify-content:space-between;
+  .rowGridTTTB{
+    display:grid;
+    grid-template-columns:
+      calc(26px * var(--ui)) 1fr
+      calc(26px * var(--ui)) 1fr;
+    gap:calc(10px * var(--ui));
     align-items:center;
-    gap:calc(10px * var(--ui));
-  }
-
-  .timeDividerTitle{
-    font-size:calc(20px * var(--ui));
-    font-weight:1000;
-    letter-spacing:.4px;
-    text-transform:uppercase;
-    color:#111;
-  }
-
-  .timeDividerRight{
-    display:flex;
-    align-items:baseline;
-    gap:calc(10px * var(--ui));
+    margin:calc(10px * var(--ui)) 0;
+    min-width:0;
   }
 
   @media (max-width:520px){
@@ -561,7 +556,7 @@
 <header>
   <div class="titleWrap">
     <div class="titleMain">AIRASIA MEMO</div>
-    <div class="titleVer">VER 1.1</div>
+    <div class="titleVer">VER 1.2</div>
   </div>
 </header>
 
@@ -599,7 +594,7 @@
   const sections = document.getElementById("sections");
   const memoList = document.getElementById("memoList");
 
-  let memos = JSON.parse(localStorage.getItem("airasia_memos_v11") || "[]");
+  let memos = JSON.parse(localStorage.getItem("airasia_memos_v12") || "[]");
   let editId = null;
 
   const EXTRA_KEYS = ["CREW","C","W","TS","TRASH"];
@@ -645,9 +640,9 @@
       return;
     }
 
-    if(k === "SHARED-AK"){
+    if(k === "SHARED-HASH"){
       t.value = onlyNum(t.value, 4);
-      document.querySelectorAll('input[data-k="SHARED-AK"]').forEach(el=>{
+      document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el=>{
         if(el !== t) el.value = t.value;
       });
       return;
@@ -658,6 +653,8 @@
     if(k.endsWith("-t")) t.value = onlyNum(t.value, 3);
     if(k.endsWith("-d")) t.value = onlyNum(t.value, 2);
     if(k.endsWith("-bb")) t.value = onlyNum(t.value, 2);
+    if(k.endsWith("-tt")) t.value = onlyNum(t.value, 4);
+    if(k.endsWith("-tb")) t.value = onlyNum(t.value, 4);
     if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
   });
 
@@ -688,7 +685,7 @@
 
     const savedTime = memoData ? (memoData[type + "-TIME"] || "") : "";
     const sharedNine = memoData ? (memoData.sharedNine || "") : "";
-    const sharedAk = memoData ? (memoData.sharedAk || "") : "";
+    const sharedHash = memoData ? (memoData.sharedHash || "") : "";
     const v = (k)=> memoData ? (memoData[type + "-" + k] || "") : "";
     const noteV = memoData ? (memoData[type + "-note"] || "") : "";
     const staStdLabel = type === "INBOUND" ? "STA" : "STD";
@@ -716,8 +713,8 @@
         <input class="long fixedField" value="${fixedAkText}" readonly tabindex="-1">
         <div class="lab">9</div>
         <input class="numBox" inputmode="numeric" maxlength="5" placeholder="00000" data-k="SHARED-9" value="${sharedNine}">
-        <div class="lab">AK</div>
-        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-AK" value="${sharedAk}">
+        <div class="lab">#</div>
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-HASH" value="${sharedHash}">
       </div>
 
       <div class="row">
@@ -748,6 +745,15 @@
         <div class="lab">BB</div>
         <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-bb" value="${v("bb")}">
       </div>
+
+      ${type === "OUTBOUND" ? `
+      <div class="rowGridTTTB">
+        <div class="lab">T/T</div>
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tt" value="${v("tt")}">
+        <div class="lab">T/B</div>
+        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-tb" value="${v("tb")}">
+      </div>
+      ` : ""}
 
       <div class="extraBox">
         <div class="extraHead">
@@ -780,42 +786,9 @@
     return d;
   }
 
-  function makeCenterTimeBox(memoData){
-    const wrap = document.createElement("div");
-    wrap.className = "timeDivider";
-
-    const saved = memoData ? (memoData["CENTER-TIME"] || "") : "";
-
-    wrap.innerHTML = `
-      <div class="timeDividerHead">
-        <div class="timeDividerTitle">TIME</div>
-        <div class="timeDividerRight">
-          <button type="button" class="timeBtn" id="centerTimeBtn">TIME</button>
-          <div class="timeVal" id="CENTER-TIMESHOWN">${saved}</div>
-        </div>
-      </div>
-    `;
-
-    const btn = wrap.querySelector("#centerTimeBtn");
-    const shown = wrap.querySelector("#CENTER-TIMESHOWN");
-
-    btn.addEventListener("click", ()=>{
-      shown.textContent = nowTime();
-    });
-
-    btn.addEventListener("dblclick", ()=>{
-      const cur = shown.textContent || nowTime();
-      const t = prompt("TIME (HH:MM 24H)", cur);
-      if(t) shown.textContent = normalizeTimeInput(t);
-    });
-
-    return wrap;
-  }
-
   function buildEditor(memoData){
     sections.innerHTML = "";
     sections.appendChild(makeSection("INBOUND", memoData));
-    sections.appendChild(makeCenterTimeBox(memoData));
     sections.appendChild(makeSection("OUTBOUND", memoData));
   }
 
@@ -842,8 +815,7 @@
     const data = { id: editId ?? Date.now() };
 
     data.sharedNine = pad(document.querySelector('input[data-k="SHARED-9"]')?.value || "", 5);
-    data.sharedAk = pad(document.querySelector('input[data-k="SHARED-AK"]')?.value || "", 4);
-    data["CENTER-TIME"] = document.getElementById("CENTER-TIMESHOWN")?.textContent || "";
+    data.sharedHash = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 4);
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
       const root = sections.querySelector(`.section[data-type="${type}"]`);
@@ -859,6 +831,8 @@
       data[type + "-t"] = pad(gi("t")?.value, 3);
       data[type + "-d"] = pad(gi("d")?.value, 2);
       data[type + "-bb"] = pad(gi("bb")?.value, 2);
+      data[type + "-tt"] = type === "OUTBOUND" ? pad(gi("tt")?.value, 4) : "";
+      data[type + "-tb"] = type === "OUTBOUND" ? pad(gi("tb")?.value, 4) : "";
 
       data[type + "-cmpt1"] = (cm(1)?.value || "").trim();
       data[type + "-cmpt2"] = cm(2)?.value || "";
@@ -889,14 +863,14 @@
       memos.push(data);
     }
 
-    localStorage.setItem("airasia_memos_v11", JSON.stringify(memos));
+    localStorage.setItem("airasia_memos_v12", JSON.stringify(memos));
     closeModal();
     renderList(data.id);
   }
 
   function formatTitleLine(m, type){
     const nine = (m.sharedNine || "").trim();
-    const ak = (m.sharedAk || "").trim();
+    const hash = (m.sharedHash || "").trim();
     const fixed = type === "INBOUND" ? "AK1623" : "AK1624";
 
     const staOrStd = type === "INBOUND"
@@ -914,19 +888,24 @@
       (m[type + "-bb"] || "").trim()
     ].filter(Boolean).join("/");
 
+    const ttTb = type === "OUTBOUND"
+      ? [(m["OUTBOUND-tt"] || "").trim(), (m["OUTBOUND-tb"] || "").trim()].filter(Boolean).join("/")
+      : "";
+
     const extras = (m[type + "-EXTRAS"] || [])
       .map(x => `${x.key}${x.val}`)
       .join(" ");
 
     const bits = [];
     bits.push(`${fixed} 9[${nine}]`);
-    bits.push(`AK[${ak}]`);
+    bits.push(`#[${hash}]`);
     if(staOrStd) bits.push(staOrStd);
     if(cmpt1) bits.push(cmpt1);
     if(cmpt2) bits.push(cmpt2);
     if(cmpt3) bits.push(cmpt3);
     if(cmpt4) bits.push(cmpt4);
     if(td) bits.push(td);
+    if(ttTb) bits.push(ttTb);
     if(extras) bits.push(extras);
 
     return bits.join(" ");
@@ -969,7 +948,7 @@
     editId = id;
     buildEditor(m);
     document.querySelectorAll('input[data-k="SHARED-9"]').forEach(el => el.value = m.sharedNine || "");
-    document.querySelectorAll('input[data-k="SHARED-AK"]').forEach(el => el.value = m.sharedAk || "");
+    document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHash || "");
     openModal();
   }
 
@@ -981,7 +960,7 @@
       return;
     }
     memos = memos.filter(m=>!ids.includes(m.id));
-    localStorage.setItem("airasia_memos_v11", JSON.stringify(memos));
+    localStorage.setItem("airasia_memos_v12", JSON.stringify(memos));
     renderList();
   }
 
