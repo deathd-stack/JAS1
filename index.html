@@ -690,7 +690,7 @@
     const noteV = memoData ? (memoData[type + "-note"] || "") : "";
     const staStdLabel = type === "INBOUND" ? "STA" : "STD";
     const staStdKey = type === "INBOUND" ? "STA" : "STD";
-    const fixedAkText = type === "INBOUND" ? "AK1623" : "AK1624";
+    const fixedAkText = type === "INBOUND" ? "1623" : "1624";
     const cmpt1Value = memoData ? (memoData[type + "-cmpt1"] || "") : "";
 
     d.innerHTML = `
@@ -871,7 +871,7 @@
   function formatTitleLine(m, type){
     const nine = (m.sharedNine || "").trim();
     const hash = (m.sharedHash || "").trim();
-    const fixed = type === "INBOUND" ? "AK1623" : "AK1624";
+    const fixed = type === "INBOUND" ? "1623" : "1624";
 
     const staOrStd = type === "INBOUND"
       ? (m["INBOUND-STA"] || "").trim()
