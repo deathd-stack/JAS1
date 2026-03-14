@@ -316,7 +316,7 @@
 
   .timeWrap{
     display:flex;
-    align-items:baseline;
+    align-items:center;
     gap:calc(10px * var(--ui));
     white-space:nowrap;
     text-transform:uppercase;
@@ -339,12 +339,19 @@
     background:rgba(226,27,27,.08);
   }
 
-  .timeVal{
+  .timeInput{
+    width:calc(92px * var(--ui)) !important;
+    min-width:calc(92px * var(--ui));
+    height:calc(42px * var(--ui));
+    line-height:calc(42px * var(--ui));
+    text-align:center;
     font-weight:1000;
-    font-size:calc(22px * var(--ui));
+    font-size:calc(20px * var(--ui));
     color:var(--red);
-    min-width:calc(64px * var(--ui));
-    text-align:right;
+    border:2px solid var(--line);
+    border-radius:calc(14px * var(--ui));
+    background:#fff;
+    padding:0 calc(8px * var(--ui));
     font-variant-numeric:tabular-nums;
   }
 
@@ -603,6 +610,13 @@
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
   }
 
+  function text5(val){
+    return (val || "")
+      .toUpperCase()
+      .replace(/\s+/g, "")
+      .slice(0, 5);
+  }
+
   function pad(val, len){
     const v = onlyNum(val, len);
     return v ? v.padStart(len, "0") : "";
@@ -616,14 +630,16 @@
   function normalizeTimeInput(val){
     const raw = (val || "").trim();
     if(!raw) return "";
+
     const digits = raw.replace(/[^0-9]/g, "");
+
+    if(digits.length <= 2){
+      return digits;
+    }
     if(digits.length === 3){
       return digits.slice(0,1) + ":" + digits.slice(1,3);
     }
-    if(digits.length >= 4){
-      return digits.slice(0,2) + ":" + digits.slice(2,4);
-    }
-    return raw.slice(0,5);
+    return digits.slice(0,2) + ":" + digits.slice(2,4);
   }
 
   document.addEventListener("input", (e)=>{
@@ -633,7 +649,7 @@
     if(!k) return;
 
     if(k === "SHARED-9"){
-      t.value = onlyNum(t.value, 5);
+      t.value = text5(t.value);
       document.querySelectorAll('input[data-k="SHARED-9"]').forEach(el=>{
         if(el !== t) el.value = t.value;
       });
@@ -645,6 +661,11 @@
       document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el=>{
         if(el !== t) el.value = t.value;
       });
+      return;
+    }
+
+    if(k.endsWith("-TIME")){
+      t.value = normalizeTimeInput(t.value).slice(0,5);
       return;
     }
 
@@ -703,7 +724,15 @@
           </div>
           <div class="timeWrap">
             <button type="button" class="timeBtn" data-timebtn="${type}">TIME</button>
-            <div class="timeVal" id="${type}-TIMESHOWN">${savedTime}</div>
+            <input
+              class="timeInput"
+              id="${type}-TIMESHOWN"
+              data-k="${type}-TIME"
+              inputmode="numeric"
+              maxlength="5"
+              placeholder="00:00"
+              value="${savedTime}"
+            >
           </div>
         </div>
       </div>
@@ -712,7 +741,7 @@
         <div class="lab">AK</div>
         <input class="long fixedField" value="${fixedAkText}" readonly tabindex="-1">
         <div class="lab">9</div>
-        <input class="numBox" inputmode="numeric" maxlength="5" placeholder="00000" data-k="SHARED-9" value="${sharedNine}">
+        <input class="numBox" maxlength="5" placeholder="TEXT" data-k="SHARED-9" value="${sharedNine}">
         <div class="lab">#</div>
         <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-HASH" value="${sharedHash}">
       </div>
@@ -767,16 +796,14 @@
     `;
 
     const timeBtn = d.querySelector(`[data-timebtn="${type}"]`);
-    const timeShown = d.querySelector(`#${type}-TIMESHOWN`);
+    const timeInput = d.querySelector(`#${type}-TIMESHOWN`);
 
     timeBtn.addEventListener("click", ()=>{
-      timeShown.textContent = nowTime();
+      timeInput.value = nowTime();
     });
 
-    timeBtn.addEventListener("dblclick", ()=>{
-      const cur = timeShown.textContent || nowTime();
-      const t = prompt("TIME (HH:MM 24H)", cur);
-      if(t) timeShown.textContent = normalizeTimeInput(t);
+    timeInput.addEventListener("blur", ()=>{
+      timeInput.value = normalizeTimeInput(timeInput.value);
     });
 
     const extrasBox = d.querySelector(`#${type}-EXTRAS`);
@@ -814,7 +841,7 @@
   function saveMemo(){
     const data = { id: editId ?? Date.now() };
 
-    data.sharedNine = pad(document.querySelector('input[data-k="SHARED-9"]')?.value || "", 5);
+    data.sharedNine = text5(document.querySelector('input[data-k="SHARED-9"]')?.value || "");
     data.sharedHash = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 4);
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
@@ -842,7 +869,7 @@
       data[type + "-note"] = note ? (note.value || "") : "";
 
       const shown = document.getElementById(type + "-TIMESHOWN");
-      data[type + "-TIME"] = shown ? (shown.textContent || "") : "";
+      data[type + "-TIME"] = shown ? normalizeTimeInput(shown.value || "") : "";
 
       const extras = [];
       const box = root.querySelector(`#${type}-EXTRAS`);
