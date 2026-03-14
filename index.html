@@ -653,10 +653,10 @@
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
   }
 
-  function english5(val){
+  function alphaNum5(val){
     return (val || "")
       .toUpperCase()
-      .replace(/[^A-Z]/g, "")
+      .replace(/[^A-Z0-9]/g, "")
       .slice(0, 5);
   }
 
@@ -692,7 +692,7 @@
     if(!k) return;
 
     if(k === "SHARED-9"){
-      t.value = english5(t.value);
+      t.value = alphaNum5(t.value);
       document.querySelectorAll('input[data-k="SHARED-9"]').forEach(el=>{
         if(el !== t) el.value = t.value;
       });
@@ -784,7 +784,7 @@
         <div class="lab">AK</div>
         <input class="long fixedField" value="${fixedAkText}" readonly tabindex="-1">
         <div class="lab">9</div>
-        <input class="numBox" maxlength="5" placeholder="ABCDE" data-k="SHARED-9" value="${sharedNine}" style="text-transform:uppercase;">
+        <input class="numBox" maxlength="5" placeholder="A1B2C" data-k="SHARED-9" value="${sharedNine}" style="text-transform:uppercase;">
         <div class="lab">#</div>
         <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-HASH" value="${sharedHash}">
       </div>
@@ -884,7 +884,7 @@
   function saveMemo(){
     const data = { id: editId ?? Date.now() };
 
-    data.sharedNine = english5(document.querySelector('input[data-k="SHARED-9"]')?.value || "");
+    data.sharedNine = alphaNum5(document.querySelector('input[data-k="SHARED-9"]')?.value || "");
     data.sharedHash = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 4);
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
