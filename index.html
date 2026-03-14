@@ -272,11 +272,11 @@
   }
 
   .sectionHead{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
+    display:grid;
+    grid-template-columns:minmax(130px,1fr) auto;
+    align-items:start;
+    gap:calc(8px * var(--ui));
     margin-bottom:calc(10px * var(--ui));
-    gap:calc(10px * var(--ui));
   }
 
   .sectionTitle{
@@ -284,19 +284,23 @@
     font-weight:1000;
     letter-spacing:.3px;
     text-transform:uppercase;
+    line-height:1.1;
+    padding-top:calc(4px * var(--ui));
   }
 
   .headRight{
-    display:flex;
-    align-items:flex-start;
+    display:grid;
+    grid-template-columns:auto auto;
     gap:calc(10px * var(--ui));
-    flex-wrap:wrap;
-    justify-content:flex-end;
+    align-items:center;
+    justify-content:end;
   }
 
-  .staStdWrap{
+  .staStdWrap,
+  .timeWrap{
     display:flex;
     align-items:center;
+    justify-content:flex-end;
     gap:calc(8px * var(--ui));
     white-space:nowrap;
   }
@@ -306,6 +310,8 @@
     font-weight:1000;
     color:#111;
     text-transform:uppercase;
+    min-width:calc(36px * var(--ui));
+    text-align:right;
   }
 
   .staStdInput{
@@ -315,10 +321,6 @@
   }
 
   .timeWrap{
-    display:flex;
-    align-items:center;
-    gap:calc(10px * var(--ui));
-    white-space:nowrap;
     text-transform:uppercase;
   }
 
@@ -326,13 +328,15 @@
     border:none;
     background:transparent;
     box-shadow:none;
-    padding:calc(4px * var(--ui)) calc(8px * var(--ui));
+    padding:0;
     margin:0;
     font-weight:1000;
     font-size:calc(16px * var(--ui));
     color:#111;
     border-radius:calc(10px * var(--ui));
     text-transform:uppercase;
+    min-width:calc(52px * var(--ui));
+    text-align:right;
   }
 
   .timeBtn:active{
@@ -353,6 +357,7 @@
     background:#fff;
     padding:0 calc(8px * var(--ui));
     font-variant-numeric:tabular-nums;
+    text-transform:none;
   }
 
   .row{
@@ -554,6 +559,17 @@
       padding:10px 14px;
       font-size:14px;
     }
+
+    .sectionHead{
+      grid-template-columns:1fr;
+      gap:calc(8px * var(--ui));
+    }
+
+    .headRight{
+      justify-content:start;
+      grid-template-columns:auto auto;
+      gap:calc(8px * var(--ui));
+    }
   }
 </style>
 </head>
@@ -610,10 +626,10 @@
     return (val || "").replace(/[^0-9]/g, "").slice(0, len);
   }
 
-  function text5(val){
+  function english5(val){
     return (val || "")
       .toUpperCase()
-      .replace(/\s+/g, "")
+      .replace(/[^A-Z]/g, "")
       .slice(0, 5);
   }
 
@@ -649,7 +665,7 @@
     if(!k) return;
 
     if(k === "SHARED-9"){
-      t.value = text5(t.value);
+      t.value = english5(t.value);
       document.querySelectorAll('input[data-k="SHARED-9"]').forEach(el=>{
         if(el !== t) el.value = t.value;
       });
@@ -741,7 +757,7 @@
         <div class="lab">AK</div>
         <input class="long fixedField" value="${fixedAkText}" readonly tabindex="-1">
         <div class="lab">9</div>
-        <input class="numBox" maxlength="5" placeholder="TEXT" data-k="SHARED-9" value="${sharedNine}">
+        <input class="numBox" maxlength="5" placeholder="ABCDE" data-k="SHARED-9" value="${sharedNine}" style="text-transform:uppercase;">
         <div class="lab">#</div>
         <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-HASH" value="${sharedHash}">
       </div>
@@ -841,7 +857,7 @@
   function saveMemo(){
     const data = { id: editId ?? Date.now() };
 
-    data.sharedNine = text5(document.querySelector('input[data-k="SHARED-9"]')?.value || "");
+    data.sharedNine = english5(document.querySelector('input[data-k="SHARED-9"]')?.value || "");
     data.sharedHash = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 4);
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
