@@ -243,21 +243,6 @@
     margin:0 auto calc(8px * var(--ui));
   }
 
-  .topActionBar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:calc(10px * var(--ui));
-  }
-
-  .topMiniBtn{
-    padding:calc(9px * var(--ui)) calc(14px * var(--ui));
-    font-size:calc(15px * var(--ui));
-    border-radius:calc(14px * var(--ui));
-    box-shadow:none;
-    color:#d91f26;
-  }
-
   .modalTitleTap{
     text-align:center;
     font-weight:1000;
@@ -517,7 +502,20 @@
   }
 
   .bottomBtns{
-    display:none;
+    display:flex;
+    gap:calc(18px * var(--ui));
+    padding:calc(18px * var(--ui)) calc(6px * var(--ui)) calc(6px * var(--ui));
+    justify-content:center;
+    text-transform:uppercase;
+    flex-wrap:wrap;
+  }
+
+  .bottomBtns button{
+    padding:calc(10px * var(--ui)) calc(18px * var(--ui));
+    font-size:calc(16px * var(--ui));
+    box-shadow:none;
+    border-radius:calc(14px * var(--ui));
+    color:#d91f26;
   }
 
   .rowGrid3{
@@ -599,11 +597,6 @@
       min-width:calc(74px * var(--ui));
       font-size:calc(16px * var(--ui));
     }
-
-    .topMiniBtn{
-      padding:8px 12px;
-      font-size:14px;
-    }
   }
 </style>
 </head>
@@ -628,10 +621,6 @@
   <div class="box" id="sheet" role="dialog" aria-modal="true">
     <div class="dragArea" id="dragArea">
       <div class="drag-handle"></div>
-      <div class="topActionBar">
-        <button type="button" class="topMiniBtn" onclick="saveMemo()">SAVE</button>
-        <button type="button" class="topMiniBtn" onclick="closeModal()">CLOSE</button>
-      </div>
     </div>
 
     <div class="modalTitleTap">
@@ -687,8 +676,12 @@
 
     const digits = raw.replace(/[^0-9]/g, "");
 
-    if(digits.length <= 2) return digits;
-    if(digits.length === 3) return digits.slice(0,1) + ":" + digits.slice(1,3);
+    if(digits.length <= 2){
+      return digits;
+    }
+    if(digits.length === 3){
+      return digits.slice(0,1) + ":" + digits.slice(1,3);
+    }
     return digits.slice(0,2) + ":" + digits.slice(2,4);
   }
 
@@ -707,7 +700,7 @@
     }
 
     if(k === "SHARED-HASH"){
-      t.value = onlyNum(t.value, 4);
+      t.value = onlyNum(t.value, 3);
       document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el=>{
         if(el !== t) el.value = t.value;
       });
@@ -793,7 +786,7 @@
         <div class="lab">9</div>
         <input class="numBox" maxlength="5" placeholder="A1B2C" data-k="SHARED-9" value="${sharedNine}" style="text-transform:uppercase;">
         <div class="lab">#</div>
-        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="SHARED-HASH" value="${sharedHash}">
+        <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="SHARED-HASH" value="${sharedHash}">
       </div>
 
       <div class="row">
@@ -892,7 +885,7 @@
     const data = { id: editId ?? Date.now() };
 
     data.sharedNine = alphaNum5(document.querySelector('input[data-k="SHARED-9"]')?.value || "");
-    data.sharedHash = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 4);
+    data.sharedHash = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
 
     ["INBOUND","OUTBOUND"].forEach(type=>{
       const root = sections.querySelector(`.section[data-type="${type}"]`);
