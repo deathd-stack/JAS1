@@ -118,12 +118,26 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 }
 .day:hover{border-color:rgba(255,145,70,.45)}
 .day.blank{background:transparent;border-color:transparent;cursor:default}
-.day.today{box-shadow:inset 0 0 0 2px var(--orange)!important;border-color:var(--orange)!important}
+.day.today{
+  border-color:rgba(255,255,255,.07)!important;
+  box-shadow:none!important;
+}
+.day.today .dayNum{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:22px;
+  height:22px;
+  padding:0 5px;
+  border-radius:999px;
+  background:var(--orange);
+  color:#fff!important;
+}
 .dayNum{font-size:12px;color:#ddd;font-weight:1000}
 .code{
   margin-top:9px;
   text-align:center;
-  color:#fff;
+  color:#ff9c57;
   font-size:14px;
   font-weight:1000;
   word-break:keep-all;
@@ -146,39 +160,44 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 .edited:after{content:"EDIT";position:absolute;right:6px;bottom:5px;font-size:8px;color:#ff9c57;opacity:.7}
 
 
-.dayNormal{
-  border-color:rgba(255,255,255,.08);
+.dayNormal,
+.dayOff,
+.dayLeave,
+.dayR,
+.dayA,
+.dayP{
+  border-color:rgba(255,255,255,.07);
+  box-shadow:none;
+}
+
+.dayOff::before,
+.dayLeave::before,
+.dayR::before,
+.dayA::before,
+.dayP::before{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  bottom:5px;
+  height:4px;
+  border-radius:999px;
 }
 
 /* 휴무 */
-.dayOff{
-  border-color:rgba(220,225,232,.92);
-  box-shadow:inset 0 0 0 1px rgba(220,225,232,.10);
-}
+.dayOff::before{background:#d8dde5}
 
 /* 연차 */
-.dayLeave{
-  border-color:rgba(255,194,71,.96);
-  box-shadow:inset 0 0 0 1px rgba(255,194,71,.10);
-}
+.dayLeave::before{background:#ffc247}
 
 /* R14 / R43 */
-.dayR{
-  border-color:rgba(181,125,255,.96);
-  box-shadow:inset 0 0 0 1px rgba(181,125,255,.10);
-}
+.dayR::before{background:#b57dff}
 
 /* A 계열 */
-.dayA{
-  border-color:rgba(72,158,255,.98);
-  box-shadow:inset 0 0 0 1px rgba(72,158,255,.10);
-}
+.dayA::before{background:#489eff}
 
 /* P 계열 */
-.dayP{
-  border-color:rgba(69,214,164,.96);
-  box-shadow:inset 0 0 0 1px rgba(69,214,164,.10);
-}
+.dayP::before{background:#45d6a4}
 
 .bottom{
   position:fixed;left:0;right:0;bottom:0;z-index:20;padding:9px 12px calc(9px + env(safe-area-inset-bottom));
