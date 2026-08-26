@@ -38,7 +38,26 @@ body:before{
 }
 .app{position:relative;z-index:1;max-width:980px;margin:auto;padding:0 12px 100px}
 header{text-align:center;padding:26px 10px 16px}
-.title{font-size:clamp(38px,8vw,64px);font-weight:1000;letter-spacing:-2px;color:#ef5c18;text-shadow:0 2px 0 rgba(255,255,255,.2)}
+.title{
+  display:flex;
+  align-items:baseline;
+  justify-content:center;
+  gap:8px;
+  white-space:nowrap;
+  color:#ef5c18;
+  text-shadow:0 2px 0 rgba(255,255,255,.2);
+  line-height:1;
+}
+.titleJAS{
+  font-size:clamp(38px,8vw,64px);
+  font-weight:1000;
+  letter-spacing:-2px;
+}
+.titleRest{
+  font-size:clamp(19px,4vw,32px);
+  font-weight:1000;
+  letter-spacing:-1px;
+}
 .subTitle{font-size:13px;color:#7c3718;letter-spacing:2px;margin-top:4px}
 
 .card{
@@ -99,14 +118,67 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 }
 .day:hover{border-color:rgba(255,145,70,.45)}
 .day.blank{background:transparent;border-color:transparent;cursor:default}
-.day.today{box-shadow:inset 0 0 0 2px var(--orange)}
+.day.today{box-shadow:inset 0 0 0 2px var(--orange)!important;border-color:var(--orange)!important}
 .dayNum{font-size:12px;color:#ddd;font-weight:1000}
 .code{
-  margin-top:9px;text-align:center;color:#ff9c57;font-size:14px;font-weight:1000;
-  word-break:break-all;
+  margin-top:9px;
+  text-align:center;
+  color:#fff;
+  font-size:14px;
+  font-weight:1000;
+  word-break:keep-all;
+  white-space:nowrap;
+  line-height:1.15;
+  padding:0;
+  border-radius:0;
+  background:transparent;
+  border:none;
 }
+
+.codeOff{background:transparent;color:inherit;border:none;box-shadow:none;}
+
+.codeLeave{background:transparent;color:inherit;border:none;box-shadow:none;}
+
+.codeAll53{background:transparent;color:inherit;border:none;box-shadow:none;}
+
+.codeSpecial{background:transparent;color:inherit;border:none;box-shadow:none;}
 .sun .dayNum{color:#ff7b76}.sat .dayNum{color:#7ca7ff}
 .edited:after{content:"EDIT";position:absolute;right:6px;bottom:5px;font-size:8px;color:#ff9c57;opacity:.7}
+
+
+.dayNormal{
+  border-color:rgba(255,255,255,.08);
+}
+
+/* 휴무 */
+.dayOff{
+  border-color:rgba(220,225,232,.92);
+  box-shadow:inset 0 0 0 1px rgba(220,225,232,.10);
+}
+
+/* 연차 */
+.dayLeave{
+  border-color:rgba(255,194,71,.96);
+  box-shadow:inset 0 0 0 1px rgba(255,194,71,.10);
+}
+
+/* R14 / R43 */
+.dayR{
+  border-color:rgba(181,125,255,.96);
+  box-shadow:inset 0 0 0 1px rgba(181,125,255,.10);
+}
+
+/* A 계열 */
+.dayA{
+  border-color:rgba(72,158,255,.98);
+  box-shadow:inset 0 0 0 1px rgba(72,158,255,.10);
+}
+
+/* P 계열 */
+.dayP{
+  border-color:rgba(69,214,164,.96);
+  box-shadow:inset 0 0 0 1px rgba(69,214,164,.10);
+}
 
 .bottom{
   position:fixed;left:0;right:0;bottom:0;z-index:20;padding:9px 12px calc(9px + env(safe-area-inset-bottom));
@@ -311,6 +383,10 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 }
 
 @media(max-width:600px){
+  .title{gap:5px}
+  .titleJAS{font-size:40px}
+  .titleRest{font-size:20px;letter-spacing:-.8px}
+
   .app{padding-left:8px;padding-right:8px}
   .topHalfGrid{grid-template-columns:1fr 1fr;gap:6px}
   .topHalfBox{padding:8px;border-radius:17px}
@@ -323,7 +399,12 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
   .row.mainRow{display:grid;grid-template-columns:1fr}
   .categories{gap:5px}.categories button{font-size:11px;padding:11px 2px}
   .day{min-height:72px;border-radius:14px;padding:6px}
-  .code{font-size:12px;margin-top:7px}
+  .code{
+    font-size:11px;
+    margin-top:7px;
+    padding:6px 3px;
+    letter-spacing:-.3px;
+  }
   .title{font-size:42px}
 }
 </style>
@@ -332,7 +413,7 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 
 <div class="app">
 <header>
-  <div class="title">JAS DUTY SCHEDULE</div>
+  <div class="title"><span class="titleJAS">JAS</span><span class="titleRest">DUTY SCHEDULE</span></div>
 </header>
 
 <section class="card compactTopCard">
@@ -457,6 +538,7 @@ let state={
   month:8,
   people:{},
   schedules:{},
+  blueA53:{},
   main:null,
   edits:{}
 };
@@ -465,6 +547,8 @@ try{
   const saved=localStorage.getItem("JAS_DUTY_V1");
   if(saved) state=Object.assign(state,JSON.parse(saved));
 }catch(e){}
+
+state.blueA53=state.blueA53||{};
 
 let currentCategory="1그룹";
 let currentUnit="1조";
@@ -490,6 +574,41 @@ function dateKey(y,m,d){
   return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
 }
 function editKey(name,date){return name+"::"+date}
+function displayCode(code){
+  const v=String(code||"").trim().toUpperCase();
+
+  if(v==="R") return "휴무";
+  if(v==="L") return "연차";
+  if(v==="RA43") return "R43";
+  if(v==="RP14") return "R14";
+
+  return v;
+}
+
+function scheduleClass(rawCode, shownCode){
+  const raw=String(rawCode||"").trim().toUpperCase();
+
+  // 1. 휴무
+  if(raw==="R") return "dayOff";
+
+  // 2. 연차
+  if(raw==="L") return "dayLeave";
+
+  // 3. R14 / R43
+  if(raw==="RA43" || raw==="RP14" || shownCode==="R14" || shownCode==="R43")
+    return "dayR";
+
+  // 4. A로 시작하는 근무 (ALL53 포함)
+  if(raw.startsWith("A") || shownCode==="ALL53")
+    return "dayA";
+
+  // 5. P로 시작하는 근무
+  if(raw.startsWith("P"))
+    return "dayP";
+
+  return "dayNormal";
+}
+
 function getCode(name,date){
   const k=editKey(name,date);
   if(Object.prototype.hasOwnProperty.call(state.edits,k)) return state.edits[k];
@@ -603,11 +722,14 @@ function renderCalendar(){
     const date=dateKey(y,m,day);
     const dow=new Date(y,m,day).getDay();
     const code=currentPerson?getCode(currentPerson,date):"";
+    const blueA53Key=currentPerson?editKey(currentPerson,date):""; // 비흰색 A53 표시 키
+    const shownCode=(/^A53$/i.test(String(code).trim()) && state.blueA53[blueA53Key]) ? "ALL53" : displayCode(code);
+    const codeClass=scheduleClass(code,shownCode);
     const d=document.createElement("div");
-    d.className="day "+(dow===0?"sun ":"")+(dow===6?"sat ":"");
+    d.className="day "+codeClass+" "+(dow===0?"sun ":"")+(dow===6?"sat ":"");
     if(now.getFullYear()===y&&now.getMonth()===m&&now.getDate()===day)d.classList.add("today");
     if(currentPerson&&Object.prototype.hasOwnProperty.call(state.edits,editKey(currentPerson,date)))d.classList.add("edited");
-    d.innerHTML=`<div class="dayNum">${day}</div><div class="code">${escapeHtml(code)}</div>`;
+    d.innerHTML=`<div class="dayNum">${day}</div><div class="code">${escapeHtml(shownCode)}</div>`;
     if(currentPerson)d.onclick=()=>openEdit(date);
     box.appendChild(d);
   }
@@ -717,9 +839,15 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
   const status=document.getElementById("status");
 
   try{
-    const wb=XLSX.read(await file.arrayBuffer(),{type:"array",raw:true,cellDates:true});
+    const wb=XLSX.read(await file.arrayBuffer(),{
+      type:"array",
+      raw:true,
+      cellDates:true,
+      cellStyles:true
+    });
     const sheetName=wb.SheetNames.find(n=>n.includes("스케쥴")||n.includes("스케줄"))||wb.SheetNames[0];
-    const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{header:1,defval:"",raw:true});
+    const ws=wb.Sheets[sheetName];
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:true});
 
     let year=parseInt(rows[0]?.[4])||state.year||2026;
     let month=parseInt(rows[0]?.[5])||state.month||8;
@@ -728,6 +856,8 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
     let currentDuty="";
     const people={};
     const schedules={};
+    const blueA53={};
+    const a53StyleRecords=[];
     let personCount=0, scheduleCount=0;
 
     // 행 번호 고정 없이 표 구조로 자동 인식
@@ -771,15 +901,81 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
         if(value===undefined||value===null||String(value).trim()==="")continue;
 
         const date=`${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
-        schedules[name][date]=String(value).trim();
+        const code=String(value).trim();
+        schedules[name][date]=code;
+
+        // A53는 셀 스타일 ID로 구분한다.
+        // 같은 파일 안에서 A53 셀들의 스타일 번호를 모은 뒤,
+        // 가장 많이 쓰이는 스타일을 "일반 A53"으로 보고
+        // 다른 스타일의 A53는 ALL53 후보로 저장한다.
+        if(/^A53$/i.test(code)){
+          const cellAddress=XLSX.utils.encode_cell({r:r,c:10+(day-1)});
+          const cell=ws[cellAddress];
+
+          let styleId=null;
+
+          // SheetJS 버전에 따라 s가 숫자일 수도 있고 객체일 수도 있음
+          if(cell){
+            if(typeof cell.s==="number"){
+              styleId=cell.s;
+            }else if(cell.s && typeof cell.s==="object"){
+              if(cell.s.numFmtId!==undefined || cell.s.fillId!==undefined || cell.s.fontId!==undefined || cell.s.borderId!==undefined){
+                styleId=JSON.stringify({
+                  numFmtId:cell.s.numFmtId??null,
+                  fillId:cell.s.fillId??null,
+                  fontId:cell.s.fontId??null,
+                  borderId:cell.s.borderId??null,
+                  alignment:cell.s.alignment??null
+                });
+              }else{
+                styleId=JSON.stringify(cell.s);
+              }
+            }
+          }
+
+          if(styleId!==null){
+            a53StyleRecords.push({
+              person:name,
+              date:date,
+              styleId:String(styleId)
+            });
+          }
+        }
+
         scheduleCount++;
       }
+    }
+
+    // A53 스타일 분류:
+    // 가장 많이 등장한 스타일 = 일반 A53
+    // 그 외 스타일 = ALL53
+    if(a53StyleRecords.length){
+      const counts={};
+      a53StyleRecords.forEach(x=>{
+        counts[x.styleId]=(counts[x.styleId]||0)+1;
+      });
+
+      let normalStyle=null;
+      let maxCount=-1;
+      Object.entries(counts).forEach(([styleId,count])=>{
+        if(count>maxCount){
+          maxCount=count;
+          normalStyle=styleId;
+        }
+      });
+
+      a53StyleRecords.forEach(x=>{
+        if(x.styleId!==normalStyle){
+          blueA53[editKey(x.person,x.date)]=true;
+        }
+      });
     }
 
     state.year=year;
     state.month=month;
     state.people=people;
     state.schedules=schedules;
+    state.blueA53=blueA53;
     persist();
 
     viewDate=new Date(year,month-1,1);
@@ -792,7 +988,7 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
     pickFirst();
     renderAll();
 
-    status.textContent=`✅ ${personCount}명 불러옴 · 검색 가능`;
+    status.textContent=`✅ ${personCount}명 불러옴 · A53 스타일 ${new Set(a53StyleRecords.map(x=>x.styleId)).size}종 · ALL53 ${Object.keys(blueA53).length}개 감지`;
   }catch(err){
     console.error(err);
     status.textContent="❌ 엑셀을 읽지 못했습니다.";
