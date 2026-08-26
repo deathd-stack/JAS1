@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f26018">
-<title>JAS 근무표</title>
+<title>JAS DUTY SCHEDULE</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
@@ -144,8 +144,7 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 
 <div class="app">
 <header>
-  <div class="title">JAS 근무표</div>
-  <div class="subTitle">JAS DUTY SCHEDULE</div>
+  <div class="title">JAS DUTY SCHEDULE</div>
 </header>
 
 <section class="card">
@@ -169,7 +168,7 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
   <label class="fileBtn">EXCEL 추가
     <input id="excelFile" type="file" accept=".xls,.xlsx,.xlsm">
   </label>
-  <div class="info" id="status">근무표 엑셀을 추가해주세요. 성명 G열 / 날짜별 근무 K~AO열을 읽습니다.</div>
+  <div class="info" id="status">근무표 엑셀을 추가해주세요. G열 성명과 K~AO 날짜별 근무를 읽고, 각 조의 끝은 표 구조로 자동 인식합니다.</div>
 </section>
 
 <section class="card">
@@ -215,13 +214,6 @@ const STRUCTURE={
   "2그룹":["9조","10조","11조","12조","13조","14조","15조","16조"],
   "3그룹":["17조","18조","19조","20조","21조","22조","23조","24조"]
 };
-
-/*
-  중요:
-  사용자가 말한 현재 근무표는 24조 포함 대상이 엑셀 48행까지.
-  JavaScript 배열은 0부터 시작하므로 Excel 48행 == index 47.
-*/
-const MAX_EXCEL_ROW = 48;
 
 let state={
   year:2026,
@@ -410,22 +402,33 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
     const schedules={};
     let personCount=0, scheduleCount=0;
 
-    // Excel 48행까지만 포함
-    const readLimit=Math.min(rows.length,MAX_EXCEL_ROW);
+    // 행 번호 고정 없이 표 구조로 자동 인식
+    // B열에 관리/소산1~3/1~24조가 나오면 해당 구역 시작.
+    // B열에 그 외 다른 구역명(신입/병가/육휴/파견/퇴사 등)이 나오면
+    // 이전 조/구역 수집을 즉시 종료한다.
+    const validDuty = v =>
+      v==="관리" ||
+      /^소산[1-3]$/.test(v) ||
+      /^(?:[1-9]|1[0-9]|2[0-4])조$/.test(v);
 
-    for(let r=0;r<readLimit;r++){
+    let insideMainTable=false;
+
+    for(let r=0;r<rows.length;r++){
       const duty=String(rows[r]?.[1]??"").trim();
       const name=String(rows[r]?.[6]??"").trim();
 
-      if(
-        duty==="관리" ||
-        /^소산[1-3]$/.test(duty) ||
-        /^(?:[1-9]|1[0-9]|2[0-4])조$/.test(duty)
-      ){
+      if(validDuty(duty)){
         currentDuty=duty;
+        insideMainTable=true;
+      }else if(duty && insideMainTable){
+        // 관리/소산/1~24조가 아닌 새 구역명이 나타나면
+        // 현재 조의 연속 구간이 끝난 것으로 처리
+        currentDuty="";
+        insideMainTable=false;
       }
 
-      if(!name||!currentDuty||name==="성명"||name.includes("합계"))continue;
+      if(!insideMainTable || !currentDuty) continue;
+      if(!name || name==="성명" || name.includes("합계")) continue;
 
       people[currentDuty]??=[];
       if(!people[currentDuty].includes(name)){
@@ -436,8 +439,9 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
       schedules[name]??={};
 
       for(let day=1;day<=31;day++){
-        const value=rows[r]?.[10+(day-1)]; // K열=1일
+        const value=rows[r]?.[10+(day-1)]; // K열=1일, AO열=31일
         if(value===undefined||value===null||String(value).trim()==="")continue;
+
         const date=`${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
         schedules[name][date]=String(value).trim();
         scheduleCount++;
@@ -460,7 +464,7 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
     pickFirst();
     renderAll();
 
-    status.textContent=`✅ ${file.name} · ${year}년 ${month}월 · ${personCount}명 · 스케줄 ${scheduleCount}칸 · 48행까지만 읽음`;
+    status.textContent=`✅ ${file.name} · ${year}년 ${month}월 · ${personCount}명 · 스케줄 ${scheduleCount}칸`;
   }catch(err){
     console.error(err);
     status.textContent="❌ 엑셀을 읽지 못했습니다.";
