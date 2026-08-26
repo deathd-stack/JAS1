@@ -129,8 +129,196 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 .editInput{height:52px;text-align:center;font-size:18px}
 .sheetActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 
+
+.compactTopCard{
+  padding:10px;
+}
+
+.topHalfGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.topHalfBox{
+  min-width:0;
+  background:
+    linear-gradient(135deg,rgba(255,145,70,.07),rgba(255,145,70,0) 30%),
+    #0b0b0e;
+  border:1px solid var(--stroke);
+  border-radius:20px;
+  padding:10px;
+}
+
+.topHalfTitle{
+  color:var(--orange2);
+  font-size:12px;
+  font-weight:1000;
+  margin-bottom:7px;
+  letter-spacing:.2px;
+}
+
+.mainCompactRow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:6px;
+  align-items:center;
+}
+
+.mainCompactRow select{
+  height:38px;
+  border-radius:13px;
+  font-size:13px;
+}
+
+.compactActionBtn{
+  height:38px;
+  padding:0 12px;
+  border-radius:13px;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.compactFileBtn{
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 10px;
+  border-radius:13px;
+  font-size:13px;
+  box-shadow:none;
+}
+
+.compactSubText{
+  margin-top:7px;
+  color:#aaaab3;
+  font-size:10px;
+  line-height:1.3;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.compactSubText .mainName{
+  color:var(--orange2);
+}
+
+
+.searchFileGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+
+.searchBtn{
+  width:100%;
+}
+
+.searchResults{
+  margin-top:10px;
+  max-height:42vh;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.searchResultBtn{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  text-align:left;
+  padding:12px 14px;
+  border-radius:16px;
+  background:linear-gradient(180deg,#17171b,#0b0b0e);
+}
+
+.searchResultName{
+  font-size:15px;
+  font-weight:1000;
+}
+
+.searchResultUnit{
+  font-size:11px;
+  color:var(--orange2);
+  white-space:nowrap;
+}
+
+.searchEmpty{
+  text-align:center;
+  color:#8d8d96;
+  font-size:12px;
+  padding:18px 8px;
+  background:rgba(255,255,255,.04);
+  border-radius:16px;
+}
+
+.searchSheet{
+  max-height:90vh;
+  overflow:auto;
+}
+
+.searchNavSection{
+  margin-top:12px;
+  padding:10px;
+  border-radius:18px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.05);
+}
+
+.searchSectionTitle{
+  margin:10px 0 6px;
+  color:var(--orange2);
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.3px;
+}
+
+.searchCategories{
+  grid-template-columns:repeat(5,1fr);
+}
+
+.searchCategories button{
+  padding:9px 3px;
+  font-size:11px;
+  border-radius:13px;
+}
+
+.searchUnits{
+  padding-top:3px;
+}
+
+.searchUnits button{
+  padding:9px 11px;
+  min-width:52px;
+  border-radius:13px;
+}
+
+.searchPersons{
+  padding-top:3px;
+  flex-wrap:wrap;
+  overflow:visible;
+}
+
+.searchPersons button{
+  min-width:max-content;
+  padding:9px 12px;
+  border-radius:13px;
+  font-size:12px;
+}
+
 @media(max-width:600px){
   .app{padding-left:8px;padding-right:8px}
+  .topHalfGrid{grid-template-columns:1fr 1fr;gap:6px}
+  .topHalfBox{padding:8px;border-radius:17px}
+  .topHalfTitle{font-size:11px}
+  .mainCompactRow select{font-size:11px;padding:0 7px}
+  .compactActionBtn{padding:0 8px;font-size:11px}
+  .compactFileBtn{font-size:12px}
+  .compactSubText{font-size:9px}
   .card{border-radius:23px;padding:11px}
   .row.mainRow{display:grid;grid-template-columns:1fr}
   .categories{gap:5px}.categories button{font-size:11px;padding:11px 2px}
@@ -147,29 +335,47 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
   <div class="title">JAS DUTY SCHEDULE</div>
 </header>
 
-<section class="card">
-  <div class="row mainRow">
-    <div class="control">
-      <label>MAIN</label>
-      <select id="mainSelect"><option value="">본인 선택</option></select>
+<section class="card compactTopCard">
+  <div class="topHalfGrid">
+
+    <div class="topHalfBox">
+      <div class="topHalfTitle">MAIN 설정</div>
+
+      <div class="mainCompactRow">
+        <select id="mainSelect">
+          <option value="">본인 선택</option>
+        </select>
+
+        <button id="saveMain" class="compactActionBtn">
+          저장
+        </button>
+      </div>
+
+      <div class="compactSubText">
+        MAIN : <span id="mainText" class="mainName">미설정</span>
+      </div>
     </div>
-    <button id="saveMain">MAIN 저장</button>
+
+    <div class="topHalfBox">
+      <div class="topHalfTitle">SEARCH / EXCEL</div>
+
+      <div class="searchFileGrid">
+        <button id="openSearch" class="compactActionBtn searchBtn">검색</button>
+
+        <label class="fileBtn compactFileBtn">
+          파일추가
+          <input id="excelFile" type="file" accept=".xls,.xlsx,.xlsm">
+        </label>
+      </div>
+
+      <div class="compactSubText" id="status">
+        직원 찾기 또는 근무표 추가
+      </div>
+    </div>
+
   </div>
-  <div class="info">현재 MAIN : <span id="mainText" class="mainName">미설정</span></div>
 </section>
 
-<section class="card">
-  <div class="categories" id="categories"></div>
-  <div class="scroll" id="units"></div>
-  <div class="scroll persons" id="persons"></div>
-</section>
-
-<section class="card">
-  <label class="fileBtn">EXCEL 추가
-    <input id="excelFile" type="file" accept=".xls,.xlsx,.xlsm">
-  </label>
-  <div class="info" id="status">근무표 엑셀을 추가해주세요. G열 성명과 K~AO 날짜별 근무를 읽고, 각 조의 끝은 표 구조로 자동 인식합니다.</div>
-</section>
 
 <section class="card">
   <div class="current">
@@ -191,6 +397,37 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
     <button id="todayBtn">TODAY</button>
     <button id="goMain" class="mainBtn">MAIN</button>
     <button id="resetEdit">수정 초기화</button>
+  </div>
+</div>
+
+
+<div class="modal" id="searchModal">
+  <div class="sheet searchSheet">
+    <div class="handle"></div>
+    <div class="sheetTitle">직원 찾기</div>
+
+    <input id="searchNameInput" class="editInput" placeholder="성명을 입력하세요">
+
+    <div class="searchNavSection">
+      <div class="searchSectionTitle">구역 선택</div>
+      <div class="categories searchCategories" id="searchCategories"></div>
+
+      <div class="searchSectionTitle">조 선택</div>
+      <div class="scroll searchUnits" id="searchUnits"></div>
+
+      <div class="searchSectionTitle">인원</div>
+      <div class="scroll persons searchPersons" id="searchPersons"></div>
+    </div>
+
+    <div class="searchSectionTitle">검색 결과</div>
+    <div id="searchResults" class="searchResults">
+      <div class="searchEmpty">이름을 입력하면 검색됩니다.</div>
+    </div>
+
+    <div class="sheetActions">
+      <button id="closeSearch">CLOSE</button>
+      <button id="clearSearch" class="active">검색 지우기</button>
+    </div>
   </div>
 </div>
 
@@ -265,9 +502,14 @@ function escapeHtml(v){
   return String(v||"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s]));
 }
 
-function renderCategories(){
-  const box=document.getElementById("categories");
-  box.innerHTML="";
+function renderSearchNav(){
+  const catBox=document.getElementById("searchCategories");
+  const unitBox=document.getElementById("searchUnits");
+  const personBox=document.getElementById("searchPersons");
+
+  if(!catBox||!unitBox||!personBox) return;
+
+  catBox.innerHTML="";
   Object.keys(STRUCTURE).forEach(cat=>{
     const b=document.createElement("button");
     b.textContent=cat;
@@ -276,14 +518,12 @@ function renderCategories(){
       currentCategory=cat;
       currentUnit=STRUCTURE[cat][0];
       pickFirst();
-      renderAll();
+      renderSearchNav();
     };
-    box.appendChild(b);
+    catBox.appendChild(b);
   });
-}
-function renderUnits(){
-  const box=document.getElementById("units");
-  box.innerHTML="";
+
+  unitBox.innerHTML="";
   STRUCTURE[currentCategory].forEach(unit=>{
     const b=document.createElement("button");
     b.textContent=currentCategory.includes("그룹")?unit.replace("조",""):unit;
@@ -291,33 +531,38 @@ function renderUnits(){
     b.onclick=()=>{
       currentUnit=unit;
       pickFirst();
-      renderAll();
+      renderSearchNav();
     };
-    box.appendChild(b);
+    unitBox.appendChild(b);
   });
-}
-function renderPersons(){
-  const box=document.getElementById("persons");
-  box.innerHTML="";
+
+  personBox.innerHTML="";
   const list=state.people[currentUnit]||[];
+
   if(!list.length){
     const span=document.createElement("div");
-    span.className="info";
-    span.style.margin="0";
-    span.textContent="이 구역의 성명 데이터가 없습니다.";
-    box.appendChild(span);
-    currentPerson="";
+    span.className="searchEmpty";
+    span.textContent="이 구역의 인원이 없습니다.";
+    personBox.appendChild(span);
     return;
   }
+
   if(!list.includes(currentPerson)) currentPerson=list[0];
+
   list.forEach(name=>{
     const b=document.createElement("button");
     b.textContent=name;
     b.className=name===currentPerson?"active":"";
-    b.onclick=()=>{currentPerson=name;renderAll()};
-    box.appendChild(b);
+    b.onclick=()=>{
+      currentPerson=name;
+      document.getElementById("searchModal").classList.remove("show");
+      renderAll();
+      document.getElementById("status").textContent=`👤 ${currentUnit} · ${currentPerson}`;
+    };
+    personBox.appendChild(b);
   });
 }
+
 function renderMain(){
   const mainText=document.getElementById("mainText");
   mainText.textContent=state.main?`${state.main.unit} · ${state.main.name}`:"미설정";
@@ -368,11 +613,9 @@ function renderCalendar(){
   }
 }
 function renderAll(){
-  renderCategories();
-  renderUnits();
-  renderPersons();
   renderMain();
   renderCalendar();
+  renderSearchNav();
 }
 
 function openEdit(date){
@@ -382,6 +625,91 @@ function openEdit(date){
   document.getElementById("editInput").value=getCode(currentPerson,date);
   document.getElementById("editModal").classList.add("show");
 }
+
+
+function getAllPeople(){
+  const all=[];
+  Object.entries(state.people).forEach(([unit,names])=>{
+    names.forEach(name=>{
+      all.push({
+        name,
+        unit,
+        category:groupOf(unit)
+      });
+    });
+  });
+  return all;
+}
+
+function renderSearchResults(query=""){
+  const box=document.getElementById("searchResults");
+  const q=String(query||"").trim().toLowerCase();
+
+  if(!q){
+    box.innerHTML='<div class="searchEmpty">이름을 입력하면 검색됩니다.</div>';
+    return;
+  }
+
+  const matches=getAllPeople().filter(p=>
+    p.name.toLowerCase().includes(q)
+  );
+
+  if(!matches.length){
+    box.innerHTML='<div class="searchEmpty">검색 결과가 없습니다.</div>';
+    return;
+  }
+
+  box.innerHTML="";
+  matches.forEach(p=>{
+    const btn=document.createElement("button");
+    btn.className="searchResultBtn";
+    btn.innerHTML=`
+      <span class="searchResultName">${escapeHtml(p.name)}</span>
+      <span class="searchResultUnit">${escapeHtml(p.unit)}</span>
+    `;
+    btn.onclick=()=>{
+      currentCategory=p.category;
+      currentUnit=p.unit;
+      currentPerson=p.name;
+      document.getElementById("searchModal").classList.remove("show");
+      renderAll();
+      document.getElementById("status").textContent=`🔎 ${p.unit} · ${p.name}`;
+    };
+    box.appendChild(btn);
+  });
+}
+
+document.getElementById("openSearch").onclick=()=>{
+  if(!getAllPeople().length){
+    document.getElementById("status").textContent="⚠️ 먼저 엑셀 근무표를 추가해주세요.";
+    return;
+  }
+  document.getElementById("searchNameInput").value="";
+  renderSearchResults("");
+  renderSearchNav();
+  document.getElementById("searchModal").classList.add("show");
+  setTimeout(()=>document.getElementById("searchNameInput").focus(),100);
+};
+
+document.getElementById("searchNameInput").addEventListener("input",e=>{
+  renderSearchResults(e.target.value);
+});
+
+document.getElementById("closeSearch").onclick=()=>{
+  document.getElementById("searchModal").classList.remove("show");
+};
+
+document.getElementById("clearSearch").onclick=()=>{
+  document.getElementById("searchNameInput").value="";
+  renderSearchResults("");
+  document.getElementById("searchNameInput").focus();
+};
+
+document.getElementById("searchModal").onclick=e=>{
+  if(e.target.id==="searchModal"){
+    document.getElementById("searchModal").classList.remove("show");
+  }
+};
 
 document.getElementById("excelFile").addEventListener("change",async e=>{
   const file=e.target.files[0];
@@ -464,7 +792,7 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
     pickFirst();
     renderAll();
 
-    status.textContent=`✅ ${file.name} · ${year}년 ${month}월 · ${personCount}명 · 스케줄 ${scheduleCount}칸`;
+    status.textContent=`✅ ${personCount}명 불러옴 · 검색 가능`;
   }catch(err){
     console.error(err);
     status.textContent="❌ 엑셀을 읽지 못했습니다.";
