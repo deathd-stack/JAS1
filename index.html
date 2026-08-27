@@ -1,8 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f26018">
 <title>JAS DUTY SCHEDULE</title>
@@ -428,12 +427,6 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
   .title{font-size:42px}
 }
 </style>
-
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png">
-<link rel="manifest" href="./manifest.webmanifest">
-
 </head>
 <body>
 
@@ -465,10 +458,8 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
       <div class="searchFileGrid">
         <button id="openSearch" class="compactActionBtn searchBtn">검색</button>
 
-        <label class="fileBtn compactFileBtn">
-          파일추가
-          <input id="excelFile" type="file" accept=".xls,.xlsx,.xlsm">
-        </label>
+        <button id="adminUploadBtn" class="fileBtn compactFileBtn" type="button">파일추가</button>
+        <input id="excelFile" type="file" accept=".xls,.xlsx,.xlsm" style="display:none">
       </div>
 
       <div class="compactSubText" id="status">
@@ -504,6 +495,20 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 </div>
 
 
+
+
+<div class="modal" id="adminPinModal">
+  <div class="sheet" style="max-width:420px">
+    <div class="handle"></div>
+    <div class="sheetTitle">관리자 확인</div>
+    <input id="adminPinInput" class="editInput" type="password" inputmode="numeric" maxlength="4" placeholder="비밀번호 4자리" autocomplete="off">
+    <div class="compactSubText" id="adminPinMessage" style="text-align:center;margin:4px 0 10px">엑셀 업데이트 권한 확인</div>
+    <div class="sheetActions">
+      <button id="cancelAdminPin">CLOSE</button>
+      <button id="confirmAdminPin" class="active">확인</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="mainPickerModal">
   <div class="sheet searchSheet">
@@ -862,6 +867,113 @@ document.getElementById("searchModal").onclick=e=>{
   }
 };
 
+
+const ADMIN_PIN="4656";
+let firebaseUnsubscribe=null;
+
+function applyRemoteSchedule(remote, year, month){
+  if(!remote){
+    state.year=year;
+    state.month=month;
+    state.people={};
+    state.schedules={};
+    state.blueA53={};
+    persist();
+    renderAll();
+    document.getElementById("status").textContent=`ℹ️ ${year}년 ${month}월 공유 근무표 없음`;
+    return;
+  }
+
+  state.year=Number(remote.year)||year;
+  state.month=Number(remote.month)||month;
+  state.people=remote.people||{};
+  state.schedules=remote.schedules||{};
+  state.blueA53=remote.blueA53||{};
+  persist();
+
+  if(state.main && (state.people[state.main.unit]||[]).includes(state.main.name)){
+    currentCategory=state.main.category;
+    currentUnit=state.main.unit;
+    currentPerson=state.main.name;
+  }else{
+    const firstUnit=Object.keys(state.people)[0]||"관리";
+    currentUnit=firstUnit;
+    currentCategory=groupOf(firstUnit);
+    pickFirst();
+  }
+
+  renderAll();
+  document.getElementById("status").textContent=`☁️ ${state.year}년 ${state.month}월 공유 근무표 동기화 완료`;
+}
+
+function watchFirebaseMonth(year, month){
+  if(!window.JASFirebase?.ready) return;
+
+  if(firebaseUnsubscribe){
+    try{ firebaseUnsubscribe(); }catch(e){}
+    firebaseUnsubscribe=null;
+  }
+
+  firebaseUnsubscribe=window.JASFirebase.watchMonth(
+    year,
+    month,
+    remote=>applyRemoteSchedule(remote, year, month),
+    ()=>document.getElementById("status").textContent="⚠️ Firebase 읽기 권한/연결 확인 필요"
+  );
+}
+
+function startFirebaseWatch(){
+  if(window.JASFirebase?.ready){
+    watchFirebaseMonth(viewDate.getFullYear(), viewDate.getMonth()+1);
+  }
+}
+
+window.addEventListener("jasFirebaseReady", startFirebaseWatch);
+setTimeout(startFirebaseWatch,1000);
+
+async function uploadCurrentScheduleToFirebase(){
+  if(!window.JASFirebase?.ready) throw new Error("Firebase not ready");
+
+  await window.JASFirebase.saveSchedule({
+    year:state.year,
+    month:state.month,
+    people:state.people,
+    schedules:state.schedules,
+    blueA53:state.blueA53||{}
+  });
+}
+
+document.getElementById("adminUploadBtn").onclick=()=>{
+  adminPinInput.value="";
+  adminPinMessage.textContent="엑셀 업데이트 권한 확인";
+  adminPinModal.classList.add("show");
+  setTimeout(()=>adminPinInput.focus(),100);
+};
+
+document.getElementById("cancelAdminPin").onclick=()=>adminPinModal.classList.remove("show");
+
+document.getElementById("confirmAdminPin").onclick=()=>{
+  if(adminPinInput.value.trim()!==ADMIN_PIN){
+    adminPinMessage.textContent="❌ 비밀번호가 맞지 않습니다.";
+    adminPinInput.select();
+    return;
+  }
+
+  adminPinModal.classList.remove("show");
+  excelFile.value="";
+  excelFile.click();
+};
+
+adminPinInput.addEventListener("keydown",e=>{
+  if(e.key==="Enter") confirmAdminPin.click();
+});
+
+adminPinModal.onclick=e=>{
+  if(e.target.id==="adminPinModal"){
+    adminPinModal.classList.remove("show");
+  }
+};
+
 document.getElementById("excelFile").addEventListener("change",async e=>{
   const file=e.target.files[0];
   if(!file)return;
@@ -1017,7 +1129,16 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
     pickFirst();
     renderAll();
 
-    status.textContent=`✅ ${personCount}명 불러옴 · A53 스타일 ${new Set(a53StyleRecords.map(x=>x.styleId)).size}종 · ALL53 ${Object.keys(blueA53).length}개 감지`;
+    status.textContent=`⏳ ${personCount}명 확인 · Firebase 공유 중...`;
+    try{
+      await uploadCurrentScheduleToFirebase();
+      status.textContent=`✅ ${year}년 ${month}월 전체 공유 완료 · ${personCount}명`;
+      viewDate=new Date(year,month-1,1);
+      watchFirebaseMonth(year,month);
+    }catch(syncErr){
+      console.error(syncErr);
+      status.textContent="⚠️ 엑셀은 읽었지만 Firebase 저장 실패 · Firestore 권한 확인 필요";
+    }
   }catch(err){
     console.error(err);
     status.textContent="❌ 엑셀을 읽지 못했습니다.";
@@ -1135,12 +1256,21 @@ document.getElementById("goMain").onclick=()=>{
   renderAll();
 };
 
-document.getElementById("prevMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);renderCalendar()};
-document.getElementById("nextMonth").onclick=()=>{viewDate.setMonth(viewDate.getMonth()+1);renderCalendar()};
+document.getElementById("prevMonth").onclick=()=>{
+  viewDate.setMonth(viewDate.getMonth()-1);
+  renderCalendar();
+  watchFirebaseMonth(viewDate.getFullYear(),viewDate.getMonth()+1);
+};
+document.getElementById("nextMonth").onclick=()=>{
+  viewDate.setMonth(viewDate.getMonth()+1);
+  renderCalendar();
+  watchFirebaseMonth(viewDate.getFullYear(),viewDate.getMonth()+1);
+};
 document.getElementById("todayBtn").onclick=()=>{
   const n=new Date();
   viewDate=new Date(n.getFullYear(),n.getMonth(),1);
   renderCalendar();
+  watchFirebaseMonth(viewDate.getFullYear(),viewDate.getMonth()+1);
 };
 
 document.getElementById("cancelEdit").onclick=()=>document.getElementById("editModal").classList.remove("show");
@@ -1172,5 +1302,44 @@ if(state.main&&(state.people[state.main.unit]||[]).includes(state.main.name)){
 }
 renderAll();
 </script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDto0AprR6IbnTNqNzZ3qt_-piJ_Cbqd_Y",
+  authDomain: "jasmemo-3c59b.firebaseapp.com",
+  projectId: "jasmemo-3c59b",
+  storageBucket: "jasmemo-3c59b.firebasestorage.app",
+  messagingSenderId: "891861551666",
+  appId: "1:891861551666:web:0b96ffcead52c73676ca2b",
+  measurementId: "G-0G4R112WVT"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+function monthDocId(year, month){
+  return `${year}-${String(month).padStart(2,"0")}`;
+}
+
+window.JASFirebase = {
+  ready: true,
+
+  async saveSchedule(payload){
+    const ref = doc(db, "jasDutySchedule", monthDocId(payload.year, payload.month));
+    await setDoc(ref, {...payload, updatedAt: serverTimestamp()});
+  },
+
+  watchMonth(year, month, callback, onError){
+    const ref = doc(db, "jasDutySchedule", monthDocId(year, month));
+    return onSnapshot(ref, snap => {
+      callback(snap.exists() ? snap.data() : null);
+    }, onError);
+  }
+};
+window.dispatchEvent(new Event("jasFirebaseReady"));
+</script>
+
 </body>
 </html>
