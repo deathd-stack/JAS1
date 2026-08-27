@@ -1,7 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f26018">
 <title>JAS DUTY SCHEDULE</title>
@@ -184,19 +185,19 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
   border-radius:999px;
 }
 
-/* í´ë¬´ */
+/* 휴무 */
 .dayOff::before{background:#d8dde5}
 
-/* ì°ì°¨ */
+/* 연차 */
 .dayLeave::before{background:#ffc247}
 
 /* R14 / R43 */
 .dayR::before{background:#b57dff}
 
-/* A ê³ì´ */
+/* A 계열 */
 .dayA::before{background:#489eff}
 
-/* P ê³ì´ */
+/* P 계열 */
 .dayP::before{background:#45d6a4}
 
 .bottom{
@@ -439,16 +440,16 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
   <div class="topHalfGrid">
 
     <div class="topHalfBox">
-      <div class="topHalfTitle">MAIN ì¤ì </div>
+      <div class="topHalfTitle">MAIN 설정</div>
 
       <div class="mainCompactRow">
         <button id="openMainPicker" class="compactActionBtn" style="width:100%">
-          ë©ì¸ ì í
+          메인 선택
         </button>
       </div>
 
       <div class="compactSubText">
-        MAIN : <span id="mainText" class="mainName">ë¯¸ì¤ì </span>
+        MAIN : <span id="mainText" class="mainName">미설정</span>
       </div>
     </div>
 
@@ -456,16 +457,16 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
       <div class="topHalfTitle">SEARCH / EXCEL</div>
 
       <div class="searchFileGrid">
-        <button id="openSearch" class="compactActionBtn searchBtn">ê²ì</button>
+        <button id="openSearch" class="compactActionBtn searchBtn">검색</button>
 
         <label class="fileBtn compactFileBtn">
-          íì¼ì¶ê°
+          파일추가
           <input id="excelFile" type="file" accept=".xls,.xlsx,.xlsm">
         </label>
       </div>
 
       <div class="compactSubText" id="status">
-        ì§ì ì°¾ê¸° ëë ê·¼ë¬´í ì¶ê°
+        직원 찾기 또는 근무표 추가
       </div>
     </div>
 
@@ -475,15 +476,15 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 
 <section class="card">
   <div class="current">
-    <div class="currentPerson" id="currentPerson">ì§ì ë¯¸ì í</div>
-    <div style="font-size:11px;color:#b9b9bf">ë ì§ë¥¼ ëë¥´ë©´ ìì </div>
+    <div class="currentPerson" id="currentPerson">직원 미선택</div>
+    <div style="font-size:11px;color:#b9b9bf">날짜를 누르면 수정</div>
   </div>
   <div class="monthBar">
     <button id="prevMonth">PREV</button>
     <div class="monthLabel" id="monthLabel">2026.08</div>
     <button id="nextMonth">NEXT</button>
   </div>
-  <div class="week"><div>ì¼</div><div>ì</div><div>í</div><div>ì</div><div>ëª©</div><div>ê¸</div><div>í </div></div>
+  <div class="week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
   <div class="calendar" id="calendar"></div>
 </section>
 </div>
@@ -492,7 +493,7 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
   <div class="bottomInner">
     <button id="todayBtn">TODAY</button>
     <button id="goMain" class="mainBtn">MAIN</button>
-    <button id="resetEdit">ìì  ì´ê¸°í</button>
+    <button id="resetEdit">수정 초기화</button>
   </div>
 </div>
 
@@ -501,20 +502,20 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 <div class="modal" id="mainPickerModal">
   <div class="sheet searchSheet">
     <div class="handle"></div>
-    <div class="sheetTitle">MAIN ì í</div>
+    <div class="sheetTitle">MAIN 선택</div>
 
-    <div class="searchSectionTitle">í° ì¹´íê³ ë¦¬</div>
+    <div class="searchSectionTitle">큰 카테고리</div>
     <div class="categories searchCategories" id="mainCategories"></div>
 
-    <div class="searchSectionTitle">ì¡° ì í</div>
+    <div class="searchSectionTitle">조 선택</div>
     <div class="scroll searchUnits" id="mainUnits"></div>
 
-    <div class="searchSectionTitle">ì±ëª</div>
+    <div class="searchSectionTitle">성명</div>
     <div class="scroll persons searchPersons" id="mainPersons"></div>
 
     <div class="sheetActions">
       <button id="closeMainPicker">CLOSE</button>
-      <button id="clearMainPicker" class="active">ì´ê¸°í</button>
+      <button id="clearMainPicker" class="active">초기화</button>
     </div>
   </div>
 </div>
@@ -522,29 +523,29 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 <div class="modal" id="searchModal">
   <div class="sheet searchSheet">
     <div class="handle"></div>
-    <div class="sheetTitle">ì§ì ì°¾ê¸°</div>
+    <div class="sheetTitle">직원 찾기</div>
 
-    <input id="searchNameInput" class="editInput" placeholder="ì±ëªì ìë ¥íì¸ì">
+    <input id="searchNameInput" class="editInput" placeholder="성명을 입력하세요">
 
     <div class="searchNavSection">
-      <div class="searchSectionTitle">êµ¬ì­ ì í</div>
+      <div class="searchSectionTitle">구역 선택</div>
       <div class="categories searchCategories" id="searchCategories"></div>
 
-      <div class="searchSectionTitle">ì¡° ì í</div>
+      <div class="searchSectionTitle">조 선택</div>
       <div class="scroll searchUnits" id="searchUnits"></div>
 
-      <div class="searchSectionTitle">ì¸ì</div>
+      <div class="searchSectionTitle">인원</div>
       <div class="scroll persons searchPersons" id="searchPersons"></div>
     </div>
 
-    <div class="searchSectionTitle">ê²ì ê²°ê³¼</div>
+    <div class="searchSectionTitle">검색 결과</div>
     <div id="searchResults" class="searchResults">
-      <div class="searchEmpty">ì´ë¦ì ìë ¥íë©´ ê²ìë©ëë¤.</div>
+      <div class="searchEmpty">이름을 입력하면 검색됩니다.</div>
     </div>
 
     <div class="sheetActions">
       <button id="closeSearch">CLOSE</button>
-      <button id="clearSearch" class="active">ê²ì ì§ì°ê¸°</button>
+      <button id="clearSearch" class="active">검색 지우기</button>
     </div>
   </div>
 </div>
@@ -552,8 +553,8 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 <div class="modal" id="editModal">
   <div class="sheet">
     <div class="handle"></div>
-    <div class="sheetTitle" id="editTitle">ê·¼ë¬´ ìì </div>
-    <input id="editInput" class="editInput" placeholder="ì: A7 / P14 / R">
+    <div class="sheetTitle" id="editTitle">근무 수정</div>
+    <input id="editInput" class="editInput" placeholder="예: A7 / P14 / R">
     <div class="sheetActions">
       <button id="cancelEdit">CLOSE</button>
       <button id="saveEdit" class="active">SAVE</button>
@@ -563,11 +564,11 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 
 <script>
 const STRUCTURE={
-  "ê´ë¦¬":["ê´ë¦¬"],
-  "ìì°":["ìì°1","ìì°2","ìì°3"],
-  "1ê·¸ë£¹":["1ì¡°","2ì¡°","3ì¡°","4ì¡°","5ì¡°","6ì¡°","7ì¡°","8ì¡°"],
-  "2ê·¸ë£¹":["9ì¡°","10ì¡°","11ì¡°","12ì¡°","13ì¡°","14ì¡°","15ì¡°","16ì¡°"],
-  "3ê·¸ë£¹":["17ì¡°","18ì¡°","19ì¡°","20ì¡°","21ì¡°","22ì¡°","23ì¡°","24ì¡°"]
+  "관리":["관리"],
+  "소산":["소산1","소산2","소산3"],
+  "1그룹":["1조","2조","3조","4조","5조","6조","7조","8조"],
+  "2그룹":["9조","10조","11조","12조","13조","14조","15조","16조"],
+  "3그룹":["17조","18조","19조","20조","21조","22조","23조","24조"]
 };
 
 let state={
@@ -587,8 +588,8 @@ try{
 
 state.blueA53=state.blueA53||{};
 
-let currentCategory="1ê·¸ë£¹";
-let currentUnit="1ì¡°";
+let currentCategory="1그룹";
+let currentUnit="1조";
 let currentPerson="";
 let viewDate=new Date(state.year,state.month-1,1);
 let editingDate="";
@@ -600,12 +601,12 @@ function persist(){
   }catch(e){return false}
 }
 function groupOf(unit){
-  if(unit==="ê´ë¦¬") return "ê´ë¦¬";
-  if(unit.startsWith("ìì°")) return "ìì°";
+  if(unit==="관리") return "관리";
+  if(unit.startsWith("소산")) return "소산";
   const n=parseInt(unit);
-  if(n<=8)return "1ê·¸ë£¹";
-  if(n<=16)return "2ê·¸ë£¹";
-  return "3ê·¸ë£¹";
+  if(n<=8)return "1그룹";
+  if(n<=16)return "2그룹";
+  return "3그룹";
 }
 function dateKey(y,m,d){
   return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
@@ -614,8 +615,8 @@ function editKey(name,date){return name+"::"+date}
 function displayCode(code){
   const v=String(code||"").trim().toUpperCase();
 
-  if(v==="R") return "í´ë¬´";
-  if(v==="L") return "ì°ì°¨";
+  if(v==="R") return "휴무";
+  if(v==="L") return "연차";
   if(v==="RA43") return "R43";
   if(v==="RP14") return "R14";
 
@@ -625,21 +626,21 @@ function displayCode(code){
 function scheduleClass(rawCode, shownCode){
   const raw=String(rawCode||"").trim().toUpperCase();
 
-  // 1. í´ë¬´
+  // 1. 휴무
   if(raw==="R") return "dayOff";
 
-  // 2. ì°ì°¨
+  // 2. 연차
   if(raw==="L") return "dayLeave";
 
   // 3. R14 / R43
   if(raw==="RA43" || raw==="RP14" || shownCode==="R14" || shownCode==="R43")
     return "dayR";
 
-  // 4. Aë¡ ììíë ê·¼ë¬´ (ALL53 í¬í¨)
+  // 4. A로 시작하는 근무 (ALL53 포함)
   if(raw.startsWith("A") || shownCode==="ALL53")
     return "dayA";
 
-  // 5. Pë¡ ììíë ê·¼ë¬´
+  // 5. P로 시작하는 근무
   if(raw.startsWith("P"))
     return "dayP";
 
@@ -682,7 +683,7 @@ function renderSearchNav(){
   unitBox.innerHTML="";
   STRUCTURE[currentCategory].forEach(unit=>{
     const b=document.createElement("button");
-    b.textContent=currentCategory.includes("ê·¸ë£¹")?unit.replace("ì¡°",""):unit;
+    b.textContent=currentCategory.includes("그룹")?unit.replace("조",""):unit;
     b.className=unit===currentUnit?"active":"";
     b.onclick=()=>{
       currentUnit=unit;
@@ -698,7 +699,7 @@ function renderSearchNav(){
   if(!list.length){
     const span=document.createElement("div");
     span.className="searchEmpty";
-    span.textContent="ì´ êµ¬ì­ì ì¸ìì´ ììµëë¤.";
+    span.textContent="이 구역의 인원이 없습니다.";
     personBox.appendChild(span);
     return;
   }
@@ -713,7 +714,7 @@ function renderSearchNav(){
       currentPerson=name;
       document.getElementById("searchModal").classList.remove("show");
       renderAll();
-      document.getElementById("status").textContent=`ð¤ ${currentUnit} Â· ${currentPerson}`;
+      document.getElementById("status").textContent=`👤 ${currentUnit} · ${currentPerson}`;
     };
     personBox.appendChild(b);
   });
@@ -721,14 +722,14 @@ function renderSearchNav(){
 
 function renderMain(){
   const mainText=document.getElementById("mainText");
-  mainText.textContent=state.main?`${state.main.unit} Â· ${state.main.name}`:"ë¯¸ì¤ì ";
+  mainText.textContent=state.main?`${state.main.unit} · ${state.main.name}`:"미설정";
 }
 function renderCalendar(){
   const box=document.getElementById("calendar");
   box.innerHTML="";
   const y=viewDate.getFullYear(),m=viewDate.getMonth();
   document.getElementById("monthLabel").textContent=`${y}.${String(m+1).padStart(2,"0")}`;
-  document.getElementById("currentPerson").textContent=currentPerson?`${currentUnit} Â· ${currentPerson}`:"ì§ì ë¯¸ì í";
+  document.getElementById("currentPerson").textContent=currentPerson?`${currentUnit} · ${currentPerson}`:"직원 미선택";
 
   const first=new Date(y,m,1).getDay();
   const last=new Date(y,m+1,0).getDate();
@@ -744,7 +745,7 @@ function renderCalendar(){
     const date=dateKey(y,m,day);
     const dow=new Date(y,m,day).getDay();
     const code=currentPerson?getCode(currentPerson,date):"";
-    const blueA53Key=currentPerson?editKey(currentPerson,date):""; // ë¹í°ì A53 íì í¤
+    const blueA53Key=currentPerson?editKey(currentPerson,date):""; // 비흰색 A53 표시 키
     const shownCode=(/^A53$/i.test(String(code).trim()) && state.blueA53[blueA53Key]) ? "ALL53" : displayCode(code);
     const codeClass=scheduleClass(code,shownCode);
     const d=document.createElement("div");
@@ -765,7 +766,7 @@ function renderAll(){
 function openEdit(date){
   if(!currentPerson)return;
   editingDate=date;
-  document.getElementById("editTitle").textContent=`${currentPerson} Â· ${date}`;
+  document.getElementById("editTitle").textContent=`${currentPerson} · ${date}`;
   document.getElementById("editInput").value=getCode(currentPerson,date);
   document.getElementById("editModal").classList.add("show");
 }
@@ -790,7 +791,7 @@ function renderSearchResults(query=""){
   const q=String(query||"").trim().toLowerCase();
 
   if(!q){
-    box.innerHTML='<div class="searchEmpty">ì´ë¦ì ìë ¥íë©´ ê²ìë©ëë¤.</div>';
+    box.innerHTML='<div class="searchEmpty">이름을 입력하면 검색됩니다.</div>';
     return;
   }
 
@@ -799,7 +800,7 @@ function renderSearchResults(query=""){
   );
 
   if(!matches.length){
-    box.innerHTML='<div class="searchEmpty">ê²ì ê²°ê³¼ê° ììµëë¤.</div>';
+    box.innerHTML='<div class="searchEmpty">검색 결과가 없습니다.</div>';
     return;
   }
 
@@ -817,7 +818,7 @@ function renderSearchResults(query=""){
       currentPerson=p.name;
       document.getElementById("searchModal").classList.remove("show");
       renderAll();
-      document.getElementById("status").textContent=`ð ${p.unit} Â· ${p.name}`;
+      document.getElementById("status").textContent=`🔎 ${p.unit} · ${p.name}`;
     };
     box.appendChild(btn);
   });
@@ -825,7 +826,7 @@ function renderSearchResults(query=""){
 
 document.getElementById("openSearch").onclick=()=>{
   if(!getAllPeople().length){
-    document.getElementById("status").textContent="â ï¸ ë¨¼ì  ìì ê·¼ë¬´íë¥¼ ì¶ê°í´ì£¼ì¸ì.";
+    document.getElementById("status").textContent="⚠️ 먼저 엑셀 근무표를 추가해주세요.";
     return;
   }
   document.getElementById("searchNameInput").value="";
@@ -867,7 +868,7 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
       cellDates:true,
       cellStyles:true
     });
-    const sheetName=wb.SheetNames.find(n=>n.includes("ì¤ì¼ì¥´")||n.includes("ì¤ì¼ì¤"))||wb.SheetNames[0];
+    const sheetName=wb.SheetNames.find(n=>n.includes("스케쥴")||n.includes("스케줄"))||wb.SheetNames[0];
     const ws=wb.Sheets[sheetName];
     const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:true});
 
@@ -882,14 +883,14 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
     const a53StyleRecords=[];
     let personCount=0, scheduleCount=0;
 
-    // í ë²í¸ ê³ ì  ìì´ í êµ¬ì¡°ë¡ ìë ì¸ì
-    // Bì´ì ê´ë¦¬/ìì°1~3/1~24ì¡°ê° ëì¤ë©´ í´ë¹ êµ¬ì­ ìì.
-    // Bì´ì ê·¸ ì¸ ë¤ë¥¸ êµ¬ì­ëª(ì ì/ë³ê°/ì¡í´/íê²¬/í´ì¬ ë±)ì´ ëì¤ë©´
-    // ì´ì  ì¡°/êµ¬ì­ ìì§ì ì¦ì ì¢ë£íë¤.
+    // 행 번호 고정 없이 표 구조로 자동 인식
+    // B열에 관리/소산1~3/1~24조가 나오면 해당 구역 시작.
+    // B열에 그 외 다른 구역명(신입/병가/육휴/파견/퇴사 등)이 나오면
+    // 이전 조/구역 수집을 즉시 종료한다.
     const validDuty = v =>
-      v==="ê´ë¦¬" ||
-      /^ìì°[1-3]$/.test(v) ||
-      /^(?:[1-9]|1[0-9]|2[0-4])ì¡°$/.test(v);
+      v==="관리" ||
+      /^소산[1-3]$/.test(v) ||
+      /^(?:[1-9]|1[0-9]|2[0-4])조$/.test(v);
 
     let insideMainTable=false;
 
@@ -901,14 +902,14 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
         currentDuty=duty;
         insideMainTable=true;
       }else if(duty && insideMainTable){
-        // ê´ë¦¬/ìì°/1~24ì¡°ê° ìë ì êµ¬ì­ëªì´ ëíëë©´
-        // íì¬ ì¡°ì ì°ì êµ¬ê°ì´ ëë ê²ì¼ë¡ ì²ë¦¬
+        // 관리/소산/1~24조가 아닌 새 구역명이 나타나면
+        // 현재 조의 연속 구간이 끝난 것으로 처리
         currentDuty="";
         insideMainTable=false;
       }
 
       if(!insideMainTable || !currentDuty) continue;
-      if(!name || name==="ì±ëª" || name.includes("í©ê³")) continue;
+      if(!name || name==="성명" || name.includes("합계")) continue;
 
       people[currentDuty]??=[];
       if(!people[currentDuty].includes(name)){
@@ -919,24 +920,24 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
       schedules[name]??={};
 
       for(let day=1;day<=31;day++){
-        const value=rows[r]?.[10+(day-1)]; // Kì´=1ì¼, AOì´=31ì¼
+        const value=rows[r]?.[10+(day-1)]; // K열=1일, AO열=31일
         if(value===undefined||value===null||String(value).trim()==="")continue;
 
         const date=`${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
         const code=String(value).trim();
         schedules[name][date]=code;
 
-        // A53ë ì ì¤íì¼ IDë¡ êµ¬ë¶íë¤.
-        // ê°ì íì¼ ììì A53 ìë¤ì ì¤íì¼ ë²í¸ë¥¼ ëª¨ì ë¤,
-        // ê°ì¥ ë§ì´ ì°ì´ë ì¤íì¼ì "ì¼ë° A53"ì¼ë¡ ë³´ê³ 
-        // ë¤ë¥¸ ì¤íì¼ì A53ë ALL53 íë³´ë¡ ì ì¥íë¤.
+        // A53는 셀 스타일 ID로 구분한다.
+        // 같은 파일 안에서 A53 셀들의 스타일 번호를 모은 뒤,
+        // 가장 많이 쓰이는 스타일을 "일반 A53"으로 보고
+        // 다른 스타일의 A53는 ALL53 후보로 저장한다.
         if(/^A53$/i.test(code)){
           const cellAddress=XLSX.utils.encode_cell({r:r,c:10+(day-1)});
           const cell=ws[cellAddress];
 
           let styleId=null;
 
-          // SheetJS ë²ì ì ë°ë¼ sê° ì«ìì¼ ìë ìê³  ê°ì²´ì¼ ìë ìì
+          // SheetJS 버전에 따라 s가 숫자일 수도 있고 객체일 수도 있음
           if(cell){
             if(typeof cell.s==="number"){
               styleId=cell.s;
@@ -968,9 +969,9 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
       }
     }
 
-    // A53 ì¤íì¼ ë¶ë¥:
-    // ê°ì¥ ë§ì´ ë±ì¥í ì¤íì¼ = ì¼ë° A53
-    // ê·¸ ì¸ ì¤íì¼ = ALL53
+    // A53 스타일 분류:
+    // 가장 많이 등장한 스타일 = 일반 A53
+    // 그 외 스타일 = ALL53
     if(a53StyleRecords.length){
       const counts={};
       a53StyleRecords.forEach(x=>{
@@ -1003,25 +1004,25 @@ document.getElementById("excelFile").addEventListener("change",async e=>{
     viewDate=new Date(year,month-1,1);
 
     if(!(state.people[currentUnit]||[]).length){
-      const firstUnit=Object.keys(people)[0]||"ê´ë¦¬";
+      const firstUnit=Object.keys(people)[0]||"관리";
       currentUnit=firstUnit;
       currentCategory=groupOf(firstUnit);
     }
     pickFirst();
     renderAll();
 
-    status.textContent=`â ${personCount}ëª ë¶ë¬ì´ Â· A53 ì¤íì¼ ${new Set(a53StyleRecords.map(x=>x.styleId)).size}ì¢ Â· ALL53 ${Object.keys(blueA53).length}ê° ê°ì§`;
+    status.textContent=`✅ ${personCount}명 불러옴 · A53 스타일 ${new Set(a53StyleRecords.map(x=>x.styleId)).size}종 · ALL53 ${Object.keys(blueA53).length}개 감지`;
   }catch(err){
     console.error(err);
-    status.textContent="â ììì ì½ì§ ëª»íìµëë¤.";
+    status.textContent="❌ 엑셀을 읽지 못했습니다.";
   }
 });
 
 
 
 
-let mainPickCategory="1ê·¸ë£¹";
-let mainPickUnit="1ì¡°";
+let mainPickCategory="1그룹";
+let mainPickUnit="1조";
 
 function renderMainPicker(){
   const catBox=document.getElementById("mainCategories");
@@ -1046,7 +1047,7 @@ function renderMainPicker(){
   unitBox.innerHTML="";
   STRUCTURE[mainPickCategory].forEach(unit=>{
     const b=document.createElement("button");
-    b.textContent=mainPickCategory.includes("ê·¸ë£¹")?unit.replace("ì¡°",""):unit;
+    b.textContent=mainPickCategory.includes("그룹")?unit.replace("조",""):unit;
     b.className=unit===mainPickUnit?"active":"";
     b.onclick=()=>{
       mainPickUnit=unit;
@@ -1061,7 +1062,7 @@ function renderMainPicker(){
   if(!names.length){
     const empty=document.createElement("div");
     empty.className="searchEmpty";
-    empty.textContent="ì´ ì¡°ì ì±ëªì´ ììµëë¤.";
+    empty.textContent="이 조의 성명이 없습니다.";
     personBox.appendChild(empty);
     return;
   }
@@ -1077,7 +1078,7 @@ function renderMainPicker(){
       persist();
       document.getElementById("mainPickerModal").classList.remove("show");
       renderAll();
-      document.getElementById("status").textContent=`â MAIN ì¤ì  : ${mainPickUnit} Â· ${name}`;
+      document.getElementById("status").textContent=`✅ MAIN 설정 : ${mainPickUnit} · ${name}`;
     };
     personBox.appendChild(b);
   });
@@ -1085,7 +1086,7 @@ function renderMainPicker(){
 
 document.getElementById("openMainPicker").onclick=()=>{
   if(!Object.keys(state.people).length){
-    document.getElementById("status").textContent="â ï¸ ë¨¼ì  ìì ê·¼ë¬´íë¥¼ ì¶ê°í´ì£¼ì¸ì.";
+    document.getElementById("status").textContent="⚠️ 먼저 엑셀 근무표를 추가해주세요.";
     return;
   }
 
@@ -1093,8 +1094,8 @@ document.getElementById("openMainPicker").onclick=()=>{
     mainPickCategory=state.main.category;
     mainPickUnit=state.main.unit;
   }else{
-    mainPickCategory="1ê·¸ë£¹";
-    mainPickUnit="1ì¡°";
+    mainPickCategory="1그룹";
+    mainPickUnit="1조";
   }
 
   renderMainPicker();
@@ -1106,8 +1107,8 @@ document.getElementById("closeMainPicker").onclick=()=>{
 };
 
 document.getElementById("clearMainPicker").onclick=()=>{
-  mainPickCategory="1ê·¸ë£¹";
-  mainPickUnit="1ì¡°";
+  mainPickCategory="1그룹";
+  mainPickUnit="1조";
   renderMainPicker();
 };
 
@@ -1119,7 +1120,7 @@ document.getElementById("mainPickerModal").onclick=e=>{
 
 document.getElementById("goMain").onclick=()=>{
   if(!state.main){
-    document.getElementById("status").textContent="â ï¸ MAINì´ ìì§ ì¤ì ëì§ ìììµëë¤.";
+    document.getElementById("status").textContent="⚠️ MAIN이 아직 설정되지 않았습니다.";
     return;
   }
   currentCategory=state.main.category;
@@ -1149,7 +1150,7 @@ document.getElementById("saveEdit").onclick=()=>{
 };
 document.getElementById("resetEdit").onclick=()=>{
   if(!currentPerson)return;
-  if(!confirm(`${currentPerson}ì ì§ì  ìì í ê·¼ë¬´ë§ ì´ê¸°íí ê¹ì?`))return;
+  if(!confirm(`${currentPerson}의 직접 수정한 근무만 초기화할까요?`))return;
   Object.keys(state.edits).forEach(k=>{
     if(k.startsWith(currentPerson+"::"))delete state.edits[k];
   });
