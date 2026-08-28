@@ -688,10 +688,10 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 }
 </style>
 
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=31">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=31">
-<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=31">
-<link rel="manifest" href="./manifest.webmanifest?v=31">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=32">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=32">
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=32">
+<link rel="manifest" href="./manifest.webmanifest?v=32">
 
 
 <style id="v25-font-size-tuning">
@@ -888,13 +888,12 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
     <div class="sheetTitle" id="groupDetailTitle">조 전체 상세</div>
 
     <div class="groupDetailCommon">
-      <div class="groupDetailLabel">공통 스케줄</div>
+      <div class="groupDetailLabel">그날 기본 스케줄</div>
       <div class="groupDetailCommonCode" id="groupDetailCommonCode">-</div>
     </div>
 
     <div class="groupDetailLegend">
-      <span>● 공통</span>
-      <span class="groupDetailDifferent">● 다른 스케줄</span>
+      <span class="groupDetailDifferent">● 특이사항만 표시</span>
     </div>
 
     <div class="groupDetailList" id="groupDetailList"></div>
@@ -1150,6 +1149,18 @@ function shownCodeFor(name,date){
     : displayCode(raw);
 }
 
+function groupActualCode(name,date){
+  const raw=String(getCode(name,date)||"").trim();
+  const specialKey=editKey(name,date);
+
+  if(/^R$/i.test(raw)) return "휴무";
+  if(/^L$/i.test(raw)) return "연차";
+  if(/^A53$/i.test(raw) && state.blueA53 && state.blueA53[specialKey]) return "All53";
+
+  // R14/R43 같은 R근무는 휴무로 바꾸지 않고 실제 코드 그대로 보여준다.
+  return displayCode(raw);
+}
+
 function groupDaySummary(unit,date){
   const names=state.people[unit]||[];
   if(!names.length) return {common:"",diffs:[]};
@@ -1184,14 +1195,17 @@ function groupDaySummary(unit,date){
   });
 
   // 전체 화면의 기본 패턴이 휴무일 때:
-  // 원본이 정확히 R인 사람은 일반 휴무이므로 제외.
-  // R14/R43 등 R근무 및 다른 실제 근무코드는 특이사항으로 표시.
+  // 정확히 R = 진짜 휴무, L = 연차이므로 특이사항에서 제외.
+  // R14/R43/P/A 등 실제 근무자만 특이사항으로 표시.
   if(common==="휴무"){
     return {
       common,
       diffs:rows.filter(row=>{
         const raw=String(row.raw||"").trim();
-        return raw!=="" && !/^R$/i.test(raw);
+        if(!raw) return false;
+        if(/^R$/i.test(raw)) return false;
+        if(/^L$/i.test(raw)) return false;
+        return true;
       })
     };
   }
@@ -1775,14 +1789,13 @@ function openGroupDetail(date){
 
   groupDetailDate=date;
   const summary=groupDaySummary(currentUnit,date);
-  const names=state.people[currentUnit]||[];
 
   const parts=date.split("-");
   const month=Number(parts[1]);
   const day=Number(parts[2]);
 
   document.getElementById("groupDetailTitle").textContent=
-    `${currentUnit} · ${month}월 ${day}일 전체`;
+    `${currentUnit} · ${month}월 ${day}일 특이사항`;
 
   document.getElementById("groupDetailCommonCode").textContent=
     summary.common || "—";
@@ -1790,21 +1803,22 @@ function openGroupDetail(date){
   const list=document.getElementById("groupDetailList");
   list.innerHTML="";
 
-  if(!names.length){
+  const exceptions=summary.diffs||[];
+
+  if(!exceptions.length){
     const empty=document.createElement("div");
     empty.className="searchEmpty";
-    empty.textContent="이 조의 인원이 없습니다.";
+    empty.textContent="특이사항이 없습니다.";
     list.appendChild(empty);
   }else{
-    names.forEach(name=>{
-      const code=shownCodeFor(name,date) || "—";
-      const different=code!==summary.common;
+    exceptions.forEach(item=>{
+      const actualCode=groupActualCode(item.name,date) || "—";
 
       const row=document.createElement("div");
-      row.className="groupDetailRow"+(different?" isDifferent":"");
+      row.className="groupDetailRow isDifferent";
       row.innerHTML=`
-        <div class="groupDetailName">${escapeHtml(name)}</div>
-        <div class="groupDetailCode">${escapeHtml(code)}</div>
+        <div class="groupDetailName">${escapeHtml(item.name)}</div>
+        <div class="groupDetailCode">${escapeHtml(actualCode)}</div>
       `;
       list.appendChild(row);
     });
@@ -2015,7 +2029,7 @@ window.dispatchEvent(new Event("jasFirebaseReady"));
 
 
 <script id="v29-cache-refresh">
-window.__JAS_BUILD__ = "v31";
+window.__JAS_BUILD__ = "v32";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
@@ -2027,10 +2041,10 @@ if ("serviceWorker" in navigator) {
 
       // If this page is controlled by an older SW, force one clean reload
       // after controller changes. localStorage data is not touched.
-      let reloaded = sessionStorage.getItem("jas-v31-reloaded") === "1";
+      let reloaded = sessionStorage.getItem("jas-v32-reloaded") === "1";
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         if (!reloaded) {
-          sessionStorage.setItem("jas-v31-reloaded", "1");
+          sessionStorage.setItem("jas-v32-reloaded", "1");
           location.reload();
         }
       });
@@ -2043,12 +2057,12 @@ if ("serviceWorker" in navigator) {
 
       // Re-register current sw.js with a cache-busting query.
       try {
-        await navigator.serviceWorker.register("./sw.js?v=31");
+        await navigator.serviceWorker.register("./sw.js?v=32");
       } catch (_) {}
 
       // If we were already on the new page, don't loop.
       if (!reloaded) {
-        sessionStorage.setItem("jas-v31-reloaded", "1");
+        sessionStorage.setItem("jas-v32-reloaded", "1");
       }
     } catch (_) {}
   });
