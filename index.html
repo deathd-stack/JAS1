@@ -402,12 +402,67 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 }
 
 
-.overtimePickerWrap{display:grid;grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);align-items:center;gap:6px;margin:10px 0 8px}
-.overtimePickerLabel{text-align:center;color:var(--orange2);font-size:11px;font-weight:1000;margin-bottom:6px}
-.overtimePickerColon{text-align:center;color:#fff;font-size:28px;font-weight:1000;padding-top:18px}
-.overtimeWheel{width:100%;height:180px;padding:0;border-radius:18px;background:#08080b;border:1px solid rgba(255,161,84,.28);color:#fff;font-size:21px;font-weight:1000;text-align:center;overflow:auto}
-.overtimeWheel option{padding:8px 0;text-align:center;background:#08080b;color:#fff}
-.overtimeSelected{text-align:center;margin:10px 0 4px;color:#ff9c57;font-size:20px;font-weight:1000}
+.overtimeSheet{
+  width:min(92vw,380px);
+  padding-top:12px;
+}
+.overtimePickerWrap{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);
+  align-items:center;
+  gap:5px;
+  width:min(82%,300px);
+  margin:6px auto 4px;
+}
+
+.overtimePickerCol{
+  min-width:0;
+}
+
+.overtimePickerLabel{
+  text-align:center;
+  color:var(--orange2);
+  font-size:10px;
+  font-weight:1000;
+  margin-bottom:4px;
+}
+
+.overtimePickerColon{
+  text-align:center;
+  color:#fff;
+  font-size:20px;
+  font-weight:1000;
+  padding-top:13px;
+}
+
+.overtimeWheel{
+  width:100%;
+  height:108px;
+  padding:0;
+  border-radius:14px;
+  background:#08080b;
+  border:1px solid rgba(255,161,84,.24);
+  color:#fff;
+  font-size:17px;
+  font-weight:1000;
+  text-align:center;
+  overflow:auto;
+}
+
+.overtimeWheel option{
+  padding:5px 0;
+  text-align:center;
+  background:#08080b;
+  color:#fff;
+}
+
+.overtimeSelected{
+  text-align:center;
+  margin:7px 0 2px;
+  color:#ff9c57;
+  font-size:16px;
+  font-weight:1000;
+}
 .overtimeActions{grid-template-columns:1fr 1fr 1fr}
 .overtimeTotalBox{margin:8px 0 12px;padding:15px;text-align:center;border-radius:18px;background:rgba(255,145,70,.08);border:1px solid rgba(255,161,84,.22)}
 .overtimeTotalLabel{color:#aaaab3;font-size:11px;font-weight:900;margin-bottom:4px}
@@ -460,6 +515,107 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 
 .groupAllBtn.active{
   color:#fff!important;
+}
+
+
+.groupDetailSheet{
+  width:min(94vw,520px);
+}
+
+.groupDetailCommon{
+  text-align:center;
+  padding:12px;
+  margin:4px 0 8px;
+  border-radius:17px;
+  background:rgba(255,145,70,.07);
+  border:1px solid rgba(255,161,84,.20);
+}
+
+.groupDetailLabel{
+  color:#aaaab3;
+  font-size:10px;
+  font-weight:900;
+  margin-bottom:3px;
+}
+
+.groupDetailCommonCode{
+  color:#ff9c57;
+  font-size:24px;
+  font-weight:1000;
+}
+
+.groupDetailLegend{
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+  margin:4px 2px 8px;
+  color:#b9b9bf;
+  font-size:9px;
+  font-weight:900;
+}
+
+.groupDetailDifferent{
+  color:#ff9c57;
+}
+
+.groupDetailList{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  max-height:44vh;
+  overflow:auto;
+}
+
+.groupDetailRow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  min-height:44px;
+  padding:9px 12px;
+  border-radius:14px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.05);
+}
+
+.groupDetailRow.isDifferent{
+  border-color:rgba(255,156,87,.38);
+  background:rgba(255,145,70,.055);
+}
+
+.groupDetailName{
+  min-width:0;
+  color:#fff;
+  font-size:13px;
+  font-weight:1000;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.groupDetailCode{
+  color:#dcdce2;
+  font-size:13px;
+  font-weight:1000;
+  white-space:nowrap;
+}
+
+.groupDetailRow.isDifferent .groupDetailCode{
+  color:#ff9c57;
+}
+
+.groupDay{
+  cursor:pointer;
+}
+
+.groupDay::after{
+  content:"탭";
+  position:absolute;
+  right:6px;
+  bottom:5px;
+  color:rgba(255,255,255,.28);
+  font-size:7px;
+  font-weight:900;
 }
 
 @media(max-width:600px){
@@ -545,7 +701,7 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 <section class="card">
   <div class="current">
     <div class="currentPerson" id="currentPerson">직원 미선택</div>
-    <div style="font-size:11px;color:#b9b9bf">날짜를 누르면 수정</div>
+    <div id="calendarHint" style="font-size:11px;color:#b9b9bf">날짜를 누르면 연장시간</div>
   </div>
   <div class="monthBar">
     <button id="prevMonth">PREV</button>
@@ -632,6 +788,31 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
   </div>
 </div>
 
+
+
+<div class="modal" id="groupDetailModal">
+  <div class="sheet searchSheet groupDetailSheet">
+    <div class="handle"></div>
+    <div class="sheetTitle" id="groupDetailTitle">조 전체 상세</div>
+
+    <div class="groupDetailCommon">
+      <div class="groupDetailLabel">공통 스케줄</div>
+      <div class="groupDetailCommonCode" id="groupDetailCommonCode">-</div>
+    </div>
+
+    <div class="groupDetailLegend">
+      <span>● 공통</span>
+      <span class="groupDetailDifferent">● 다른 스케줄</span>
+    </div>
+
+    <div class="groupDetailList" id="groupDetailList"></div>
+
+    <div class="sheetActions">
+      <button id="closeGroupDetail">CLOSE</button>
+      <button id="groupDetailSearch" class="active">직원 검색</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="overtimeModal">
   <div class="sheet overtimeSheet">
@@ -952,7 +1133,7 @@ function renderCalendar(){
         <div class="groupCommonCode">${escapeHtml(common||"—")}</div>
         ${diffHtml?`<div class="groupDiffs">${diffHtml}</div>`:""}
       `;
-      // 전체보기에서는 날짜 수정/연장시간 입력을 막음
+      d.onclick=()=>openGroupDetail(date);
     }else{
       const code=currentPerson?getCode(currentPerson,date):"";
       const blueA53Key=currentPerson?editKey(currentPerson,date):"";
@@ -1465,6 +1646,68 @@ document.getElementById("goMain").onclick=()=>{
   renderAll();
 };
 
+
+
+let groupDetailDate="";
+
+function openGroupDetail(date){
+  if(!groupView) return;
+
+  groupDetailDate=date;
+  const summary=groupDaySummary(currentUnit,date);
+  const names=state.people[currentUnit]||[];
+
+  const parts=date.split("-");
+  const month=Number(parts[1]);
+  const day=Number(parts[2]);
+
+  document.getElementById("groupDetailTitle").textContent=
+    `${currentUnit} · ${month}월 ${day}일 전체`;
+
+  document.getElementById("groupDetailCommonCode").textContent=
+    summary.common || "—";
+
+  const list=document.getElementById("groupDetailList");
+  list.innerHTML="";
+
+  if(!names.length){
+    const empty=document.createElement("div");
+    empty.className="searchEmpty";
+    empty.textContent="이 조의 인원이 없습니다.";
+    list.appendChild(empty);
+  }else{
+    names.forEach(name=>{
+      const code=shownCodeFor(name,date) || "—";
+      const different=code!==summary.common;
+
+      const row=document.createElement("div");
+      row.className="groupDetailRow"+(different?" isDifferent":"");
+      row.innerHTML=`
+        <div class="groupDetailName">${escapeHtml(name)}</div>
+        <div class="groupDetailCode">${escapeHtml(code)}</div>
+      `;
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById("groupDetailModal").classList.add("show");
+}
+
+document.getElementById("closeGroupDetail").onclick=()=>{
+  document.getElementById("groupDetailModal").classList.remove("show");
+};
+
+document.getElementById("groupDetailSearch").onclick=()=>{
+  document.getElementById("groupDetailModal").classList.remove("show");
+  renderSearchNav();
+  document.getElementById("searchModal").classList.add("show");
+};
+
+document.getElementById("groupDetailModal").onclick=e=>{
+  if(e.target.id==="groupDetailModal"){
+    document.getElementById("groupDetailModal").classList.remove("show");
+  }
+};
 
 let overtimeDate="";
 function buildOvertimeWheels(){ const h=document.getElementById("overtimeHour"),m=document.getElementById("overtimeMinute"); if(!h.options.length){for(let i=0;i<=12;i++){const o=document.createElement("option");o.value=String(i);o.textContent=String(i).padStart(2,"0");h.appendChild(o)}} if(!m.options.length){for(let i=0;i<60;i+=10){const o=document.createElement("option");o.value=String(i);o.textContent=String(i).padStart(2,"0");m.appendChild(o)}} }
