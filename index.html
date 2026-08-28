@@ -688,10 +688,10 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 }
 </style>
 
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=30">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=30">
-<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=30">
-<link rel="manifest" href="./manifest.webmanifest?v=30">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=31">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=31">
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=31">
+<link rel="manifest" href="./manifest.webmanifest?v=31">
 
 
 <style id="v25-font-size-tuning">
@@ -1183,11 +1183,16 @@ function groupDaySummary(unit,date){
     }
   });
 
-  // 전체 화면이 휴무일 때는 원본 R/R14/R43 등 R근무자 이름을 전부 특이사항에 표시.
+  // 전체 화면의 기본 패턴이 휴무일 때:
+  // 원본이 정확히 R인 사람은 일반 휴무이므로 제외.
+  // R14/R43 등 R근무 및 다른 실제 근무코드는 특이사항으로 표시.
   if(common==="휴무"){
     return {
       common,
-      diffs:rows.filter(row=>/^R/i.test(row.raw))
+      diffs:rows.filter(row=>{
+        const raw=String(row.raw||"").trim();
+        return raw!=="" && !/^R$/i.test(raw);
+      })
     };
   }
 
@@ -2010,7 +2015,7 @@ window.dispatchEvent(new Event("jasFirebaseReady"));
 
 
 <script id="v29-cache-refresh">
-window.__JAS_BUILD__ = "v30";
+window.__JAS_BUILD__ = "v31";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
@@ -2022,10 +2027,10 @@ if ("serviceWorker" in navigator) {
 
       // If this page is controlled by an older SW, force one clean reload
       // after controller changes. localStorage data is not touched.
-      let reloaded = sessionStorage.getItem("jas-v30-reloaded") === "1";
+      let reloaded = sessionStorage.getItem("jas-v31-reloaded") === "1";
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         if (!reloaded) {
-          sessionStorage.setItem("jas-v30-reloaded", "1");
+          sessionStorage.setItem("jas-v31-reloaded", "1");
           location.reload();
         }
       });
@@ -2038,12 +2043,12 @@ if ("serviceWorker" in navigator) {
 
       // Re-register current sw.js with a cache-busting query.
       try {
-        await navigator.serviceWorker.register("./sw.js?v=30");
+        await navigator.serviceWorker.register("./sw.js?v=31");
       } catch (_) {}
 
       // If we were already on the new page, don't loop.
       if (!reloaded) {
-        sessionStorage.setItem("jas-v30-reloaded", "1");
+        sessionStorage.setItem("jas-v31-reloaded", "1");
       }
     } catch (_) {}
   });
