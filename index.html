@@ -1142,6 +1142,7 @@ function monthOvertimeEntries(name,year,monthIndex){ if(!name)return[]; const pr
 function shownCodeFor(name,date){
   const raw=getCode(name,date);
   const specialKey=editKey(name,date);
+  if(/^R$/i.test(String(raw).trim())) return "휴무";
   return (/^A53$/i.test(String(raw).trim()) && state.blueA53 && state.blueA53[specialKey])
     ? "All53"
     : displayCode(raw);
