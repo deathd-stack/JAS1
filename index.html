@@ -403,74 +403,118 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 
 
 .overtimeSheet{
-  width:min(92vw,380px);
-  padding-top:12px;
+  width:min(84vw,300px);
+  padding-top:10px;
 }
+
 .overtimePickerWrap{
   display:grid;
-  grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);
+  grid-template-columns:56px 12px 56px;
+  justify-content:center;
   align-items:center;
-  gap:5px;
-  width:min(82%,300px);
-  margin:6px auto 4px;
+  gap:4px;
+  margin:3px auto 2px;
 }
 
 .overtimePickerCol{
+  width:56px;
   min-width:0;
 }
 
 .overtimePickerLabel{
   text-align:center;
   color:var(--orange2);
-  font-size:10px;
+  font-size:9px;
   font-weight:1000;
-  margin-bottom:4px;
+  margin-bottom:2px;
 }
 
 .overtimePickerColon{
   text-align:center;
   color:#fff;
-  font-size:20px;
-  font-weight:1000;
-  padding-top:13px;
-}
-
-.overtimeWheel{
-  width:100%;
-  height:108px;
-  padding:0;
-  border-radius:14px;
-  background:#08080b;
-  border:1px solid rgba(255,161,84,.24);
-  color:#fff;
   font-size:17px;
   font-weight:1000;
-  text-align:center;
-  overflow:auto;
+  padding-top:10px;
 }
 
-.overtimeWheel option{
-  padding:5px 0;
-  text-align:center;
+.slotWheel{
+  position:relative;
+  width:56px;
+  height:84px;
+  overflow-y:auto;
+  scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  border-radius:12px;
   background:#08080b;
+  border:1px solid rgba(255,161,84,.22);
+  scrollbar-width:none;
+}
+
+.slotWheel::-webkit-scrollbar{display:none;}
+
+.slotWheel::before,
+.slotWheel::after{
+  content:"";
+  display:block;
+  height:28px;
+}
+
+.slotWheelItem{
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  scroll-snap-align:center;
+  color:#6f6f76;
+  font-size:14px;
+  font-weight:1000;
+  user-select:none;
+}
+
+.slotWheelItem.selected{
   color:#fff;
+  font-size:17px;
+}
+
+.slotWheelFocus{
+  pointer-events:none;
+  position:absolute;
+  left:0;
+  right:0;
+  top:28px;
+  height:28px;
+  border-top:1px solid rgba(255,156,87,.30);
+  border-bottom:1px solid rgba(255,156,87,.30);
 }
 
 .overtimeSelected{
   text-align:center;
-  margin:7px 0 2px;
+  margin:4px 0 1px;
   color:#ff9c57;
-  font-size:16px;
+  font-size:14px;
   font-weight:1000;
 }
-.overtimeActions{grid-template-columns:1fr 1fr 1fr}
+
+.overtimeActions{
+  grid-template-columns:1fr 1fr 1fr;
+}
+
 .overtimeTotalBox{margin:8px 0 12px;padding:15px;text-align:center;border-radius:18px;background:rgba(255,145,70,.08);border:1px solid rgba(255,161,84,.22)}
 .overtimeTotalLabel{color:#aaaab3;font-size:11px;font-weight:900;margin-bottom:4px}
 .overtimeTotalValue{color:#ff9c57;font-size:28px;font-weight:1000}
 .overtimeSummaryList{display:flex;flex-direction:column;gap:7px;max-height:42vh;overflow:auto;margin-bottom:10px}
 .overtimeSummaryRow{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 13px;border-radius:15px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06)}
 .overtimeSummaryDate{font-size:13px;font-weight:1000}.overtimeSummaryTime{color:#ff9c57;font-size:13px;font-weight:1000}
-.day.hasOvertime::after{content:"OT";position:absolute;right:7px;top:7px;font-size:8px;line-height:1;color:#ff9c57;font-weight:1000;letter-spacing:.3px}
+.dayOvertime{
+  margin-top:3px;
+  text-align:center;
+  color:#ffb27a;
+  font-size:8px;
+  line-height:1;
+  font-weight:1000;
+  white-space:nowrap;
+}
 
 
 .groupDay{
@@ -619,6 +663,9 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 }
 
 @media(max-width:600px){
+  .overtimeSheet{width:min(82vw,290px)}
+  .dayOvertime{font-size:7px;margin-top:2px}
+
   .groupDay{min-height:94px;padding:5px}
   .groupCommonCode{font-size:11px;margin-top:5px}
   .groupDiff{font-size:7px}
@@ -819,9 +866,15 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
     <div class="handle"></div>
     <div class="sheetTitle" id="overtimeTitle">연장시간</div>
     <div class="overtimePickerWrap">
-      <div class="overtimePickerCol"><div class="overtimePickerLabel">시간</div><select id="overtimeHour" class="overtimeWheel" size="5"></select></div>
+      <div class="overtimePickerCol">
+        <div class="overtimePickerLabel">시간</div>
+        <div id="overtimeHourWheel" class="slotWheel" aria-label="연장 시간"></div>
+      </div>
       <div class="overtimePickerColon">:</div>
-      <div class="overtimePickerCol"><div class="overtimePickerLabel">분</div><select id="overtimeMinute" class="overtimeWheel" size="5"></select></div>
+      <div class="overtimePickerCol">
+        <div class="overtimePickerLabel">분</div>
+        <div id="overtimeMinuteWheel" class="slotWheel" aria-label="연장 분"></div>
+      </div>
     </div>
     <div class="overtimeSelected" id="overtimeSelected">0시간 00분</div>
     <div class="sheetActions overtimeActions">
@@ -1143,9 +1196,13 @@ function renderCalendar(){
       d.className="day "+codeClass+" "+(dow===0?"sun ":"")+(dow===6?"sat ":"");
       if(now.getFullYear()===y&&now.getMonth()===m&&now.getDate()===day)d.classList.add("today");
       if(currentPerson&&Object.prototype.hasOwnProperty.call(state.edits,editKey(currentPerson,date)))d.classList.add("edited");
-      if(currentPerson&&getOvertimeMinutes(currentPerson,date)>0)d.classList.add("hasOvertime");
+      const overtimeMinutes=currentPerson?getOvertimeMinutes(currentPerson,date):0;
 
-      d.innerHTML=`<div class="dayNum">${day}</div><div class="code">${escapeHtml(shownCode)}</div>`;
+      d.innerHTML=`
+        <div class="dayNum">${day}</div>
+        <div class="code">${escapeHtml(shownCode)}</div>
+        ${overtimeMinutes>0?`<div class="dayOvertime">OT ${Math.floor(overtimeMinutes/60)}:${String(overtimeMinutes%60).padStart(2,"0")}</div>`:""}
+      `;
       if(currentPerson)d.onclick=()=>openOvertime(date);
     }
 
@@ -1710,12 +1767,104 @@ document.getElementById("groupDetailModal").onclick=e=>{
 };
 
 let overtimeDate="";
-function buildOvertimeWheels(){ const h=document.getElementById("overtimeHour"),m=document.getElementById("overtimeMinute"); if(!h.options.length){for(let i=0;i<=12;i++){const o=document.createElement("option");o.value=String(i);o.textContent=String(i).padStart(2,"0");h.appendChild(o)}} if(!m.options.length){for(let i=0;i<60;i+=10){const o=document.createElement("option");o.value=String(i);o.textContent=String(i).padStart(2,"0");m.appendChild(o)}} }
-function updateOvertimeSelected(){ const h=Number(overtimeHour.value||0),m=Number(overtimeMinute.value||0); overtimeSelected.textContent=formatOvertime(h*60+m); }
-function openOvertime(date){ if(!currentPerson){status.textContent="⚠️ 먼저 성명을 선택해주세요.";return} buildOvertimeWheels(); overtimeDate=date; const mins=getOvertimeMinutes(currentPerson,date),h=Math.floor(mins/60),m=mins%60; overtimeTitle.textContent=`${currentPerson} · ${date} 연장시간`; overtimeHour.value=String(Math.min(h,12)); overtimeMinute.value=String(Math.min(50,Math.round(m/10)*10)); updateOvertimeSelected(); overtimeModal.classList.add("show"); }
-overtimeHour.addEventListener("change",updateOvertimeSelected); overtimeMinute.addEventListener("change",updateOvertimeSelected);
+let overtimeWheelHour=0;
+let overtimeWheelMinute=0;
+let overtimeWheelTimer=null;
+
+function createSlotWheel(el,values){
+  el.innerHTML="";
+  values.forEach(v=>{
+    const item=document.createElement("div");
+    item.className="slotWheelItem";
+    item.dataset.value=String(v);
+    item.textContent=String(v).padStart(2,"0");
+    el.appendChild(item);
+  });
+  const focus=document.createElement("div");
+  focus.className="slotWheelFocus";
+  el.appendChild(focus);
+}
+
+function wheelItems(el){
+  return Array.from(el.querySelectorAll(".slotWheelItem"));
+}
+
+function paintWheel(el,index){
+  wheelItems(el).forEach((item,i)=>item.classList.toggle("selected",i===index));
+}
+
+function setWheelValue(el,value,animate=false){
+  const items=wheelItems(el);
+  let index=items.findIndex(x=>Number(x.dataset.value)===Number(value));
+  if(index<0)index=0;
+  el.scrollTo({top:index*28,behavior:animate?"smooth":"auto"});
+  paintWheel(el,index);
+}
+
+function snapWheel(el,type){
+  const items=wheelItems(el);
+  if(!items.length)return;
+  let index=Math.round(el.scrollTop/28);
+  index=Math.max(0,Math.min(items.length-1,index));
+  el.scrollTo({top:index*28,behavior:"smooth"});
+  paintWheel(el,index);
+  const value=Number(items[index].dataset.value||0);
+  if(type==="hour")overtimeWheelHour=value;
+  else overtimeWheelMinute=value;
+  updateOvertimeSelected();
+}
+
+function bindWheel(el,type){
+  el.addEventListener("scroll",()=>{
+    clearTimeout(overtimeWheelTimer);
+    overtimeWheelTimer=setTimeout(()=>snapWheel(el,type),80);
+  });
+  el.addEventListener("click",e=>{
+    const item=e.target.closest(".slotWheelItem");
+    if(!item)return;
+    const value=Number(item.dataset.value||0);
+    setWheelValue(el,value,true);
+    if(type==="hour")overtimeWheelHour=value;
+    else overtimeWheelMinute=value;
+    updateOvertimeSelected();
+  });
+}
+
+function buildOvertimeWheels(){
+  const h=document.getElementById("overtimeHourWheel");
+  const m=document.getElementById("overtimeMinuteWheel");
+  if(!h.dataset.ready){
+    createSlotWheel(h,Array.from({length:13},(_,i)=>i));
+    bindWheel(h,"hour");
+    h.dataset.ready="1";
+  }
+  if(!m.dataset.ready){
+    createSlotWheel(m,[0,10,20,30,40,50]);
+    bindWheel(m,"minute");
+    m.dataset.ready="1";
+  }
+}
+
+function updateOvertimeSelected(){
+  overtimeSelected.textContent=formatOvertime(overtimeWheelHour*60+overtimeWheelMinute);
+}
+
+function openOvertime(date){
+  if(!currentPerson){status.textContent="⚠️ 먼저 성명을 선택해주세요.";return}
+  buildOvertimeWheels();
+  overtimeDate=date;
+  const mins=getOvertimeMinutes(currentPerson,date);
+  overtimeWheelHour=Math.min(Math.floor(mins/60),12);
+  overtimeWheelMinute=Math.min(50,Math.round((mins%60)/10)*10);
+  overtimeTitle.textContent=`${currentPerson} · ${date} 연장시간`;
+  setWheelValue(document.getElementById("overtimeHourWheel"),overtimeWheelHour,false);
+  setWheelValue(document.getElementById("overtimeMinuteWheel"),overtimeWheelMinute,false);
+  updateOvertimeSelected();
+  overtimeModal.classList.add("show");
+}
+
 cancelOvertime.onclick=()=>overtimeModal.classList.remove("show");
-saveOvertime.onclick=()=>{ if(!currentPerson||!overtimeDate)return; const total=Number(overtimeHour.value||0)*60+Number(overtimeMinute.value||0),k=overtimeKey(currentPerson,overtimeDate); if(total>0)state.overtime[k]=total; else delete state.overtime[k]; persist(); overtimeModal.classList.remove("show"); renderCalendar(); };
+saveOvertime.onclick=()=>{ if(!currentPerson||!overtimeDate)return; const total=overtimeWheelHour*60+overtimeWheelMinute,k=overtimeKey(currentPerson,overtimeDate); if(total>0)state.overtime[k]=total; else delete state.overtime[k]; persist(); overtimeModal.classList.remove("show"); renderCalendar(); };
 deleteOvertime.onclick=()=>{ if(!currentPerson||!overtimeDate)return; delete state.overtime[overtimeKey(currentPerson,overtimeDate)]; persist(); overtimeModal.classList.remove("show"); renderCalendar(); };
 overtimeModal.onclick=e=>{if(e.target.id==="overtimeModal")overtimeModal.classList.remove("show")};
 function openOvertimeSummary(){ if(groupView){status.textContent="⚠️ 연장시간은 개인 성명을 선택한 뒤 볼 수 있습니다.";return} if(!currentPerson){status.textContent="⚠️ 먼저 성명을 선택해주세요.";return} const y=viewDate.getFullYear(),m=viewDate.getMonth(),entries=monthOvertimeEntries(currentPerson,y,m),total=entries.reduce((s,x)=>s+x.minutes,0); overtimeSummaryTitle.textContent=`${currentPerson} · ${y}년 ${m+1}월 연장시간`; overtimeTotalValue.textContent=formatOvertime(total); overtimeSummaryList.innerHTML=""; if(!entries.length){const e=document.createElement("div");e.className="searchEmpty";e.textContent="저장된 연장시간이 없습니다.";overtimeSummaryList.appendChild(e)} else entries.forEach(item=>{const r=document.createElement("button");r.type="button";r.className="overtimeSummaryRow";const day=Number(item.date.slice(-2));r.innerHTML=`<span class="overtimeSummaryDate">${m+1}월 ${day}일</span><span class="overtimeSummaryTime">${formatOvertime(item.minutes)}</span>`;r.onclick=()=>{overtimeSummaryModal.classList.remove("show");openOvertime(item.date)};overtimeSummaryList.appendChild(r)}); overtimeSummaryModal.classList.add("show"); }
