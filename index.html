@@ -701,6 +701,36 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 <link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=2">
 <link rel="manifest" href="./manifest.webmanifest?v=2">
 
+
+<style id="v25-font-size-tuning">
+/* 가독성 확대: 모바일 달력 칸이 깨지지 않는 범위 */
+.dayNum{font-size:11px!important;}
+.code{font-size:13px!important;line-height:1.08!important;}
+.dayOvertime{font-size:9px!important;line-height:1.05!important;}
+
+.groupCommonCode{font-size:13px!important;line-height:1.05!important;}
+.groupDiff{font-size:9px!important;line-height:1.15!important;}
+.groupDay::after{font-size:8px!important;}
+
+.slotWheelItem{font-size:16px!important;}
+.slotWheelItem.selected{font-size:19px!important;}
+.overtimePickerLabel{font-size:10px!important;}
+.overtimeSelected{font-size:16px!important;}
+
+.groupDetailLabel{font-size:11px!important;}
+.groupDetailCommonCode{font-size:26px!important;}
+.groupDetailLegend{font-size:10px!important;}
+.groupDetailName,.groupDetailCode{font-size:14px!important;}
+
+@media(max-width:600px){
+  .dayNum{font-size:10px!important;}
+  .code{font-size:12px!important;}
+  .dayOvertime{font-size:8px!important;}
+  .groupCommonCode{font-size:11px!important;}
+  .groupDiff{font-size:8px!important;}
+}
+</style>
+
 </head>
 <body>
 
