@@ -688,10 +688,10 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 }
 </style>
 
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=32">
-<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=32">
-<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=32">
-<link rel="manifest" href="./manifest.webmanifest?v=32">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=33">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=33">
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=33">
+<link rel="manifest" href="./manifest.webmanifest?v=33">
 
 
 <style id="v25-font-size-tuning">
@@ -881,6 +881,21 @@ button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;bor
 </div>
 
 
+
+
+<div class="modal" id="dayActionModal">
+  <div class="sheet" style="width:min(88vw,340px)">
+    <div class="handle"></div>
+    <div class="sheetTitle" id="dayActionTitle">날짜 선택</div>
+    <div class="sheetActions" style="grid-template-columns:1fr 1fr">
+      <button id="dayActionOvertime">연장시간</button>
+      <button id="dayActionEdit" class="active">코드 수정</button>
+    </div>
+    <div class="sheetActions" style="grid-template-columns:1fr;margin-top:8px">
+      <button id="dayActionClose">CLOSE</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="groupDetailModal">
   <div class="sheet searchSheet groupDetailSheet">
@@ -1280,7 +1295,7 @@ function renderCalendar(){
         <div class="code">${escapeHtml(shownCode)}</div>
         ${overtimeMinutes>0?`<div class="dayOvertime">OT ${Math.floor(overtimeMinutes/60)}:${String(overtimeMinutes%60).padStart(2,"0")}</div>`:""}
       `;
-      if(currentPerson)d.onclick=()=>openOvertime(date);
+      if(currentPerson)d.onclick=()=>openDayAction(date);
     }
 
     box.appendChild(d);
@@ -1782,6 +1797,38 @@ document.getElementById("goMain").onclick=()=>{
 
 
 
+
+let dayActionDate="";
+
+function openDayAction(date){
+  if(!currentPerson)return;
+  dayActionDate=date;
+  const parts=date.split("-");
+  document.getElementById("dayActionTitle").textContent=
+    `${currentPerson} · ${Number(parts[1])}월 ${Number(parts[2])}일`;
+  document.getElementById("dayActionModal").classList.add("show");
+}
+
+document.getElementById("dayActionOvertime").onclick=()=>{
+  document.getElementById("dayActionModal").classList.remove("show");
+  openOvertime(dayActionDate);
+};
+
+document.getElementById("dayActionEdit").onclick=()=>{
+  document.getElementById("dayActionModal").classList.remove("show");
+  openEdit(dayActionDate);
+};
+
+document.getElementById("dayActionClose").onclick=()=>{
+  document.getElementById("dayActionModal").classList.remove("show");
+};
+
+document.getElementById("dayActionModal").onclick=e=>{
+  if(e.target.id==="dayActionModal"){
+    document.getElementById("dayActionModal").classList.remove("show");
+  }
+};
+
 let groupDetailDate="";
 
 function openGroupDetail(date){
@@ -2029,7 +2076,7 @@ window.dispatchEvent(new Event("jasFirebaseReady"));
 
 
 <script id="v29-cache-refresh">
-window.__JAS_BUILD__ = "v32";
+window.__JAS_BUILD__ = "v33";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
@@ -2041,10 +2088,10 @@ if ("serviceWorker" in navigator) {
 
       // If this page is controlled by an older SW, force one clean reload
       // after controller changes. localStorage data is not touched.
-      let reloaded = sessionStorage.getItem("jas-v32-reloaded") === "1";
+      let reloaded = sessionStorage.getItem("jas-v33-reloaded") === "1";
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         if (!reloaded) {
-          sessionStorage.setItem("jas-v32-reloaded", "1");
+          sessionStorage.setItem("jas-v33-reloaded", "1");
           location.reload();
         }
       });
@@ -2057,12 +2104,12 @@ if ("serviceWorker" in navigator) {
 
       // Re-register current sw.js with a cache-busting query.
       try {
-        await navigator.serviceWorker.register("./sw.js?v=32");
+        await navigator.serviceWorker.register("./sw.js?v=33");
       } catch (_) {}
 
       // If we were already on the new page, don't loop.
       if (!reloaded) {
-        sessionStorage.setItem("jas-v32-reloaded", "1");
+        sessionStorage.setItem("jas-v33-reloaded", "1");
       }
     } catch (_) {}
   });
