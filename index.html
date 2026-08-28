@@ -1,4172 +1,1350 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-<meta http-equiv="Pragma" content="no-cache" />
-<meta http-equiv="Expires" content="0" />
-<title>JAGOS VER.X</title>
-<meta name="application-name" content="JAGOS" />
-<meta name="apple-mobile-web-app-title" content="JAGOS" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="theme-color" content="#000000" />
-<link rel="manifest" href="manifest.webmanifest" />
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
-<link rel="apple-touch-icon" href="icon-512.png" />
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f26018">
+<title>JAS DUTY SCHEDULE</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <style>
-  :root{
-    --bgSolid:#ff6a00;
-    --orange1:#ffb347;
-    --orange2:#ff7a00;
-    --orange3:#ff5a00;
-    --blue:#4c8dff;
-    --red:#ff4d4f;
-    --line:#2e2e32;
-    --text:#f5f5f7;
-    --muted:#b4b4bc;
-    --shadow:0 20px 44px rgba(0,0,0,.34);
-    --shadow-soft:0 10px 24px rgba(0,0,0,.26);
-    --ui:0.715;
-    --dayUi:0.65;
-  }
-
-  *{box-sizing:border-box}
-
-  html, body{
-    margin:0;
-    padding:0;
-  }
-
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
-    font-weight:800;
-    color:var(--text);
-    min-height:100vh;
-    overflow-x:hidden;
-    background:var(--bgSolid);
-  }
-
-  header{
-    text-align:center;
-    padding:calc(24px * var(--ui)) calc(14px * var(--ui)) calc(10px * var(--ui));
-    user-select:none;
-    cursor:pointer;
-  }
-
-  .titleWrap{
-    display:flex;
-    justify-content:center;
-    align-items:baseline;
-    gap:calc(10px * var(--ui));
-    flex-wrap:wrap;
-  }
-
-  .titleMain{
-    font-size:calc(46.2px * var(--ui));
-    font-weight:1000;
-    letter-spacing:-1.2px;
-    text-transform:uppercase;
-    line-height:1;
-    color:#fff;
-    text-shadow:0 0 18px rgba(0,0,0,.14);
-  }
-
-  .titleVer{
-    font-size:calc(18.7px * var(--ui));
-    font-weight:1000;
-    opacity:.92;
-    text-transform:uppercase;
-    color:#fff2d8;
-    letter-spacing:.4px;
-  }
-
-  .controls{
-    width:min(calc(780px * var(--ui) / .65), calc(100% - 24px));
-    margin:0 auto;
-    display:flex;
-    flex-direction:column;
-    gap:calc(8px * var(--ui));
-    padding:calc(8px * var(--ui)) 0 calc(8px * var(--ui));
-  }
-
-  .controlsRow{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:calc(10px * var(--ui));
-    flex-wrap:nowrap;
-  }
-
-  .controlsRow .authorControlWrap,
-  .controlsRow .teamControlWrap,
-  .controlsRow .mainControlWrap{
-    flex:1;
-    min-width:0;
-  }
-
-  .controlsRow .authorControlInput,
-  .controlsRow .teamControlSelect,
-  .controlsRow .mainControlSelect{
-    width:100%;
-    min-width:0;
-  }
-
-  .teamControlWrap{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:999px;
-    padding:calc(8px * var(--ui)) calc(12px * var(--ui));
-    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
-    box-shadow:var(--shadow-soft);
-  }
-
-  .teamControlLabel{
-    color:#fff;
-    font-size:calc(14px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-    white-space:nowrap;
-  }
-
-  .teamControlSelect{
-    height:calc(40px * var(--ui));
-    min-width:calc(96px * var(--ui));
-    padding:0 calc(10px * var(--ui));
-    border-radius:calc(16px * var(--ui));
-    border:2px solid var(--line);
-    background:#121214;
-    color:#fff;
-    font-family:inherit;
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-  }
-
-  .mainControlWrap{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:999px;
-    padding:calc(8px * var(--ui)) calc(12px * var(--ui));
-    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
-    box-shadow:var(--shadow-soft);
-  }
-
-  .mainControlLabel{
-    color:#fff;
-    font-size:calc(14px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-    white-space:nowrap;
-  }
-
-  .mainControlSelect{
-    height:calc(40px * var(--ui));
-    min-width:calc(96px * var(--ui));
-    padding:0 calc(10px * var(--ui));
-    border-radius:calc(16px * var(--ui));
-    border:2px solid var(--line);
-    background:#121214;
-    color:#fff;
-    font-family:inherit;
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-  }
-
-  .authorControlWrap{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:999px;
-    padding:calc(8px * var(--ui)) calc(12px * var(--ui));
-    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
-    box-shadow:var(--shadow-soft);
-  }
-
-  .authorControlLabel{
-    color:#fff;
-    font-size:calc(14px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-    white-space:nowrap;
-  }
-
-  .authorControlInput{
-    height:calc(40px * var(--ui));
-    min-width:calc(112px * var(--ui));
-    width:calc(132px * var(--ui));
-    padding:0 calc(12px * var(--ui));
-    border-radius:calc(16px * var(--ui));
-    border:2px solid var(--line);
-    background:#121214;
-    color:#fff;
-    font-family:inherit;
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    text-transform:none;
-    text-align:left;
-  }
-
-  .authorPill{
-    margin-top:calc(8px * var(--ui));
-    margin-left:calc(42px * var(--ui));
-    display:inline-flex;
-    align-items:center;
-    gap:calc(6px * var(--ui));
-    padding:calc(6px * var(--ui)) calc(10px * var(--ui));
-    border-radius:999px;
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.05);
-    color:#fff2d8;
-    font-size:calc(12px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-  }
-
-  .teamBadge{
-    margin-top:calc(8px * var(--ui));
-    margin-left:calc(42px * var(--ui));
-    display:inline-flex;
-    align-items:center;
-    gap:calc(6px * var(--ui));
-    padding:calc(6px * var(--ui)) calc(10px * var(--ui));
-    border-radius:999px;
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.05);
-    color:var(--muted);
-    font-size:calc(12px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-  }
-
-  .cmptWrap{
-    flex:1;
-    min-width:0;
-    display:flex;
-    align-items:flex-start;
-    gap:calc(8px * var(--ui));
-  }
-
-  .cmptFWrap{
-    flex:0 0 auto;
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    min-height:calc(54px * var(--ui));
-    padding:0 calc(10px * var(--ui));
-    border:2px solid var(--line);
-    border-radius:calc(22px * var(--ui));
-    background:#121214;
-  }
-
-  .cmptFLabel{
-    color:#fff;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-  }
-
-  .cmptFSelect{
-    width:calc(58px * var(--ui));
-    min-width:calc(58px * var(--ui));
-    height:calc(38px * var(--ui));
-    padding:0 calc(8px * var(--ui));
-    border-radius:calc(14px * var(--ui));
-    border:2px solid var(--line);
-    background:#0f0f12;
-    color:#fff;
-    font-family:inherit;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-  }
-
-  button{
-    border:none;
-    border-radius:999px;
-    background:linear-gradient(180deg, rgba(40,40,44,.96), rgba(27,27,30,.96));
-    padding:calc(14px * var(--ui)) calc(22px * var(--ui));
-    font-weight:1000;
-    color:var(--orange1);
-    font-size:calc(16px * var(--ui));
-    box-shadow:var(--shadow-soft);
-    text-transform:uppercase;
-    cursor:pointer;
-    transition:transform .14s ease, box-shadow .14s ease, filter .14s ease, opacity .14s ease;
-    border:1px solid rgba(255,255,255,.06);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-  }
-
-  button:hover{
-    transform:translateY(-1px);
-    box-shadow:0 16px 30px rgba(0,0,0,.30);
-    filter:brightness(1.04);
-  }
-
-  button:active{
-    transform:scale(.985);
-  }
-
-  .dayBar{
-    width:min(calc(780px * var(--dayUi) / .65), calc(100% - 24px));
-    margin:calc(2px * var(--dayUi)) auto calc(10px * var(--dayUi));
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:calc(8px * var(--dayUi));
-    flex-wrap:wrap;
-  }
-
-  .dayBtn{
-    padding:calc(10px * var(--dayUi)) calc(14px * var(--dayUi));
-    font-size:calc(13px * var(--dayUi));
-    border-radius:999px;
-    box-shadow:none;
-    background:rgba(34,34,38,.92);
-    color:var(--orange1);
-    border:1px solid rgba(255,255,255,.05);
-  }
-
-  .dayLabel{
-    background:rgba(34,34,38,.96);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:999px;
-    padding:calc(10px * var(--dayUi)) calc(16px * var(--dayUi));
-    font-size:calc(13px * var(--dayUi));
-    font-weight:1000;
-    color:#fff;
-    box-shadow:0 8px 18px rgba(0,0,0,.20);
-    text-transform:uppercase;
-    letter-spacing:.3px;
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-  }
-
-  #memoList{
-    padding:calc(10px * var(--ui)) calc(14px * var(--ui)) calc(220px * var(--ui));
-    max-width:calc(780px * var(--ui) / .65);
-    margin:0 auto;
-  }
-
-  .emptyDay{
-    background:rgba(28,28,31,.70);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:calc(30px * var(--ui));
-    padding:calc(22px * var(--ui));
-    color:#fff;
-    text-align:center;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    margin-bottom:calc(42px * var(--ui));
-    box-shadow:0 14px 28px rgba(0,0,0,.22);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-  }
-
-  .memoCard{
-    background:linear-gradient(180deg, rgba(34,34,38,.96), rgba(24,24,27,.96));
-    border-radius:calc(32px * var(--ui));
-    padding:calc(16px * var(--ui)) calc(14px * var(--ui));
-    margin:calc(12px * var(--ui)) 0;
-    box-shadow:var(--shadow);
-    border:1px solid rgba(255,255,255,.06);
-    overflow:hidden;
-    position:relative;
-    backdrop-filter:blur(14px);
-    -webkit-backdrop-filter:blur(14px);
-  }
-
-  .memoCard::before{
-    content:"";
-    position:absolute;
-    left:0;
-    top:0;
-    bottom:0;
-    width:calc(6px * var(--ui));
-    background:linear-gradient(180deg,var(--orange1),var(--orange2),var(--orange3));
-    box-shadow:0 0 20px rgba(255,122,0,.25);
-  }
-
-  .memoRow{
-    display:flex;
-    gap:calc(10px * var(--ui));
-    align-items:flex-start;
-    padding-left:calc(4px * var(--ui));
-  }
-
-  .selBox{
-    width:calc(30px * var(--ui));
-    height:calc(30px * var(--ui));
-    border-radius:calc(12px * var(--ui));
-    border:2px solid rgba(255,255,255,.18);
-    background:#131316;
-    appearance:none;
-    margin-top:calc(8px * var(--ui));
-    flex:0 0 auto;
-    position:relative;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
-  }
-
-  .selBox:checked{
-    background:#1a1a1d;
-    border-color:var(--orange2);
-    box-shadow:0 0 0 calc(4px * var(--ui)) rgba(255,122,0,.12);
-  }
-
-  .selBox:checked::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:calc(10px * var(--ui));
-    height:calc(16px * var(--ui));
-    border-right:calc(3px * var(--ui)) solid var(--orange2);
-    border-bottom:calc(3px * var(--ui)) solid var(--orange2);
-    transform:translate(-50%,-60%) rotate(45deg);
-  }
-
-  .lines{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    gap:calc(10px * var(--ui));
-    cursor:pointer;
-    min-width:0;
-  }
-
-  .line{
-    display:flex;
-    align-items:flex-start;
-    gap:calc(10px * var(--ui));
-    min-width:0;
-  }
-
-  .tagPill{
-    background:linear-gradient(180deg,#ff9a2f,#ff6a00);
-    color:#fff;
-    border-radius:999px;
-    padding:calc(10px * var(--ui)) calc(14px * var(--ui));
-    font-weight:1000;
-    font-size:calc(15px * var(--ui));
-    min-width:calc(70px * var(--ui));
-    text-align:center;
-    flex:0 0 auto;
-    text-transform:uppercase;
-    box-shadow:0 8px 16px rgba(255,122,0,.20);
-  }
-
-  .textPill{
-    background:rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.05);
-    border-radius:999px;
-    padding:calc(11px * var(--ui)) calc(16px * var(--ui));
-    font-weight:1000;
-    font-size:calc(18px * var(--ui));
-    color:#fff;
-    flex:1;
-    min-width:0;
-    white-space:normal;
-    overflow:visible;
-    word-break:break-word;
-    text-transform:uppercase;
-  }
-
-  .datePill{
-    margin-top:calc(8px * var(--ui));
-    margin-left:calc(42px * var(--ui));
-    font-size:calc(12px * var(--ui));
-    color:var(--muted);
-    font-weight:1000;
-    text-transform:uppercase;
-    letter-spacing:.2px;
-  }
-
-  .flash{animation:flash .55s;}
-  @keyframes flash{
-    50%{transform:scale(1.01); filter:brightness(1.06)}
-  }
-
-  .bottomLeftButtons{
-    position:fixed;
-    left:calc(14px * var(--ui));
-    bottom:calc(18px * var(--ui));
-    z-index:30;
-    display:flex;
-    flex-direction:column;
-    gap:calc(12px * var(--ui));
-  }
-
-  .bottomRightButtons{
-    position:fixed;
-    right:calc(14px * var(--ui));
-    bottom:calc(18px * var(--ui));
-    z-index:30;
-    display:flex;
-    flex-direction:column;
-    gap:calc(12px * var(--ui));
-    align-items:flex-end;
-  }
-
-  .itMemoBtn,
-  .akMemoBtn,
-  .equipBtn{
-    width:calc(148px * var(--ui));
-    height:calc(50px * var(--ui));
-    border-radius:999px;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    padding:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border:1px solid rgba(255,255,255,.08);
-    box-shadow:
-      0 12px 24px rgba(0,0,0,.22),
-      inset 0 1px 0 rgba(255,255,255,.06);
-    letter-spacing:.2px;
-  }
-
-  .itMemoBtn{
-    background:linear-gradient(180deg,#ffe063,#ffc61a);
-    color:#111;
-  }
-
-  .akMemoBtn{
-    background:linear-gradient(180deg,#ff3953,#d80024);
-    color:#fff;
-  }
-
-  .equipBtn{
-    background:linear-gradient(180deg,#2d2d33,#1c1c20);
-    color:var(--orange1);
-  }
-
-  #equipBadge{
-    position:relative;
-    min-width:calc(148px * var(--ui));
-    background:rgba(18,18,20,.92);
-    color:#fff;
-    border-radius:calc(24px * var(--ui));
-    padding:calc(12px * var(--ui)) calc(14px * var(--ui));
-    font-weight:1000;
-    line-height:1.15;
-    text-align:right;
-    box-shadow:
-      0 14px 28px rgba(0,0,0,.24),
-      inset 0 1px 0 rgba(255,255,255,.05);
-    display:none;
-    text-transform:uppercase;
-    border:1px solid rgba(255,255,255,.06);
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
-  }
-
-  #equipBadge .b1{font-size:calc(18px * var(--ui));}
-  #equipBadge .b2{font-size:calc(18px * var(--ui)); opacity:.95;}
-
-  .modal{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.58);
-    display:none;
-    justify-content:center;
-    align-items:flex-end;
-    z-index:50;
-    overscroll-behavior:contain;
-    pointer-events:none;
-  }
-
-  .box{
-    width:100%;
-    max-width:calc(820px * var(--ui) / .65);
-    background:#17171a;
-    border-radius:calc(34px * var(--ui)) calc(34px * var(--ui)) 0 0;
-    padding:0 calc(14px * var(--ui)) calc(18px * var(--ui));
-    max-height:92vh;
-    overflow:auto;
-    transform:translateY(0);
-    will-change:transform;
-    -webkit-overflow-scrolling:touch;
-    pointer-events:auto;
-    box-shadow:0 -10px 30px rgba(0,0,0,.28);
-    border-top:1px solid rgba(255,255,255,.05);
-  }
-
-  .dragArea{
-    padding:calc(7px * var(--ui)) 0 calc(8px * var(--ui));
-    position:sticky;
-    top:0;
-    background:#17171a;
-    z-index:40;
-  }
-
-  .drag-handle{
-    width:calc(62px * var(--ui));
-    height:calc(8px * var(--ui));
-    background:#494952;
-    border-radius:999px;
-    margin:0 auto calc(8px * var(--ui));
-  }
-
-  .topActionBar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:calc(10px * var(--ui));
-  }
-
-  .topMiniBtn{
-    padding:calc(10px * var(--ui)) calc(16px * var(--ui));
-    font-size:calc(14px * var(--ui));
-    border-radius:999px;
-    box-shadow:none;
-    background:#242429;
-    color:var(--orange1);
-  }
-
-  /* 네가 원하는 고정 영역 */
-  .modalTitleTap{
-    position:sticky;
-    top:calc(72px * var(--ui));
-    z-index:34;
-    text-align:center;
-    font-weight:1000;
-    color:#fff;
-    padding:calc(10px * var(--ui)) 0 calc(12px * var(--ui));
-    cursor:pointer;
-    user-select:none;
-    text-transform:uppercase;
-    background:linear-gradient(180deg, rgba(23,23,26,1) 0%, rgba(23,23,26,.98) 78%, rgba(23,23,26,.90) 100%);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-    margin:0 calc(-14px * var(--ui));
-  }
-
-  .modalTitleTap .m1{font-size:calc(18px * var(--ui));}
-  .modalTitleTap .m2{font-size:calc(12px * var(--ui)); opacity:.58; margin-top:2px;}
-
-  .dateLine{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    margin-bottom:calc(8px * var(--ui));
-    margin-top:calc(6px * var(--ui));
-  }
-
-  .dateLine .dateLab{
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-  }
-
-  .dateInput{
-    width:auto !important;
-    min-width:calc(180px * var(--ui));
-    text-align:center;
-    padding:0 calc(12px * var(--ui));
-  }
-
-  .pickRow{
-    display:flex;
-    justify-content:center;
-    gap:calc(10px * var(--ui));
-    flex-wrap:wrap;
-    margin:calc(6px * var(--ui)) 0 calc(12px * var(--ui));
-  }
-
-  .pickPill{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    background:#222226;
-    border:2px solid #2d2d32;
-    border-radius:999px;
-    padding:calc(11px * var(--ui)) calc(16px * var(--ui));
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-    user-select:none;
-    color:#fff;
-  }
-
-  .pickPill input{
-    width:calc(20px * var(--ui));
-    height:calc(20px * var(--ui));
-    margin:0;
-    accent-color:var(--orange2);
-  }
-
-  .section{
-    background:#1f1f23;
-    border-radius:calc(28px * var(--ui));
-    padding:calc(14px * var(--ui));
-    margin:calc(12px * var(--ui)) 0;
-    overflow:hidden;
-    border:1px solid rgba(255,255,255,.05);
-  }
-
-  .sectionHead{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    margin-bottom:calc(10px * var(--ui));
-    gap:calc(10px * var(--ui));
-  }
-
-  .sectionTitle{
-    font-size:calc(24px * var(--ui));
-    font-weight:1000;
-    letter-spacing:.3px;
-    text-transform:uppercase;
-    color:#fff;
-  }
-
-  .headRight{
-    display:flex;
-    align-items:flex-start;
-    gap:calc(10px * var(--ui));
-    flex-wrap:wrap;
-    justify-content:flex-end;
-  }
-
-  .staStdWrap{
-    display:flex;
-    align-items:center;
-    gap:calc(8px * var(--ui));
-    white-space:nowrap;
-  }
-
-  .staStdLab{
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-  }
-
-  .staStdInput{
-    width:calc(92px * var(--ui)) !important;
-    min-width:calc(92px * var(--ui));
-    text-align:center;
-  }
-
-  .timeWrap{
-    display:flex;
-    align-items:baseline;
-    gap:calc(10px * var(--ui));
-    white-space:nowrap;
-    text-transform:uppercase;
-  }
-
-  .timeBtn{
-    border:none;
-    background:transparent;
-    box-shadow:none;
-    padding:calc(4px * var(--ui)) calc(8px * var(--ui));
-    margin:0;
-    font-weight:1000;
-    font-size:calc(16px * var(--ui));
-    color:#fff;
-    border-radius:999px;
-    text-transform:uppercase;
-  }
-
-  .timeBtn:active{background:rgba(255,122,0,.08);}
-
-  .timeVal{
-    font-weight:1000;
-    font-size:calc(22px * var(--ui));
-    color:var(--orange1);
-    min-width:calc(64px * var(--ui));
-    text-align:right;
-    font-variant-numeric:tabular-nums;
-    cursor:pointer;
-  }
-
-  .row{
-    display:flex;
-    align-items:center;
-    gap:calc(10px * var(--ui));
-    margin:calc(10px * var(--ui)) 0;
-    flex-wrap:nowrap;
-    min-width:0;
-  }
-
-  .lab{
-    font-size:calc(20px * var(--ui));
-    font-weight:1000;
-    min-width:calc(46px * var(--ui));
-    color:#fff;
-    white-space:nowrap;
-    text-transform:uppercase;
-  }
-
-  input, textarea, select{
-    font-family:inherit;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    border:2px solid var(--line);
-    border-radius:calc(22px * var(--ui));
-    outline:none;
-    background:#121214;
-    color:#fff;
-    -webkit-text-size-adjust:100%;
-    font-variant-numeric:tabular-nums;
-    text-transform:uppercase;
-    transition:border-color .14s ease, box-shadow .14s ease;
-  }
-
-  input::placeholder, textarea::placeholder{
-    color:#8e8e96;
-  }
-
-  input:focus, textarea:focus, select:focus{
-    border-color:rgba(255,122,0,.7);
-    box-shadow:0 0 0 calc(4px * var(--ui)) rgba(255,122,0,.12);
-  }
-
-  input{
-    width:100%;
-    height:calc(54px * var(--ui));
-    line-height:calc(54px * var(--ui));
-    padding:0 calc(12px * var(--ui));
-    text-align:center;
-  }
-
-  textarea{
-    width:100%;
-    height:calc(82px * var(--ui));
-    resize:none;
-    font-weight:800;
-    padding:calc(12px * var(--ui));
-    text-transform:none;
-    border-radius:calc(24px * var(--ui));
-  }
-
-  select{
-    height:calc(54px * var(--ui));
-    padding:0 calc(12px * var(--ui));
-  }
-
-  .numBox{
-    font-size:calc(18px * var(--ui));
-    letter-spacing:.6px;
-  }
-
-  .long{
-    flex:1;
-    min-width:0;
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-    padding-left:calc(16px * var(--ui));
-    text-align:left;
-  }
-
-  .cmptArea{
-    flex:1;
-    min-width:0;
-    min-height:calc(54px * var(--ui));
-    height:calc(54px * var(--ui));
-    line-height:1.35;
-    padding:calc(14px * var(--ui)) calc(16px * var(--ui));
-    text-align:left;
-    resize:none;
-    overflow:hidden;
-    text-transform:uppercase;
-    white-space:pre-wrap;
-    word-break:break-word;
-  }
-
-  .extraBox{
-    background:#18181b;
-    border:2px solid #27272c;
-    border-radius:calc(26px * var(--ui));
-    padding:calc(14px * var(--ui));
-    margin-top:calc(10px * var(--ui));
-  }
-
-  .extraHead{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:calc(10px * var(--ui));
-    text-transform:uppercase;
-  }
-
-  .extraTitle{
-    font-size:calc(20px * var(--ui));
-    font-weight:1000;
-    letter-spacing:.4px;
-    color:#fff;
-  }
-
-  .iconBtn{
-    width:calc(48px * var(--ui));
-    height:calc(48px * var(--ui));
-    border-radius:calc(18px * var(--ui));
-    border:none;
-    background:#242429;
-    box-shadow:0 8px 18px rgba(0,0,0,.16);
-    color:var(--orange1);
-    font-size:calc(28px * var(--ui));
-    font-weight:1000;
-    text-transform:uppercase;
-  }
-
-  .extraRow{
-    display:flex;
-    gap:calc(10px * var(--ui));
-    align-items:center;
-    margin-top:calc(10px * var(--ui));
-  }
-
-  .extraRow select{
-    width:calc(130px * var(--ui));
-    font-size:calc(16px * var(--ui));
-    font-weight:1000;
-  }
-
-  .extraRow input{
-    width:calc(130px * var(--ui));
-    font-size:calc(18px * var(--ui));
-  }
-
-  .minusBtn{
-    width:calc(60px * var(--ui));
-    height:calc(54px * var(--ui));
-    border-radius:calc(20px * var(--ui));
-    border:none;
-    background:#242429;
-    color:var(--orange1);
-    font-weight:1000;
-    font-size:calc(22px * var(--ui));
-    box-shadow:none;
-    text-transform:uppercase;
-  }
-
-  .lirBtn{
-    padding:calc(10px * var(--ui)) calc(16px * var(--ui));
-    font-size:calc(14px * var(--ui));
-    border-radius:999px;
-    box-shadow:none;
-    background:#242429;
-    color:var(--orange1);
-  }
-
-  .lirCalcRow{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:calc(10px * var(--ui));
-    margin:calc(12px * var(--ui)) 0 calc(4px * var(--ui));
-    flex-wrap:nowrap;
-  }
-
-  .lirBtns{
-    display:flex;
-    align-items:center;
-    gap:calc(10px * var(--ui));
-    flex-wrap:wrap;
-  }
-
-  .calcCircleBtn{
-    width:calc(48px * var(--ui));
-    height:calc(48px * var(--ui));
-    min-width:calc(48px * var(--ui));
-    border-radius:999px;
-    border:none;
-    background:#242429;
-    box-shadow:0 8px 18px rgba(0,0,0,.16);
-    color:var(--orange1);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:0;
-  }
-
-  .calcIconBtn{
-    position:relative;
-  }
-
-  .calcIcon{
-    position:relative;
-    display:block;
-    width:calc(22px * var(--ui));
-    height:calc(26px * var(--ui));
-    border:2px solid var(--orange2);
-    border-radius:calc(8px * var(--ui));
-  }
-
-  .calcIcon::before{
-    content:"";
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    top:calc(3px * var(--ui));
-    width:calc(12px * var(--ui));
-    height:calc(4px * var(--ui));
-    background:var(--orange2);
-    border-radius:calc(3px * var(--ui));
-  }
-
-  .calcIcon::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-    bottom:calc(4px * var(--ui));
-    width:calc(12px * var(--ui));
-    height:calc(10px * var(--ui));
-    background:
-      radial-gradient(circle, var(--orange2) 58%, transparent 60%) 0 0 / calc(4px * var(--ui)) calc(4px * var(--ui)) repeat;
-    opacity:.95;
-  }
-
-  .calcFloatingWrap{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.42);
-    display:none;
-    align-items:flex-end;
-    justify-content:center;
-    z-index:120;
-    padding:calc(16px * var(--ui));
-  }
-
-  .calcFloatingWrap.show{
-    display:flex;
-  }
-
-  .calcFloating{
-    width:min(calc(430px * var(--ui) / .65), 100%);
-    background:#18181b;
-    border-radius:calc(30px * var(--ui));
-    box-shadow:0 22px 46px rgba(0,0,0,.34);
-    padding:calc(14px * var(--ui));
-    animation:calcUp .16s ease;
-    border:1px solid rgba(255,255,255,.05);
-  }
-
-  @keyframes calcUp{
-    from{transform:translateY(18px); opacity:.75}
-    to{transform:translateY(0); opacity:1}
-  }
-
-  .calcTopBar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:calc(10px * var(--ui));
-    margin-bottom:calc(10px * var(--ui));
-  }
-
-  .calcTitle{
-    font-size:calc(15px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    text-transform:uppercase;
-    letter-spacing:.4px;
-  }
-
-  .calcCloseBtn{
-    border:none;
-    background:#242429;
-    color:var(--orange1);
-    width:calc(42px * var(--ui));
-    height:calc(42px * var(--ui));
-    border-radius:calc(16px * var(--ui));
-    box-shadow:none;
-    padding:0;
-    font-size:calc(18px * var(--ui));
-    font-weight:1000;
-  }
-
-  .calcDisplay{
-    width:100%;
-    height:calc(60px * var(--ui));
-    border:2px solid #2b2b31;
-    border-radius:calc(24px * var(--ui));
-    background:#101012;
-    padding:0 calc(14px * var(--ui));
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    font-size:calc(24px * var(--ui));
-    font-weight:1000;
-    color:#fff;
-    overflow:hidden;
-    white-space:nowrap;
-    font-variant-numeric:tabular-nums;
-  }
-
-  .calcGrid{
-    margin-top:calc(10px * var(--ui));
-    display:grid;
-    grid-template-columns:repeat(4, 1fr);
-    gap:calc(8px * var(--ui));
-  }
-
-  .calcKey{
-    height:calc(54px * var(--ui));
-    border:none;
-    border-radius:calc(20px * var(--ui));
-    background:#242429;
-    color:#fff;
-    font-size:calc(18px * var(--ui));
-    font-weight:1000;
-    box-shadow:none;
-    padding:0;
-  }
-
-  .calcKey.op{
-    background:#2b2b31;
-    color:var(--orange1);
-  }
-
-  .calcKey.eq{
-    background:linear-gradient(180deg,var(--orange2),var(--orange3));
-    color:#fff;
-  }
-
-  .calcKey.wide{
-    grid-column:span 2;
-  }
-
-  .focusedCalcTarget{
-    border-color:rgba(255,122,0,.7) !important;
-    box-shadow:0 0 0 calc(4px * var(--ui)) rgba(255,122,0,.12) !important;
-  }
-
-  #photoLayer{
-    position:fixed;
-    inset:0;
-    background:#000;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:90;
-  }
-
-  #photoLayer img{
-    max-width:100%;
-    max-height:100%;
-    object-fit:contain;
-  }
-
-  .rowGrid3{
-    display:grid;
-    grid-template-columns:
-      calc(26px * var(--ui)) .9fr
-      calc(26px * var(--ui)) .9fr
-      calc(14px * var(--ui)) .9fr;
-    gap:calc(10px * var(--ui));
-    align-items:center;
-    margin:calc(10px * var(--ui)) 0;
-    min-width:0;
-  }
-
-  .rowGridTDBB{
-    display:grid;
-    grid-template-columns:
-      calc(18px * var(--ui)) 1fr
-      calc(18px * var(--ui)) .9fr
-      calc(26px * var(--ui)) .9fr;
-    gap:calc(10px * var(--ui));
-    align-items:center;
-    margin:calc(10px * var(--ui)) 0;
-    min-width:0;
-  }
-
-  .rowGridTTTB{
-    display:grid;
-    grid-template-columns:
-      calc(26px * var(--ui)) 1fr
-      calc(26px * var(--ui)) 1fr;
-    gap:calc(10px * var(--ui));
-    align-items:center;
-    margin:calc(10px * var(--ui)) 0;
-    min-width:0;
-  }
-
-  @media (max-width:520px){
-    .controlsRow{
-      gap:8px;
-    }
-
-    .controlsRow button{
-      padding:12px 14px;
-      font-size:14px;
-    }
-
-    .controlsRow .mainControlWrap{
-      min-width:120px;
-    }
-
-    .controlsRow .teamControlLabel,
-    .controlsRow .mainControlLabel,
-    .controlsRow .authorControlLabel{
-      font-size:13px;
-    }
-
-    .controlsRow .authorControlInput,
-    .controlsRow .teamControlSelect,
-    .controlsRow .mainControlSelect{
-      font-size:14px;
-      height:38px;
-    }
-
-    .bottomLeftButtons{
-      left:12px;
-      bottom:14px;
-      gap:10px;
-    }
-
-    .bottomRightButtons{
-      right:12px;
-      bottom:14px;
-      gap:10px;
-    }
-
-    .itMemoBtn,
-    .akMemoBtn,
-    .equipBtn{
-      width:122px;
-      height:42px;
-      font-size:14px;
-    }
-
-    #equipBadge{
-      min-width:122px;
-      padding:10px 12px;
-    }
-
-    #equipBadge .b1,
-    #equipBadge .b2{
-      font-size:14px;
-    }
-
-    .topMiniBtn{
-      padding:8px 12px;
-      font-size:14px;
-    }
-  }
-
-  /* ===== PREMIUM SCREENSHOT-LIKE OVERRIDE ===== */
-  :root{
-    --premium-bg:#efe4dc;
-    --premium-panel:rgba(10,10,13,.90);
-    --premium-panel-2:rgba(14,14,18,.84);
-    --premium-stroke:rgba(255,150,52,.26);
-    --premium-orange:#ff6a00;
-    --premium-orange-soft:#ff9d4d;
-    --premium-cream:#fff4eb;
-    --premium-shadow:0 20px 40px rgba(0,0,0,.34);
-  }
-
-  body{
-    background:
-      radial-gradient(1000px 420px at 50% 8%, rgba(255,122,0,.22), transparent 60%),
-      linear-gradient(180deg, #f3e6de 0%, #ebddd4 20%, #df7a2d 74%, #a84710 100%) !important;
-    position:relative;
-    color:#fff;
-  }
-
-  body::before{
-    content:"";
-    position:fixed;
-    left:50%;
-    top:18px;
-    transform:translateX(-50%);
-    width:min(90vw, 980px);
-    height:min(55vw, 640px);
-    background:url("icon-512.png") no-repeat center top / contain;
-    opacity:.18;
-    pointer-events:none;
-    z-index:0;
-    filter:saturate(1.06);
-  }
-
-  body::after{
-    content:"";
-    position:fixed;
-    inset:0;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0) 32%),
-      radial-gradient(800px 260px at 50% 0%, rgba(255,255,255,.22), transparent 60%);
-    pointer-events:none;
-    z-index:0;
-  }
-
-  body > *{
-    position:relative;
-    z-index:1;
-  }
-
-  header{
-    padding:calc(22px * var(--ui)) calc(14px * var(--ui)) calc(18px * var(--ui));
-  }
-
-  .titleWrap{
-    gap:calc(12px * var(--ui));
-  }
-
-  .titleMain{
-    color:#f25b17;
-    text-shadow:0 2px 0 rgba(255,255,255,.16);
-    font-size:calc(62px * var(--ui));
-    letter-spacing:-1.8px;
-    font-weight:1000;
-  }
-
-  .titleVer{
-    color:#f26d22;
-    font-size:calc(22px * var(--ui));
-    opacity:1;
-  }
-
-  .controls{
-    width:min(calc(980px * var(--ui) / .65), calc(100% - 28px));
-    gap:calc(12px * var(--ui));
-    padding:calc(6px * var(--ui)) 0 calc(10px * var(--ui));
-  }
-
-  .controlsRow{
-    gap:calc(14px * var(--ui));
-  }
-
-  button,
-  .dayBtn,
-  .topMiniBtn,
-  .itMemoBtn,
-  .akMemoBtn,
-  .equipBtn{
-    background:
-      linear-gradient(135deg, rgba(255,145,70,.12) 0%, rgba(255,145,70,0) 24%),
-      linear-gradient(180deg, rgba(13,13,17,.98), rgba(5,5,8,.98)) !important;
-    color:#fff !important;
-    border:1px solid rgba(255,164,86,.34) !important;
-    box-shadow:
-      0 12px 22px rgba(0,0,0,.28),
-      inset 0 1px 0 rgba(255,255,255,.08),
-      inset 0 0 0 1px rgba(255,132,28,.08) !important;
-  }
-
-  button:hover,
-  .dayBtn:hover,
-  .topMiniBtn:hover{
-    transform:translateY(-1px);
-    filter:brightness(1.04);
-  }
-
-  .controlsRow > button{
-    min-width:calc(164px * var(--ui));
-    min-height:calc(72px * var(--ui));
-    border-radius:calc(28px * var(--ui));
-    font-size:calc(19px * var(--ui));
-    letter-spacing:.2px;
-  }
-
-  .teamControlWrap,
-  .authorControlWrap,
-  .mainControlWrap{
-    background:
-      linear-gradient(135deg, rgba(255,145,70,.08) 0%, rgba(255,145,70,0) 22%),
-      linear-gradient(180deg, rgba(14,14,18,.92), rgba(7,7,11,.94)) !important;
-    border:1px solid rgba(255,170,96,.22) !important;
-    border-radius:calc(28px * var(--ui)) !important;
-    box-shadow:var(--premium-shadow);
-    padding:calc(10px * var(--ui)) calc(14px * var(--ui));
-  }
-
-  .teamControlLabel,
-  .mainControlLabel,
-  .authorControlLabel{
-    color:#ff9d4d;
-    font-size:calc(15px * var(--ui));
-  }
-
-  .teamControlSelect,
-  .mainControlSelect,
-  .authorControlInput,
-  input, textarea, select{
-    background:rgba(3,4,7,.90) !important;
-    border:1px solid rgba(255,166,92,.22) !important;
-    color:#fff !important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-  }
-
-  .dayBar{
-    width:min(calc(980px * var(--dayUi) / .65), calc(100% - 28px));
-    margin:calc(8px * var(--ui)) auto calc(16px * var(--ui));
-    background:
-      linear-gradient(135deg, rgba(255,145,70,.08) 0%, rgba(255,145,70,0) 22%),
-      linear-gradient(180deg, rgba(14,14,18,.92), rgba(7,7,11,.94));
-    border:1px solid rgba(255,170,96,.22);
-    border-radius:calc(34px * var(--ui));
-    padding:calc(12px * var(--ui));
-    box-shadow:var(--premium-shadow);
-    gap:calc(10px * var(--dayUi));
-  }
-
-  .dayBtn{
-    font-size:calc(15px * var(--dayUi));
-    padding:calc(13px * var(--dayUi)) calc(16px * var(--dayUi));
-    border-radius:999px;
-  }
-
-  .dayLabel{
-    background:linear-gradient(180deg, #ff7b12, #ff6200);
-    color:#fff;
-    border:none;
-    box-shadow:0 10px 18px rgba(255,98,0,.25);
-    min-width:calc(165px * var(--dayUi));
-    text-align:center;
-    font-size:calc(15px * var(--dayUi));
-  }
-
-  #memoList{
-    max-width:calc(980px * var(--ui) / .65);
-    padding:calc(2px * var(--ui)) calc(14px * var(--ui)) calc(220px * var(--ui));
-  }
-
-  .memoCard{
-    background:
-      linear-gradient(135deg, rgba(255,145,70,.08) 0%, rgba(255,145,70,0) 22%),
-      linear-gradient(180deg, rgba(13,13,17,.94), rgba(7,7,11,.96)) !important;
-    border-radius:calc(34px * var(--ui)) !important;
-    border:1px solid rgba(255,166,92,.26) !important;
-    padding:calc(18px * var(--ui)) calc(16px * var(--ui)) !important;
-    box-shadow:
-      0 18px 34px rgba(0,0,0,.35),
-      inset 0 1px 0 rgba(255,255,255,.06);
-    margin:calc(16px * var(--ui)) 0;
-  }
-
-  .memoCard::before{
-    width:calc(4px * var(--ui));
-    background:linear-gradient(180deg, rgba(255,132,28,.0), rgba(255,132,28,.35), rgba(255,132,28,.0));
-    box-shadow:none;
-  }
-
-  .selBox{
-    width:calc(34px * var(--ui));
-    height:calc(34px * var(--ui));
-    border-radius:calc(12px * var(--ui));
-    border:1px solid rgba(255,180,110,.25);
-    background:#0c0d11;
-  }
-
-  .selBox:checked{
-    border-color:#ff8b2b;
-    box-shadow:0 0 0 calc(5px * var(--ui)) rgba(255,123,18,.10);
-  }
-
-  .tagPill{
-    min-width:calc(84px * var(--ui));
-    padding:calc(12px * var(--ui)) calc(16px * var(--ui));
-    background:linear-gradient(180deg,#ff8b2b,#ff6200) !important;
-    box-shadow:0 12px 18px rgba(255,98,0,.22);
-  }
-
-  .textPill{
-    background:rgba(255,255,255,.03) !important;
-    border:1px solid rgba(255,255,255,.04) !important;
-    border-radius:calc(18px * var(--ui));
-    font-size:calc(19px * var(--ui));
-    line-height:1.24;
-  }
-
-  .datePill, .authorPill, .teamBadge{
-    color:rgba(255,255,255,.72);
-  }
-
-  .bottomLeftButtons,
-  .bottomRightButtons{
-    bottom:calc(16px * var(--ui));
-  }
-
-  .itMemoBtn,
-  .akMemoBtn,
-  .equipBtn{
-    width:calc(156px * var(--ui));
-    height:calc(54px * var(--ui));
-    border-radius:999px;
-    font-size:calc(16px * var(--ui));
-  }
-
-  #equipBadge{
-    background:rgba(7,7,11,.92);
-    border:1px solid rgba(255,170,96,.22);
-    border-radius:calc(24px * var(--ui));
-  }
-
-  .modal{
-    background:rgba(12,9,8,.52);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-  }
-
-  .box{
-    background:
-      linear-gradient(135deg, rgba(255,145,70,.08) 0%, rgba(255,145,70,0) 22%),
-      linear-gradient(180deg, rgba(14,14,18,.97), rgba(8,8,11,.98)) !important;
-    border-top:1px solid rgba(255,170,96,.22);
-    box-shadow:0 -16px 40px rgba(0,0,0,.36);
-  }
-
-  .modalTitleTap{
-    background:linear-gradient(180deg, rgba(18,18,22,.98) 0%, rgba(18,18,22,.92) 100%);
-  }
-
-  .section{
-    background:
-      linear-gradient(135deg, rgba(255,145,70,.06) 0%, rgba(255,145,70,0) 20%),
-      linear-gradient(180deg, rgba(18,18,22,.94), rgba(9,9,12,.96));
-    border:1px solid rgba(255,170,96,.14);
-    border-radius:calc(30px * var(--ui));
-  }
-
-  .emptyDay{
-    background:
-      linear-gradient(135deg, rgba(255,145,70,.08) 0%, rgba(255,145,70,0) 22%),
-      linear-gradient(180deg, rgba(13,13,17,.92), rgba(7,7,11,.94));
-    border:1px solid rgba(255,166,92,.22);
-    border-radius:calc(34px * var(--ui));
-  }
-
-  .calcFloating{
-    background:
-      linear-gradient(135deg, rgba(255,145,70,.08) 0%, rgba(255,145,70,0) 22%),
-      linear-gradient(180deg, rgba(14,14,18,.97), rgba(7,7,11,.98));
-    border:1px solid rgba(255,170,96,.18);
-  }
-
-  @media (max-width: 820px){
-    body::before{
-      width:125vw;
-      height:72vw;
-      top:22px;
-      opacity:.16;
-    }
-
-    .controls{
-      width:calc(100% - 20px);
-    }
-
-    .controlsRow > button{
-      min-width:0;
-      flex:1;
-    }
-
-    .dayBar{
-      width:calc(100% - 20px);
-    }
-
-    #memoList{
-      max-width:none;
-      width:100%;
-      padding-left:10px;
-      padding-right:10px;
-    }
-  }
-
-  @media (max-width: 560px){
-    .titleMain{font-size:calc(50px * var(--ui));}
-    .titleVer{font-size:calc(19px * var(--ui));}
-
-    .controlsRow{
-      gap:8px;
-    }
-
-    .controlsRow > button{
-      min-height:calc(58px * var(--ui));
-      font-size:calc(15px * var(--ui));
-      padding:calc(10px * var(--ui)) calc(8px * var(--ui));
-    }
-
-    .controlsRow .authorControlWrap,
-    .controlsRow .teamControlWrap,
-    .controlsRow .mainControlWrap{
-      padding:8px 10px;
-      border-radius:22px !important;
-    }
-
-    .dayBar{
-      flex-wrap:wrap;
-      justify-content:center;
-      padding:10px;
-    }
-
-    .dayBtn{
-      font-size:11px;
-      padding:10px 11px;
-    }
-
-    .dayLabel{
-      order:-1;
-      width:100%;
-      min-width:0;
-      margin-bottom:6px;
-    }
-
-    .memoCard{
-      border-radius:26px !important;
-      padding:14px 12px !important;
-    }
-
-    .memoRow{
-      gap:8px;
-    }
-
-    .tagPill{
-      min-width:66px;
-      font-size:13px;
-      padding:9px 10px;
-    }
-
-    .textPill{
-      font-size:15px;
-      padding:10px 12px;
-    }
-  }
-
-
-
-  /* ===== JAGOS SCHEDULE EMBED ===== */
-  .scheduleIconBtn{
-    width:calc(42px * var(--ui));
-    height:calc(42px * var(--ui));
-    border-radius:999px;
-    padding:0;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:calc(20px * var(--ui));
-    line-height:1;
-    color:#111;
-    background:linear-gradient(180deg,#ffe063,#ffc61a);
-    box-shadow:0 10px 22px rgba(0,0,0,.22);
-    vertical-align:middle;
-  }
-
-  #scheduleScreen{
-    position:fixed;
-    inset:0;
-    z-index:44;
-    display:none;
-    overflow:auto;
-    padding:calc(16px * var(--ui)) calc(12px * var(--ui)) calc(120px * var(--ui));
-    background:
-      radial-gradient(1000px 420px at 50% 8%, rgba(255,122,0,.22), transparent 60%),
-      linear-gradient(180deg,#f3e6de 0%,#ebddd4 20%,#df7a2d 74%,#a84710 100%);
-    -webkit-overflow-scrolling:touch;
-  }
-  #scheduleScreen.show{display:block;}
-  .schTop{max-width:900px;margin:0 auto calc(10px * var(--ui));display:flex;align-items:center;justify-content:space-between;gap:calc(10px * var(--ui));}
-  .schTitle{font-size:calc(30px * var(--ui));font-weight:1000;color:#fff;text-shadow:0 10px 22px rgba(0,0,0,.18);letter-spacing:-.8px;}
-  .schCloseBtn,.schMiniBtn{box-shadow:var(--shadow-soft);padding:calc(11px * var(--ui)) calc(15px * var(--ui));font-size:calc(14px * var(--ui));}
-  .schControls{max-width:900px;margin:0 auto calc(8px * var(--ui));display:flex;gap:calc(8px * var(--ui));}
-  .schPill{flex:1;min-width:0;display:flex;align-items:center;gap:calc(8px * var(--ui));border:1px solid rgba(255,255,255,.06);border-radius:999px;padding:calc(8px * var(--ui)) calc(12px * var(--ui));background:linear-gradient(180deg,rgba(40,40,44,.96),rgba(27,27,30,.96));box-shadow:var(--shadow-soft);}
-  .schPill label{font-size:calc(13px * var(--ui));font-weight:1000;color:#fff;white-space:nowrap;}
-  .schPill select{width:100%;height:calc(38px * var(--ui));font-size:calc(14px * var(--ui));}
-  .schMonthBar{max-width:900px;margin:0 auto calc(10px * var(--ui));display:flex;align-items:center;justify-content:center;gap:calc(8px * var(--ui));}
-  .schMonthLabel{background:rgba(34,34,38,.96);border-radius:999px;padding:calc(10px * var(--ui)) calc(18px * var(--ui));font-size:calc(16px * var(--ui));font-weight:1000;color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.20);}
-  .schBadge{max-width:900px;margin:0 auto calc(10px * var(--ui));background:rgba(18,18,20,.88);border:1px solid rgba(255,255,255,.06);border-radius:calc(24px * var(--ui));padding:calc(12px * var(--ui));box-shadow:var(--shadow-soft);text-align:center;}
-  .schBadge .b1{font-size:calc(18px * var(--ui));font-weight:1000;color:#fff;}.schBadge .b2{font-size:calc(12px * var(--ui));font-weight:900;color:#fff2d8;margin-top:3px;}
-  .schCalendarWrap{max-width:900px;margin:0 auto;background:rgba(18,18,20,.72);border-radius:calc(28px * var(--ui));padding:calc(10px * var(--ui));box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.06);}
-  .schWeekHead,.schCalendar{display:grid;grid-template-columns:repeat(7,1fr);gap:calc(6px * var(--ui));}
-  .schWeekHead div{text-align:center;font-size:calc(11px * var(--ui));color:#fff;font-weight:1000;opacity:.8;padding:calc(4px * var(--ui)) 0;}.schSun{color:#ff9a9a!important}.schSat{color:#9ab7ff!important}
-  .schDay{min-height:calc(76px * var(--ui));border-radius:calc(18px * var(--ui));background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.05);padding:calc(8px * var(--ui));cursor:pointer;overflow:hidden;}
-  .schDay.blank{opacity:.18;cursor:default}.schDay.today{outline:2px solid rgba(255,198,26,.8)}
-  .schDayNum{font-size:calc(13px * var(--ui));font-weight:1000;color:#fff;}.schCode{margin-top:calc(6px * var(--ui));display:inline-flex;max-width:100%;border-radius:999px;background:linear-gradient(180deg,#ff9a2f,#ff6a00);padding:calc(5px * var(--ui)) calc(8px * var(--ui));font-size:calc(12px * var(--ui));font-weight:1000;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.schMemo{margin-top:4px;color:#fff2d8;font-size:calc(10px * var(--ui));font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.schSmall{margin-top:4px;color:#d8d8de;font-size:calc(10px * var(--ui));font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .schBottomActions{position:fixed;left:50%;bottom:calc(16px * var(--ui));transform:translateX(-50%);z-index:46;display:flex;gap:calc(10px * var(--ui));width:min(900px,calc(100% - 24px));justify-content:center;pointer-events:none;}.schBottomActions button{pointer-events:auto;min-width:calc(126px * var(--ui));}
-  .schPrimary{background:linear-gradient(180deg,#ff9a2f,#ff6a00)!important;color:#fff!important;}.schDark{background:linear-gradient(180deg,#2d2d33,#1c1c20)!important;color:var(--orange1)!important;}
-  .schModal{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.58);display:none;align-items:flex-end;justify-content:center;}.schModal.show{display:flex}.schBox{width:100%;max-width:760px;max-height:90vh;overflow:auto;background:#17171a;border-radius:calc(34px * var(--ui)) calc(34px * var(--ui)) 0 0;padding:0 calc(14px * var(--ui)) calc(18px * var(--ui));box-shadow:0 -10px 30px rgba(0,0,0,.28);}.schDrag{position:sticky;top:0;background:#17171a;z-index:2;padding:calc(7px * var(--ui)) 0 calc(8px * var(--ui));}.schHandle{width:calc(62px * var(--ui));height:calc(8px * var(--ui));background:#494952;border-radius:999px;margin:0 auto calc(8px * var(--ui));}.schActionBar{display:flex;justify-content:space-between;gap:calc(10px * var(--ui));}.schSection{background:#1f1f23;border-radius:calc(24px * var(--ui));padding:calc(13px * var(--ui));margin:calc(10px * var(--ui)) 0;border:1px solid rgba(255,255,255,.05);}.schSectionTitle{font-size:calc(18px * var(--ui));font-weight:1000;color:#fff;margin-bottom:calc(8px * var(--ui));}.schCodeGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(8px * var(--ui));}.schCodeBtn{padding:calc(10px * var(--ui)) calc(8px * var(--ui));font-size:calc(13px * var(--ui));box-shadow:none;background:#242429;color:#fff;}.schCodeBtn.active{background:linear-gradient(180deg,#ff9a2f,#ff6a00);color:#fff;}.schEditGrid{display:grid;grid-template-columns:calc(52px * var(--ui)) 1fr;gap:calc(8px * var(--ui));align-items:center;}.schEditGrid label{font-size:calc(13px * var(--ui));font-weight:1000;color:#fff;}.schEditGrid input,.schEditGrid select{height:calc(44px * var(--ui));font-size:calc(14px * var(--ui));}.schBulkRow{display:grid;grid-template-columns:1fr auto;gap:calc(8px * var(--ui));margin-bottom:calc(8px * var(--ui));}.schMemberEdit{display:grid;grid-template-columns:.8fr .9fr .8fr;gap:calc(6px * var(--ui));align-items:center;margin-top:calc(7px * var(--ui));}.schMemberEdit .name{font-size:calc(13px * var(--ui));font-weight:1000;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.schMemberEdit input,.schMemberEdit select{height:calc(42px * var(--ui));font-size:calc(13px * var(--ui));}.schMemberRow{display:grid;grid-template-columns:1fr auto;gap:calc(8px * var(--ui));align-items:center;margin-top:calc(8px * var(--ui));}.schMemberRow input{height:calc(44px * var(--ui));text-align:left;}.schOtLine{display:flex;flex-wrap:wrap;gap:calc(6px * var(--ui));}.schOtPill{display:inline-flex;gap:4px;align-items:center;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.05);padding:calc(7px * var(--ui)) calc(9px * var(--ui));font-size:calc(12px * var(--ui));font-weight:1000;color:#fff;}.schOtPill b{color:var(--orange1)}
-
-
-  /* ===== POLISHED UI REFINEMENT V2 - layout safe ===== */
-  :root{
-    --jas-glass:rgba(18,18,22,.78);
-    --jas-glass-strong:rgba(18,18,22,.92);
-    --jas-border:rgba(255,255,255,.09);
-    --jas-orange-glow:rgba(255,106,0,.32);
-  }
-
-  .titleWrap{
-    gap:calc(8px * var(--ui));
-  }
-
-  .titleMain{
-    letter-spacing:-1.6px;
-    text-shadow:0 10px 28px rgba(0,0,0,.18), 0 0 20px rgba(255,106,0,.18);
-  }
-
-  .scheduleIconBtn{
-    width:calc(38px * var(--ui));
-    height:calc(38px * var(--ui));
-    font-size:calc(18px * var(--ui));
-    background:linear-gradient(180deg,#fff2b2,#ffc928 54%,#ff9a1f);
-    border:1px solid rgba(255,255,255,.38);
-    box-shadow:0 12px 26px rgba(0,0,0,.24), 0 0 20px rgba(255,198,26,.18);
-  }
-
-  .controlsRow > *,
-  .teamControlWrap,
-  .mainControlWrap,
-  .authorControlWrap,
-  .dayLabel,
-  .memoCard,
-  .emptyDay{
-    border-color:var(--jas-border)!important;
-  }
-
-  .memoCard,
-  .emptyDay{
-    background:linear-gradient(180deg,rgba(33,33,39,.94),rgba(18,18,23,.94));
-  }
-
-  button,
-  .dayBtn,
-  .topMiniBtn,
-  .lirBtn,
-  .iconBtn,
-  .minusBtn{
-    border:1px solid rgba(255,255,255,.08);
-  }
-
-  #scheduleScreen{
-    background:
-      radial-gradient(900px 360px at 50% 5%, rgba(255,198,78,.30), transparent 58%),
-      radial-gradient(720px 460px at 15% 82%, rgba(255,106,0,.24), transparent 62%),
-      linear-gradient(180deg,#f4e8df 0%,#eadbd2 24%,#dd762c 73%,#8d370d 100%)!important;
-  }
-
-  .schTop,
-  .schControls,
-  .schMonthBar,
-  .schBadge,
-  .schCalendarWrap{
-    max-width:920px;
-  }
-
-  .schTitle{
-    font-size:calc(32px * var(--ui));
-    letter-spacing:-1.1px;
-    text-shadow:0 12px 28px rgba(0,0,0,.22), 0 0 18px rgba(255,106,0,.16);
-  }
-
-  .schPill,
-  .schBadge,
-  .schCalendarWrap,
-  .schBox,
-  .schSection{
-    border-color:var(--jas-border)!important;
-  }
-
-  .schPill{
-    background:linear-gradient(180deg,rgba(34,34,40,.92),rgba(17,17,22,.92));
-    box-shadow:0 14px 28px rgba(0,0,0,.22);
-  }
-
-  .schMonthLabel,
-  .schBadge,
-  .schCalendarWrap{
-    background:var(--jas-glass);
-    backdrop-filter:blur(16px);
-    -webkit-backdrop-filter:blur(16px);
-  }
-
-  .schBadge{
-    border-radius:calc(26px * var(--ui));
-    box-shadow:0 18px 36px rgba(0,0,0,.24);
-  }
-
-  .schCalendarWrap{
-    padding:calc(12px * var(--ui));
-    box-shadow:0 22px 48px rgba(0,0,0,.30);
-  }
-
-  .schDay{
-    background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.035));
-    border:1px solid rgba(255,255,255,.08);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
-    transition:transform .13s ease, background .13s ease, box-shadow .13s ease;
-  }
-
-  .schDay:active{
-    transform:scale(.985);
-    background:rgba(255,255,255,.10);
-  }
-
-  .schDay.today{
-    outline:2px solid rgba(255,198,26,.88);
-    box-shadow:0 0 0 4px rgba(255,198,26,.10), inset 0 1px 0 rgba(255,255,255,.05);
-  }
-
-  .schCode{
-    box-shadow:0 8px 16px rgba(255,106,0,.18);
-  }
-
-  .schBottomActions{
-    padding:calc(8px * var(--ui));
-    border-radius:999px;
-    background:rgba(20,20,24,.18);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-  }
-
-  .schModal{
-    background:rgba(0,0,0,.64);
-    backdrop-filter:blur(4px);
-    -webkit-backdrop-filter:blur(4px);
-  }
-
-  .schBox{
-    background:linear-gradient(180deg,rgba(25,25,30,.98),rgba(14,14,18,.98));
-    box-shadow:0 -18px 44px rgba(0,0,0,.34);
-  }
-
-  .schDrag{
-    background:linear-gradient(180deg,rgba(25,25,30,1),rgba(25,25,30,.96));
-  }
-
-  .schSection{
-    background:linear-gradient(180deg,rgba(34,34,40,.86),rgba(25,25,30,.86));
-  }
-
-  .schCodeGrid{
-    grid-template-columns:repeat(4, minmax(0,1fr));
-  }
-
-  .schCodeBtn{
-    border-radius:calc(18px * var(--ui));
-    background:linear-gradient(180deg,rgba(49,49,56,.94),rgba(34,34,40,.94));
-    border:1px solid rgba(255,255,255,.07);
-  }
-
-  .schCodeBtn.active,
-  .schPrimary{
-    box-shadow:0 12px 24px rgba(255,106,0,.20)!important;
-  }
-
-  .schMemberEdit{
-    grid-template-columns:.72fr .86fr .92fr;
-  }
-
-  .schOtPill{
-    background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.045));
-  }
-
-  @media (max-width:520px){
-    .schCodeGrid{grid-template-columns:repeat(3,minmax(0,1fr));}
-    .schMemberEdit{grid-template-columns:.68fr .82fr .95fr;gap:5px;}
-    .schBottomActions button{min-width:112px;font-size:13px;}
-    .schTitle{font-size:25px;}
-  }
-
-
-  /* ===== SCHEDULE FINAL FIX: full screen calendar + holiday color ===== */
-  #scheduleScreen{
-    padding:calc(8px * var(--ui)) calc(8px * var(--ui)) calc(72px * var(--ui))!important;
-  }
-
-  .schTop{margin-bottom:calc(6px * var(--ui))!important;}
-  .schControls{margin-bottom:calc(6px * var(--ui))!important;}
-  .schMonthBar{margin-bottom:calc(6px * var(--ui))!important;}
-  .schBadge{display:none!important;}
-
-  .schCalendarWrap{
-    width:calc(100vw - 16px)!important;
-    max-width:980px!important;
-    height:calc(100dvh - 178px)!important;
-    min-height:430px;
-    padding:calc(8px * var(--ui))!important;
-    display:flex;
-    flex-direction:column;
-    margin-bottom:0!important;
-  }
-
-  .schWeekHead{
-    flex:0 0 auto;
-    gap:calc(4px * var(--ui))!important;
-  }
-
-  .schCalendar{
-    flex:1 1 auto;
-    min-height:0;
-    gap:calc(4px * var(--ui))!important;
-    grid-auto-rows:1fr;
-  }
-
-  .schDay{
-    min-height:0!important;
-    padding:calc(6px * var(--ui))!important;
-    border-radius:calc(15px * var(--ui))!important;
-  }
-
-  .schCode.off{
-    background:#fff!important;
-    color:#ff6a00!important;
-    border:1px solid rgba(255,106,0,.35)!important;
-    box-shadow:0 8px 16px rgba(255,255,255,.12)!important;
-  }
-
-  .schBottomActions{
-    bottom:calc(8px * var(--ui))!important;
-    padding:calc(5px * var(--ui))!important;
-  }
-
-  @media (max-width:520px){
-    #scheduleScreen{padding:8px 7px 62px!important;}
-    .schTitle{font-size:22px!important;}
-    .schCloseBtn,.schMiniBtn{padding:8px 11px!important;font-size:12px!important;}
-    .schPill{padding:6px 8px!important;}
-    .schPill select{height:32px!important;font-size:12px!important;}
-    .schMonthLabel{padding:8px 14px!important;font-size:14px!important;}
-    .schCalendarWrap{
-      width:calc(100vw - 14px)!important;
-      height:calc(100dvh - 154px)!important;
-      min-height:390px;
-      border-radius:20px!important;
-    }
-    .schDayNum{font-size:12px!important;}
-    .schCode{font-size:10px!important;padding:4px 6px!important;margin-top:4px!important;}
-    .schSmall,.schMemo{font-size:9px!important;margin-top:3px!important;}
-  }
-
-
-  /* ===== FIX: title calendar button to far right ===== */
-  #homeHeader{
-    position:relative;
-  }
-
-  #homeHeader .titleWrap{
-    position:relative;
-    width:min(calc(780px * var(--ui) / .65), calc(100% - 24px));
-    margin:0 auto;
-    padding-right:calc(56px * var(--ui));
-  }
-
-  #homeHeader .scheduleIconBtn{
-    position:absolute;
-    right:0;
-    top:50%;
-    transform:translateY(-50%);
-    z-index:3;
-  }
-
-  #homeHeader .scheduleIconBtn:hover{
-    transform:translateY(-50%);
-  }
-
-  #homeHeader .scheduleIconBtn:active{
-    transform:translateY(-50%) scale(.96);
-  }
-
-  @media (max-width:520px){
-    #homeHeader .titleWrap{
-      width:calc(100% - 16px);
-      padding-right:44px;
-    }
-  }
-
-
-  /* ===== OVERTIME VIEW BIG VERTICAL CARDS ===== */
-  #schOtModal .schBox{
-    max-height:94vh!important;
-  }
-
-  #schOtModal .schSectionTitle{
-    font-size:22px!important;
-    text-align:center;
-    margin-bottom:14px!important;
-    color:#fff;
-  }
-
-  .schOtLine{
-    display:flex!important;
-    flex-direction:column!important;
-    flex-wrap:nowrap!important;
-    gap:12px!important;
-    max-height:68vh;
-    overflow:auto;
-    padding:2px 2px 10px;
-  }
-
-  .schOtTotal{
-    width:100%;
-    border-radius:24px;
-    padding:16px 18px;
-    background:linear-gradient(180deg,#ff9a2f,#ff6a00);
-    color:#fff;
-    font-weight:1000;
-    font-size:20px;
-    text-align:center;
-    box-shadow:0 12px 24px rgba(255,106,0,.24);
-  }
-
-  .schOtPill{
-    width:100%!important;
-    display:flex!important;
-    flex-direction:column!important;
-    align-items:stretch!important;
-    justify-content:center!important;
-    gap:10px!important;
-    border-radius:26px!important;
-    background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.06))!important;
-    border:1px solid rgba(255,255,255,.10)!important;
-    padding:18px 18px!important;
-    color:#fff!important;
-    box-shadow:0 12px 24px rgba(0,0,0,.18)!important;
-  }
-
-  .schOtName{
-    font-size:22px;
-    font-weight:1000;
-    line-height:1.15;
-    letter-spacing:-.2px;
-    color:#fff;
-    word-break:break-word;
-  }
-
-  .schOtTime{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    font-size:18px;
-    font-weight:1000;
-    color:#ffcf9b;
-  }
-
-  .schOtTime b{
-    color:#ffb347!important;
-    font-size:30px!important;
-    line-height:1;
-    font-weight:1000;
-    font-variant-numeric:tabular-nums;
-  }
-
-  @media (max-width:520px){
-    #schOtModal .schSectionTitle{font-size:20px!important;}
-    .schOtLine{gap:10px!important;max-height:70vh;}
-    .schOtTotal{font-size:18px;padding:14px 16px;}
-    .schOtPill{padding:16px 16px!important;border-radius:24px!important;}
-    .schOtName{font-size:21px;}
-    .schOtTime{font-size:17px;}
-    .schOtTime b{font-size:29px!important;}
-  }
-
+:root{
+  --orange:#ff6500;
+  --orange2:#ff9348;
+  --cream:#f1e5dd;
+  --dark:#09090c;
+  --panel:rgba(10,10,13,.93);
+  --panel2:rgba(18,18,22,.94);
+  --stroke:rgba(255,161,84,.25);
+  --text:#fff;
+  --muted:#aaaab3;
+  --shadow:0 20px 42px rgba(0,0,0,.30);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif}
+body{
+  color:var(--text);
+  background:
+    radial-gradient(900px 400px at 50% 0%,rgba(255,122,0,.25),transparent 62%),
+    linear-gradient(180deg,#f3e6dd 0%,#eadbd1 22%,#de7a31 76%,#a84611 100%);
+  min-height:100vh;
+  font-weight:800;
+}
+body:before{
+  content:"JAS";
+  position:fixed;left:50%;top:70px;transform:translateX(-50%);
+  font-size:min(38vw,310px);font-weight:1000;letter-spacing:-15px;
+  color:rgba(255,255,255,.09);pointer-events:none;z-index:0;
+}
+.app{position:relative;z-index:1;max-width:980px;margin:auto;padding:0 12px 100px}
+header{text-align:center;padding:26px 10px 16px}
+.title{
+  display:flex;
+  align-items:baseline;
+  justify-content:center;
+  gap:8px;
+  white-space:nowrap;
+  color:#ef5c18;
+  text-shadow:0 2px 0 rgba(255,255,255,.2);
+  line-height:1;
+}
+.titleJAS{
+  font-size:clamp(38px,8vw,64px);
+  font-weight:1000;
+  letter-spacing:-2px;
+}
+.titleRest{
+  font-size:clamp(19px,4vw,32px);
+  font-weight:1000;
+  letter-spacing:-1px;
+}
+.subTitle{font-size:13px;color:#7c3718;letter-spacing:2px;margin-top:4px}
+
+.card{
+  background:linear-gradient(135deg,rgba(255,145,70,.08),rgba(255,145,70,0) 25%),var(--panel);
+  border:1px solid var(--stroke);
+  box-shadow:var(--shadow);
+  border-radius:28px;
+  padding:14px;
+  margin:10px 0;
+  backdrop-filter:blur(14px);
+}
+.row{display:flex;gap:10px;align-items:center}
+.control{
+  flex:1;display:flex;align-items:center;gap:8px;min-width:0;
+  background:#0b0b0e;border:1px solid var(--stroke);border-radius:22px;padding:9px 12px;
+}
+.control label{color:var(--orange2);font-size:13px;font-weight:1000;white-space:nowrap}
+select,input{
+  width:100%;min-width:0;height:42px;border-radius:15px;border:1px solid rgba(255,166,92,.22);
+  background:#050507;color:#fff;padding:0 11px;font:inherit;font-weight:900;outline:none;
+}
+button,.fileBtn{
+  border:1px solid rgba(255,164,86,.34);border-radius:20px;
+  background:linear-gradient(180deg,#121216,#050507);color:#fff;
+  padding:12px 15px;font:inherit;font-weight:1000;box-shadow:0 10px 20px rgba(0,0,0,.22);cursor:pointer;
+}
+button.active{background:linear-gradient(180deg,#ff8c37,#ff5d00);color:white;border-color:#ff994e}
+.fileBtn{display:block;text-align:center;background:linear-gradient(180deg,#ff8c37,#ff5d00);cursor:pointer}
+.fileBtn input{display:none}
+
+.categories{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.categories button{padding:12px 4px;font-size:13px}
+.scroll{display:flex;gap:7px;overflow-x:auto;padding-top:10px;scrollbar-width:none}
+.scroll button{min-width:58px;padding:10px 12px;white-space:nowrap}
+.persons button{min-width:max-content}
+
+.info{
+  margin-top:9px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.055);
+  color:#ddd;font-size:12px;line-height:1.5;border:1px solid rgba(255,255,255,.05)
+}
+.mainName{color:var(--orange2);font-weight:1000}
+.current{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;
+}
+.currentPerson{font-size:17px;font-weight:1000}
+.monthBar{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0 12px}
+.monthBar button{padding:9px 13px;border-radius:999px;font-size:12px}
+.monthLabel{
+  min-width:150px;text-align:center;background:#0c0c10;border:1px solid var(--stroke);
+  border-radius:999px;padding:10px 15px;font-size:15px;font-weight:1000;
+}
+.week,.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.week div{text-align:center;color:#e4cfc1;font-size:11px;padding:4px 0}
+.day{
+  min-height:95px;background:linear-gradient(180deg,#141419,#0b0b0e);
+  border:1px solid rgba(255,255,255,.07);border-radius:18px;padding:8px;cursor:pointer;
+  position:relative;overflow:hidden;
+}
+.day:hover{border-color:rgba(255,145,70,.45)}
+.day.blank{background:transparent;border-color:transparent;cursor:default}
+.day.today{
+  border-color:rgba(255,255,255,.07)!important;
+  box-shadow:none!important;
+}
+.day.today .dayNum{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:22px;
+  height:22px;
+  padding:0 5px;
+  border-radius:999px;
+  background:var(--orange);
+  color:#fff!important;
+}
+.dayNum{font-size:12px;color:#ddd;font-weight:1000}
+.code{
+  margin-top:9px;
+  text-align:center;
+  color:#ff9c57;
+  font-size:14px;
+  font-weight:1000;
+  word-break:keep-all;
+  white-space:nowrap;
+  line-height:1.15;
+  padding:0;
+  border-radius:0;
+  background:transparent;
+  border:none;
+}
+
+.codeOff{background:transparent;color:inherit;border:none;box-shadow:none;}
+
+.codeLeave{background:transparent;color:inherit;border:none;box-shadow:none;}
+
+.codeAll53{background:transparent;color:inherit;border:none;box-shadow:none;}
+
+.codeSpecial{background:transparent;color:inherit;border:none;box-shadow:none;}
+.sun .dayNum{color:#ff7b76}.sat .dayNum{color:#7ca7ff}
+.edited:after{content:"EDIT";position:absolute;right:6px;bottom:5px;font-size:8px;color:#ff9c57;opacity:.7}
+
+
+.dayNormal,
+.dayOff,
+.dayLeave,
+.dayR,
+.dayA,
+.dayP{
+  border-color:rgba(255,255,255,.07);
+  box-shadow:none;
+}
+
+.dayOff::before,
+.dayLeave::before,
+.dayR::before,
+.dayA::before,
+.dayP::before{
+  content:"";
+  position:absolute;
+  left:10px;
+  right:10px;
+  bottom:5px;
+  height:4px;
+  border-radius:999px;
+}
+
+/* 휴무 */
+.dayOff::before{background:#d8dde5}
+
+/* 연차 */
+.dayLeave::before{background:#ffc247}
+
+/* R14 / R43 */
+.dayR::before{background:#b57dff}
+
+/* A 계열 */
+.dayA::before{background:#489eff}
+
+/* P 계열 */
+.dayP::before{background:#45d6a4}
+
+.bottom{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;padding:9px 12px calc(9px + env(safe-area-inset-bottom));
+  background:rgba(5,5,8,.88);border-top:1px solid rgba(255,160,80,.18);backdrop-filter:blur(14px)
+}
+.bottomInner{max-width:980px;margin:auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.bottom button{padding:12px 7px}
+.bottom .mainBtn{background:linear-gradient(180deg,#ff8c37,#ff5d00)}
+
+.modal{
+  position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.55);z-index:50;
+}
+.modal.show{display:flex}
+.sheet{
+  width:min(100%,520px);background:#111115;border-radius:28px 28px 0 0;padding:16px 15px calc(18px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--stroke);box-shadow:0 -16px 40px rgba(0,0,0,.35)
+}
+.handle{width:55px;height:6px;background:#45454d;border-radius:999px;margin:0 auto 13px}
+.sheetTitle{text-align:center;font-size:16px;font-weight:1000;margin-bottom:12px}
+.editInput{height:52px;text-align:center;font-size:18px}
+.sheetActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+
+
+.compactTopCard{
+  padding:10px;
+}
+
+.topHalfGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.topHalfBox{
+  min-width:0;
+  background:
+    linear-gradient(135deg,rgba(255,145,70,.07),rgba(255,145,70,0) 30%),
+    #0b0b0e;
+  border:1px solid var(--stroke);
+  border-radius:20px;
+  padding:10px;
+}
+
+.topHalfTitle{
+  color:var(--orange2);
+  font-size:12px;
+  font-weight:1000;
+  margin-bottom:7px;
+  letter-spacing:.2px;
+}
+
+.mainCompactRow{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:6px;
+  align-items:center;
+}
+
+.mainCompactRow select{
+  height:38px;
+  border-radius:13px;
+  font-size:13px;
+}
+
+.compactActionBtn{
+  height:38px;
+  padding:0 12px;
+  border-radius:13px;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.compactFileBtn{
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 10px;
+  border-radius:13px;
+  font-size:13px;
+  box-shadow:none;
+}
+
+.compactSubText{
+  margin-top:7px;
+  color:#aaaab3;
+  font-size:10px;
+  line-height:1.3;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.compactSubText .mainName{
+  color:var(--orange2);
+}
+
+
+.searchFileGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+
+.searchBtn{
+  width:100%;
+}
+
+.searchResults{
+  margin-top:10px;
+  max-height:42vh;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.searchResultBtn{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  text-align:left;
+  padding:12px 14px;
+  border-radius:16px;
+  background:linear-gradient(180deg,#17171b,#0b0b0e);
+}
+
+.searchResultName{
+  font-size:15px;
+  font-weight:1000;
+}
+
+.searchResultUnit{
+  font-size:11px;
+  color:var(--orange2);
+  white-space:nowrap;
+}
+
+.searchEmpty{
+  text-align:center;
+  color:#8d8d96;
+  font-size:12px;
+  padding:18px 8px;
+  background:rgba(255,255,255,.04);
+  border-radius:16px;
+}
+
+.searchSheet{
+  max-height:90vh;
+  overflow:auto;
+}
+
+.searchNavSection{
+  margin-top:12px;
+  padding:10px;
+  border-radius:18px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.05);
+}
+
+.searchSectionTitle{
+  margin:10px 0 6px;
+  color:var(--orange2);
+  font-size:11px;
+  font-weight:1000;
+  letter-spacing:.3px;
+}
+
+.searchCategories{
+  grid-template-columns:repeat(5,1fr);
+}
+
+.searchCategories button{
+  padding:9px 3px;
+  font-size:11px;
+  border-radius:13px;
+}
+
+.searchUnits{
+  padding-top:3px;
+}
+
+.searchUnits button{
+  padding:9px 11px;
+  min-width:52px;
+  border-radius:13px;
+}
+
+.searchPersons{
+  padding-top:3px;
+  flex-wrap:wrap;
+  overflow:visible;
+}
+
+.searchPersons button{
+  min-width:max-content;
+  padding:9px 12px;
+  border-radius:13px;
+  font-size:12px;
+}
+
+@media(max-width:600px){
+  .title{gap:5px}
+  .titleJAS{font-size:40px}
+  .titleRest{font-size:20px;letter-spacing:-.8px}
+
+  .app{padding-left:8px;padding-right:8px}
+  .topHalfGrid{grid-template-columns:1fr 1fr;gap:6px}
+  .topHalfBox{padding:8px;border-radius:17px}
+  .topHalfTitle{font-size:11px}
+  .mainCompactRow select{font-size:11px;padding:0 7px}
+  .compactActionBtn{padding:0 8px;font-size:11px}
+  .compactFileBtn{font-size:12px}
+  .compactSubText{font-size:9px}
+  .card{border-radius:23px;padding:11px}
+  .row.mainRow{display:grid;grid-template-columns:1fr}
+  .categories{gap:5px}.categories button{font-size:11px;padding:11px 2px}
+  .day{min-height:72px;border-radius:14px;padding:6px}
+  .code{
+    font-size:11px;
+    margin-top:7px;
+    padding:6px 3px;
+    letter-spacing:-.3px;
+  }
+  .title{font-size:42px}
+}
 </style>
-</head>
 
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png?v=2">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png?v=2">
+<link rel="icon" type="image/png" sizes="512x512" href="./icon-512.png?v=2">
+<link rel="manifest" href="./manifest.webmanifest?v=2">
+
+</head>
 <body>
 
-<header id="homeHeader" onclick="openPhoto()" ondblclick="openPhoto()">
-  <div class="titleWrap">
-    <div class="titleMain">JAGOS</div>
-    <div class="titleVer">VER.X</div>
-    <button type="button" class="scheduleIconBtn" onclick="event.stopPropagation(); openSchedule();" title="SCHEDULE">📅</button>
-  </div>
+<div class="app">
+<header>
+  <div class="title"><span class="titleJAS">JAS</span><span class="titleRest">DUTY SCHEDULE</span></div>
 </header>
 
-<div id="scheduleScreen" aria-hidden="true">
-  <div class="schTop">
-    <div class="schTitle">JAGOS SCHEDULE</div>
-    <button type="button" class="schCloseBtn schDark" onclick="closeSchedule()">MEMO</button>
-  </div>
-  <div class="schControls">
-    <div class="schPill"><label>TEAM</label><select id="schTeamSelect"></select></div>
-    <div class="schPill"><label>MAIN</label><select id="schMainSelect"></select></div>
-  </div>
-  <div class="schMonthBar">
-    <button type="button" class="schMiniBtn schDark" id="schPrevMonthBtn">PREV</button>
-    <div class="schMonthLabel" id="schMonthLabel">2026.06</div>
-    <button type="button" class="schMiniBtn schDark" id="schNextMonthBtn">NEXT</button>
-  </div>
-  <div class="schBadge"><div class="b1" id="schBadgeTeam">MAIN TEAM</div><div class="b2">전체 공유 스케줄</div></div>
-  <div class="schCalendarWrap">
-    <div class="schWeekHead"><div class="schSun">SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div class="schSat">SAT</div></div>
-    <div class="schCalendar" id="schCalendar"></div>
-  </div>
-  <div class="schBottomActions">
-    <button type="button" class="schDark" id="schMemberBtn">조원 추가</button>
-    <button type="button" class="schPrimary" id="schOtViewBtn">연장시간보기</button>
-  </div>
-</div>
-
-<div class="schModal" id="schDayModal"><div class="schBox"><div class="schDrag"><div class="schHandle"></div><div class="schActionBar"><button type="button" class="schDark" id="schDayCloseBtn">CLOSE</button><button type="button" class="schPrimary" id="schDaySaveBtn">SAVE</button></div></div>
-  <div class="modalTitleTap" id="schDayTitle">DAY EDIT</div>
-  <div class="schSection"><div class="schSectionTitle">근무 코드 선택</div><div class="schCodeGrid" id="schCodeGrid"></div></div>
-  <div class="schSection"><div class="schSectionTitle">근무 입력</div><div class="schEditGrid"><label>CODE</label><input id="schShiftInput" placeholder="근무 코드"><label>MEMO</label><input id="schMemoInput" placeholder="간단 메모"></div></div>
-  <div class="schSection"><div class="schSectionTitle">조원별 근무 / 연장</div><div class="schBulkRow"><input id="schBulkOtInput" inputmode="numeric" maxlength="4" placeholder="전체 연장 예: 0200"><button type="button" class="schPrimary" id="schApplyBulkOtBtn">전체적용</button></div><div id="schMemberEditList"></div></div>
-</div></div>
-
-<div class="schModal" id="schMemberModal"><div class="schBox"><div class="schDrag"><div class="schHandle"></div><div class="schActionBar"><button type="button" class="schDark" id="schMemberCloseBtn">CLOSE</button><button type="button" class="schPrimary" id="schMemberSaveBtn">SAVE</button></div></div>
-  <div class="modalTitleTap">조원 추가</div>
-  <div class="schSection"><div class="schSectionTitle">최대 6명</div><div id="schMemberList"></div><button type="button" class="schPrimary" id="schAddMemberBtn">+ 조원 추가</button></div>
-</div></div>
-
-<div class="schModal" id="schOtModal"><div class="schBox"><div class="schDrag"><div class="schHandle"></div><div class="schActionBar"><button type="button" class="schDark" id="schOtCloseBtn">CLOSE</button></div></div>
-  <div class="modalTitleTap">연장시간보기</div>
-  <div class="schSection"><div class="schSectionTitle" id="schOtTitle">월 합계</div><div class="schOtLine" id="schOtList"></div></div>
-</div></div>
-
-
-<div class="controls" id="topControls">
-  <div class="controlsRow">
-    <button type="button" onclick="newMemo()">ADD</button>
-    <button type="button" onclick="deleteSelected()">DELETE</button>
-    <button type="button" onclick="addPhoto()">PHOTO</button>
-    <div class="mainControlWrap">
-      <div class="mainControlLabel">MAIN</div>
-      <select id="mainTeamSelect" class="mainControlSelect"></select>
-    </div>
-  </div>
-  <div class="controlsRow">
-    <div class="teamControlWrap">
-      <div class="teamControlLabel">TEAM</div>
-      <select id="quickTeamSelect" class="teamControlSelect"></select>
-    </div>
-    <div class="authorControlWrap">
-      <div class="authorControlLabel">NAME</div>
-      <input id="authorNameInput" class="authorControlInput" maxlength="12" placeholder="YOUR NAME">
-    </div>
-  </div>
-</div>
-
-<div class="dayBar">
-  <button type="button" class="dayBtn" onclick="moveDay(-1)">PREV DAY</button>
-  <div class="dayLabel" id="dayLabel">TODAY</div>
-  <button type="button" class="dayBtn" onclick="goToday()">TODAY</button>
-  <button type="button" class="dayBtn" onclick="deleteCurrentDay()">DEL DAY</button>
-  <button type="button" class="dayBtn" onclick="moveDay(1)">NEXT DAY</button>
-</div>
-
-<div id="memoList"></div>
-
-<div class="bottomLeftButtons">
-  <button class="equipBtn" type="button" onclick="openEquip()">EQUIPMENT</button>
-  <button class="itMemoBtn" onclick="location.href='https://deathd-stack.github.io/JAS2/'">IT MEMO</button>
-</div>
-
-<div class="bottomRightButtons">
-  <div id="equipBadge"></div>
-  <button class="akMemoBtn" onclick="location.href='https://deathd-stack.github.io/JAS1/'">AK MEMO</button>
-</div>
-
-<input type="file" id="photoInput" accept="image/*" hidden />
-<input type="file" id="lirPhotoInput" accept="image/*" hidden />
-
-<div class="modal" id="modal" aria-hidden="true">
-  <div class="box" id="sheet" role="dialog" aria-modal="true">
-    <div class="dragArea" id="dragArea">
-      <div class="drag-handle"></div>
-      <div class="topActionBar">
-        <button type="button" class="topMiniBtn" onclick="saveMemo()">SAVE</button>
-        <button type="button" class="topMiniBtn" onclick="closeModal()">CLOSE</button>
-      </div>
-    </div>
-
-    <div class="modalTitleTap" onclick="openPhoto()">
-      <div class="m1">JAGOS</div>
-      <div class="m2">TAP TO OPEN PHOTO</div>
-    </div>
-
-    <div class="dateLine">
-      <div class="dateLab">DATE</div>
-      <input type="date" id="memoDate" class="dateInput">
-    </div>
-
-    <div class="pickRow">
-      <label class="pickPill">
-        <input type="checkbox" id="pickInbound" checked>
-        <span>INBOUND</span>
-      </label>
-      <label class="pickPill">
-        <input type="checkbox" id="pickOutbound" checked>
-        <span>OUTBOUND</span>
-      </label>
-    </div>
-
-    <div id="sections"></div>
-  </div>
-</div>
-
-<div id="photoLayer" ondblclick="closePhoto()" onclick="closePhoto()">
-  <img id="photoImg" alt="photo" />
-</div>
-
-<div class="modal" id="equipModal" aria-hidden="true">
-  <div class="box" style="max-height:70vh" onclick="event.stopPropagation()">
-    <div class="dragArea">
-      <div class="drag-handle"></div>
-      <div class="topActionBar">
-        <button type="button" class="topMiniBtn" onclick="saveEquip()">SAVE</button>
-        <button type="button" class="topMiniBtn" onclick="closeEquip()">CLOSE</button>
-      </div>
-    </div>
-
-    <div style="font-weight:1000;font-size:20px;margin:6px 0 12px; text-transform:uppercase; color:#fff;">EQUIPMENT</div>
-
-    <div class="row">
-      <div class="lab" style="min-width:72px;">TUG</div>
-      <input id="tug1" class="numBox" inputmode="numeric" maxlength="2" placeholder="00">
-      <input id="tug2" class="numBox" inputmode="numeric" maxlength="2" placeholder="00">
-    </div>
-
-    <div class="row">
-      <div class="lab" style="min-width:72px;">BELT</div>
-      <input id="belt" class="numBox" inputmode="numeric" maxlength="2" placeholder="00">
-    </div>
-  </div>
-</div>
-
-<div id="calcWrap" class="calcFloatingWrap" aria-hidden="true">
-  <div class="calcFloating" onclick="event.stopPropagation()">
-    <div class="calcTopBar">
-      <div class="calcTitle">CALCULATOR</div>
-      <button type="button" class="calcCloseBtn" onclick="closeCalc()">✕</button>
-    </div>
-    <div class="calcDisplay" id="globalCalcDisplay">0</div>
-    <div class="calcGrid">
-      <button type="button" class="calcKey op" data-global-calc="C">C</button>
-      <button type="button" class="calcKey op" data-global-calc="⌫">⌫</button>
-      <button type="button" class="calcKey op" data-global-calc="%">%</button>
-      <button type="button" class="calcKey op" data-global-calc="/">÷</button>
-
-      <button type="button" class="calcKey" data-global-calc="7">7</button>
-      <button type="button" class="calcKey" data-global-calc="8">8</button>
-      <button type="button" class="calcKey" data-global-calc="9">9</button>
-      <button type="button" class="calcKey op" data-global-calc="*">×</button>
-
-      <button type="button" class="calcKey" data-global-calc="4">4</button>
-      <button type="button" class="calcKey" data-global-calc="5">5</button>
-      <button type="button" class="calcKey" data-global-calc="6">6</button>
-      <button type="button" class="calcKey op" data-global-calc="-">−</button>
-
-      <button type="button" class="calcKey" data-global-calc="1">1</button>
-      <button type="button" class="calcKey" data-global-calc="2">2</button>
-      <button type="button" class="calcKey" data-global-calc="3">3</button>
-      <button type="button" class="calcKey op" data-global-calc="+">+</button>
-
-      <button type="button" class="calcKey wide" data-global-calc="0">0</button>
-      <button type="button" class="calcKey" data-global-calc=".">.</button>
-      <button type="button" class="calcKey eq" data-global-calc="=">=</button>
-    </div>
-  </div>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs, onSnapshot, query, where, runTransaction, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDto0AprR6IbnTNqNzZ3qt_-piJ_Cbqd_Y",
-    authDomain: "jasmemo-3c59b.firebaseapp.com",
-    projectId: "jasmemo-3c59b",
-    storageBucket: "jasmemo-3c59b.firebasestorage.app",
-    messagingSenderId: "891861551666",
-    appId: "1:891861551666:web:0b96ffcead52c73676ca2b",
-    measurementId: "G-0G4R112WVT"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  enableIndexedDbPersistence(db).catch((err)=>{
-    console.warn("PERSISTENCE OFF", err?.code || err);
-  });
-
-  const PHOTO_KEY = "jas_photo_v64";
-  const EQUIP_KEY = "jas_equipment_v64";
-  const AUTHOR_KEY = "jas_author_v1";
-  const MAIN_TEAM_KEY = "jas_main_team_v1";
-  const AUTO_DELETE_DAYS = 3;
-  const AUTO_DELETE_MS = AUTO_DELETE_DAYS * 24 * 60 * 60 * 1000;
-
-  const modal = document.getElementById("modal");
-  const sheet = document.getElementById("sheet");
-  const dragArea = document.getElementById("dragArea");
-  const sections = document.getElementById("sections");
-  const memoList = document.getElementById("memoList");
-  const photoInput = document.getElementById("photoInput");
-  const lirPhotoInput = document.getElementById("lirPhotoInput");
-  const photoLayer = document.getElementById("photoLayer");
-  const photoImg = document.getElementById("photoImg");
-  const memoDate = document.getElementById("memoDate");
-  const dayLabel = document.getElementById("dayLabel");
-  const pickInbound = document.getElementById("pickInbound");
-  const pickOutbound = document.getElementById("pickOutbound");
-  const topControls = document.getElementById("topControls");
-  const quickTeamSelect = document.getElementById("quickTeamSelect");
-  const mainTeamSelect = document.getElementById("mainTeamSelect");
-  const authorNameInput = document.getElementById("authorNameInput");
-
-  const equipBadge = document.getElementById("equipBadge");
-  const equipModal = document.getElementById("equipModal");
-  const tug1 = document.getElementById("tug1");
-  const tug2 = document.getElementById("tug2");
-  const belt = document.getElementById("belt");
-
-  const calcWrap = document.getElementById("calcWrap");
-  const globalCalcDisplay = document.getElementById("globalCalcDisplay");
-
-  let memos = [];
-  let photo = localStorage.getItem(PHOTO_KEY) || "";
-  let authorName = (localStorage.getItem(AUTHOR_KEY) || "").trim();
-  let mainTeam = (localStorage.getItem(MAIN_TEAM_KEY) || "").toUpperCase();
-  let editId = null;
-  let dayOffset = 0;
-  let activeLirType = null;
-  let currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
-  let globalCalcExpr = "";
-  let activeCalcInput = null;
-  let memosUnsubscribe = null;
-  let editingBaseMemo = null;
-  const memoCache = new Map();
-
-  const EXTRA_KEYS = ["W","C","COB","GB","TS","EMS","RUSH","CARSEAT","COMAT","STRAP","LONGFIN","CYCLE","CREW","PAX","PAD","DHC"];
-
-  const TEAM_VALUES = ["ALL", ...Array.from({length:24}, (_,i)=> String(i+1)), "G1", "G2", "T"];
-  const TT_OPTIONS = ["", "CJU-3-43","CJU-3-44","CJU-3-45","CJU-3-69","CJU-3-70","JAS-3-51","JAS-3-64","JAS-3-72","JAS-3-73","JAS-3-83"];
-  const TB_OPTIONS = ["", "CJU-40","CJU-52","CJU-53","CJU-54","CJU-55","CJU-70","CJU-86","CJU-87","CJU-111","CJU-199","CJU-4-46","CJU-4-47","JAS-1448","JAS-1458","JAS-1459"];
-  let activeTeamFilter = "ALL";
-
-  function optionHtml(list, selectedValue=""){
-    const current = String(selectedValue || "");
-    return list.map(v => `<option value="${v}" ${v===current ? "selected" : ""}>${v || "SELECT"}</option>`).join("");
-  }
-
-  function fillTeamOptions(selected = "ALL"){
-    if(!quickTeamSelect) return;
-    quickTeamSelect.innerHTML = TEAM_VALUES.map(v => `<option value="${v}" ${String(v)===String(selected) ? "selected" : ""}>${v}</option>`).join("");
-  }
-
-  function fillMainTeamOptions(selected = ""){
-    if(!mainTeamSelect) return;
-    const values = ["", ...TEAM_VALUES.filter(v => v !== "ALL")];
-    mainTeamSelect.innerHTML = values.map(v => `<option value="${v}" ${String(v)===String(selected) ? "selected" : ""}>${v || "OFF"}</option>`).join("");
-  }
-
-  function normalizeAuthorName(val){
-    return String(val || "").trim().slice(0, 12);
-  }
-
-  function saveAuthorName(val){
-    authorName = normalizeAuthorName(val);
-    localStorage.setItem(AUTHOR_KEY, authorName);
-    if(authorNameInput && authorNameInput.value !== authorName){
-      authorNameInput.value = authorName;
-    }
-  }
-
-  function normalizeMainTeam(val){
-    const v = String(val || "").toUpperCase();
-    return TEAM_VALUES.includes(v) && v !== "ALL" ? v : "";
-  }
-
-  function saveMainTeam(val){
-    mainTeam = normalizeMainTeam(val);
-    localStorage.setItem(MAIN_TEAM_KEY, mainTeam);
-    if(mainTeamSelect && mainTeamSelect.value !== mainTeam){
-      mainTeamSelect.value = mainTeam;
-    }
-  }
-
-  if(authorNameInput){
-    authorNameInput.value = authorName;
-    authorNameInput.addEventListener("input", ()=>{
-      saveAuthorName(authorNameInput.value);
-    });
-    authorNameInput.addEventListener("change", ()=>{
-      saveAuthorName(authorNameInput.value);
-    });
-  }
-
-  if(mainTeamSelect){
-    fillMainTeamOptions(mainTeam);
-    mainTeamSelect.addEventListener("change", ()=>{
-      saveMainTeam(mainTeamSelect.value);
-      if(mainTeam){
-        fillTeamOptions(mainTeam);
-        if(quickTeamSelect) quickTeamSelect.value = mainTeam;
-        activeTeamFilter = mainTeam;
-        listenMemos(activeTeamFilter, getViewingDayKey());
-      }
-    });
-  }
-
-  if(quickTeamSelect){
-    quickTeamSelect.addEventListener("change", ()=>{
-      activeTeamFilter = getActiveTeamValue();
-      listenMemos(activeTeamFilter, getViewingDayKey());
-    });
-  }
-
-  function parseFStoredValue(raw){
-    const txt = String(raw || "").trim();
-    const m = txt.match(/^F\s*([0-4])\s*(.*)$/i);
-    if(m) return { level: m[1], text: m[2].trim() };
-    return { level: "0", text: txt };
-  }
-
-  function buildStoredCmptValue(type, idx, root){
-    const textarea = root.querySelector(`[data-k="${type}-cmpt${idx}"]`);
-    const text = cleanTextUpper(textarea?.value || "");
-    if(type === "OUTBOUND" && (idx === 1 || idx === 2)){
-      const sel = root.querySelector(`[data-k="${type}-cmpt${idx}-f"]`);
-      const level = sel ? String(sel.value || "0") : "0";
-      return text ? `F${level} ${text}` : `F${level}`;
-    }
-    return text;
-  }
-
-  function onlyNum(val, len){
-    return (val || "").replace(/[^0-9]/g, "").slice(0, len);
-  }
-
-  function pad(val, len){
-    const v = onlyNum(val, len);
-    return v ? v.padStart(len, "0") : "";
-  }
-
-  function cleanTextUpper(val){
-    return (val || "").toUpperCase().trim();
-  }
-
-  function defaultF(val){
-    const v = cleanTextUpper(val);
-    return v ? v : "F";
-  }
-
-  function nowTime(){
-    const d = new Date();
-    return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
-  }
-
-  function normalizeTimeText(val){
-    const raw = (val || "").trim();
-    if(!raw) return "";
-    const digits = raw.replace(/[^0-9]/g, "");
-    if(digits.length === 3) return digits.slice(0,1) + ":" + digits.slice(1,3);
-    if(digits.length >= 4) return digits.slice(0,2) + ":" + digits.slice(2,4);
-    return raw.slice(0,5);
-  }
-
-  function askTime(currentValue=""){
-    const t = prompt("TIME (HH:MM 24H)", currentValue || nowTime());
-    if(t === null) return null;
-    return normalizeTimeText(t);
-  }
-
-  function todayStr(){
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
-
-  function dateToStr(d){
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const day = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${day}`;
-  }
-
-  function getViewingDate(){
-    const d = new Date();
-    d.setHours(0,0,0,0);
-    d.setDate(d.getDate() + dayOffset);
-    return d;
-  }
-
-  function getViewingDayKey(){
-    return dateToStr(getViewingDate());
-  }
-
-  function updateDayLabel(){
-    dayLabel.textContent = getViewingDayKey();
-  }
-
-  function calcDayOffsetFromDate(dateStr){
-    const base = new Date(todayStr());
-    const target = new Date(dateStr);
-    base.setHours(0,0,0,0);
-    target.setHours(0,0,0,0);
-    return Math.round((target - base) / 86400000);
-  }
-
-  function getActiveTeamValue(){
-    return (quickTeamSelect?.value || "ALL").toUpperCase();
-  }
-
-  function getCacheKey(teamValue, dayKey){
-    return `${teamValue}__${dayKey}`;
-  }
-
-  function getTeamQuery(teamValue, dayKey){
-    return query(
-      collection(db, "memos"),
-      where("team", "==", teamValue),
-      where("dayKey", "==", dayKey)
-    );
-  }
-
-  function listenMemos(teamValue = "ALL", dayKey = getViewingDayKey()){
-    if(memosUnsubscribe){
-      memosUnsubscribe();
-      memosUnsubscribe = null;
-    }
-
-    const cacheKey = getCacheKey(teamValue, dayKey);
-    if(memoCache.has(cacheKey)){
-      memos = [...memoCache.get(cacheKey)];
-      renderList();
-    }else{
-      memos = [];
-      renderList();
-    }
-
-    if(teamValue === "ALL") return;
-
-    const q = getTeamQuery(teamValue, dayKey);
-
-    memosUnsubscribe = onSnapshot(q, (snapshot)=>{
-      const nextMemos = snapshot.docs.map(docSnap => {
-        const data = docSnap.data() || {};
-        return {
-          ...data,
-          id: Number(data.id || 0),
-          team: String(data.team || "").toUpperCase(),
-          author: normalizeAuthorName(data.author || "")
-        };
-      });
-      memoCache.set(cacheKey, nextMemos);
-      memos = nextMemos;
-      renderList();
-    }, (error)=>{
-      console.error(error);
-      alert("FIREBASE LOAD ERROR");
-    });
-  }
-
-  function sameValue(a, b){
-    if(Array.isArray(a) || Array.isArray(b) || (a && typeof a === "object") || (b && typeof b === "object")){
-      try{ return JSON.stringify(a ?? null) === JSON.stringify(b ?? null); }catch(_){ return a === b; }
-    }
-    return (a ?? "") === (b ?? "");
-  }
-
-  async function saveMemoRemote(data, baseMemo = null){
-    const ref = doc(db, "memos", String(data.id));
-    return await runTransaction(db, async (tx)=>{
-      const snap = await tx.get(ref);
-      if(!snap.exists() || !baseMemo){
-        tx.set(ref, data);
-        return data;
-      }
-
-      const latest = snap.data() || {};
-      const merged = { ...latest };
-      const alwaysWrite = new Set(["id","updatedAt","author"]);
-
-      Object.keys(data).forEach(key=>{
-        if(alwaysWrite.has(key) || !sameValue(data[key], baseMemo[key])){
-          merged[key] = data[key];
-        }
-      });
-
-      // 문서를 열어둔 사이 다른 사람이 바꾼 필드는 건드리지 않고,
-      // 이번 사용자가 실제로 수정한 필드만 최신 문서에 합친다.
-      tx.set(ref, merged);
-      return merged;
-    });
-  }
-
-  async function deleteMemosRemote(ids){
-    await Promise.all(ids.map(id => deleteDoc(doc(db, "memos", String(id)))));
-  }
-
-  function getMemoCreatedMs(data){
-    const createdAt = data?.createdAt;
-    if(createdAt?.seconds) return createdAt.seconds * 1000;
-    if(typeof createdAt === "number") return createdAt;
-    if(typeof createdAt === "string"){
-      const t = new Date(createdAt).getTime();
-      if(!Number.isNaN(t)) return t;
-    }
-
-    const idTime = Number(data?.id);
-    if(Number.isFinite(idTime) && idTime > 1000000000000) return idTime;
-
-    const dateText = data?.memoDate || data?.dayKey;
-    if(dateText){
-      const t = new Date(dateText).getTime();
-      if(!Number.isNaN(t)) return t;
-    }
-
-    return null;
-  }
-
-  async function autoDeleteOldMemos(){
-    const snapshot = await getDocs(collection(db, "memos"));
-    const now = Date.now();
-    const oldIds = [];
-
-    snapshot.forEach(docSnap => {
-      const data = docSnap.data() || {};
-      const createdMs = getMemoCreatedMs(data);
-      if(createdMs && now - createdMs >= AUTO_DELETE_MS){
-        oldIds.push(docSnap.id);
-      }
-    });
-
-    if(oldIds.length){
-      await Promise.all(oldIds.map(id => deleteDoc(doc(db, "memos", String(id)))));
-      memoCache.clear();
-    }
-  }
-
-  function moveDay(n){
-    dayOffset += n;
-    updateDayLabel();
-    listenMemos(activeTeamFilter, getViewingDayKey());
-  }
-
-  function goToday(){
-    dayOffset = 0;
-    updateDayLabel();
-    listenMemos(activeTeamFilter, getViewingDayKey());
-  }
-
-  async function deleteCurrentDay(){
-    const dk = getViewingDayKey();
-    const target = memos.filter(m => (m.dayKey || m.memoDate) === dk);
-    if(!target.length){
-      alert("NO MEMO IN THIS DAY");
-      return;
-    }
-    if(!confirm("DELETE ALL MEMOS IN THIS DAY?")) return;
-    try{
-      await deleteMemosRemote(target.map(m => m.id));
-    }catch(error){
-      console.error(error);
-      alert("DELETE FAIL");
-    }
-  }
-
-  function isCalcEligibleInput(el){
-    if(!(el instanceof HTMLInputElement)) return false;
-    const k = el.dataset.k || "";
-    if(!k) return false;
-    return (
-      k.endsWith("-7C") ||
-      k.endsWith("-STA") ||
-      k.endsWith("-STD") ||
-      k.endsWith("-t") ||
-      k.endsWith("-d") ||
-      k.endsWith("-bb") ||
-      k.endsWith("-tt") ||
-      k.endsWith("-tb") ||
-      k.endsWith("-REG") ||
-      k === "SHARED-HASH" ||
-      k.startsWith("extraVal-")
-    );
-  }
-
-  document.addEventListener("focusin", (e)=>{
-    const t = e.target;
-    if(isCalcEligibleInput(t)){
-      if(activeCalcInput && activeCalcInput !== t){
-        activeCalcInput.classList.remove("focusedCalcTarget");
-      }
-      activeCalcInput = t;
-      activeCalcInput.classList.add("focusedCalcTarget");
-    }
-  });
-
-  document.addEventListener("click", (e)=>{
-    const t = e.target;
-    if(!(t instanceof HTMLElement)) return;
-    if(!t.closest(".section") && !t.closest(".calcFloating")){
-      if(activeCalcInput){
-        activeCalcInput.classList.remove("focusedCalcTarget");
-      }
-    }
-  });
-
-  document.addEventListener("input", (e)=>{
-    const t = e.target;
-    if(!(t instanceof HTMLInputElement)) return;
-    const k = t.dataset.k || "";
-    if(!k) return;
-
-    if(k === "SHARED-HASH"){
-      t.value = onlyNum(t.value, 3);
-      document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el=>{
-        if(el !== t) el.value = t.value;
-      });
-      return;
-    }
-
-    if(k.endsWith("-7C")) t.value = onlyNum(t.value, 4);
-    if(k.endsWith("-STA")) t.value = onlyNum(t.value, 4);
-    if(k.endsWith("-STD")) t.value = onlyNum(t.value, 4);
-    if(k.endsWith("-t")) t.value = onlyNum(t.value, 3);
-    if(k.endsWith("-d")) t.value = onlyNum(t.value, 2);
-    if(k.endsWith("-bb")) t.value = onlyNum(t.value, 2);
-    if(k.endsWith("-tt")) t.value = onlyNum(t.value, 4);
-    if(k.endsWith("-tb")) t.value = onlyNum(t.value, 4);
-    if(k.startsWith("extraVal-")) t.value = onlyNum(t.value, 3);
-  });
-
-  function makeExtraRow(type, key="CREW", val=""){
-    const row = document.createElement("div");
-    row.className = "extraRow";
-    row.innerHTML = `
-      <select>
-        ${EXTRA_KEYS.map(k => `<option value="${k}" ${k===key ? "selected" : ""}>${k}</option>`).join("")}
-      </select>
-      <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="extraVal-${type}" value="${onlyNum(val,3)}">
-      <button type="button" class="minusBtn" onclick="this.parentElement.remove()">-</button>
-    `;
-    return row;
-  }
-
-  function addExtraRow(type){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
-    if(!box) return;
-    box.appendChild(makeExtraRow(type, "CREW", ""));
-  }
-
-  function bindEditableTime(el, initialValue){
-    el.textContent = initialValue || "";
-    el.addEventListener("click", ()=>{
-      const t = askTime(el.textContent || "");
-      if(t !== null) el.textContent = t;
-    });
-  }
-
-  function openLirPicker(type){
-    activeLirType = type;
-    lirPhotoInput.value = "";
-    lirPhotoInput.click();
-  }
-
-  function viewLirPhoto(type){
-    const src = currentLirPhotos[type] || "";
-    if(!src){
-      alert("NO LIR PHOTO");
-      return;
-    }
-    photoImg.src = src;
-    photoLayer.style.display = "flex";
-  }
-
-  function openCalc(){
-    calcWrap.classList.add("show");
-    calcWrap.setAttribute("aria-hidden","false");
-  }
-
-  function closeCalc(){
-    calcWrap.classList.remove("show");
-    calcWrap.setAttribute("aria-hidden","true");
-  }
-
-  function updateGlobalCalcDisplay(val){
-    globalCalcDisplay.textContent = val || "0";
-  }
-
-  function safeEval(expr){
-    if(!expr) return "0";
-    const cleaned = expr.replace(/[^0-9+\-*/%.()]/g, "");
-    if(!cleaned) return "0";
-    try{
-      const result = Function("return (" + cleaned + ")")();
-      if(result === undefined || result === null || Number.isNaN(result) || !Number.isFinite(result)){
-        return "ERROR";
-      }
-      return String(result);
-    }catch(e){
-      return "ERROR";
-    }
-  }
-
-  function applyCalcToInput(result){
-    if(!activeCalcInput) return;
-    const k = activeCalcInput.dataset.k || "";
-    const digits = String(result || "").replace(/[^0-9]/g, "");
-
-    if(k.endsWith("-REG")){
-      activeCalcInput.value = digits.slice(0,6);
-    }else if(k === "SHARED-HASH"){
-      activeCalcInput.value = digits.slice(0,3);
-    }else if(k.endsWith("-7C") || k.endsWith("-STA") || k.endsWith("-STD")){
-      activeCalcInput.value = digits.slice(0,4);
-    }else if(k.endsWith("-t") || k.startsWith("extraVal-")){
-      activeCalcInput.value = digits.slice(0,3);
-    }else if(k.endsWith("-d") || k.endsWith("-bb")){
-      activeCalcInput.value = digits.slice(0,2);
-    }else{
-      activeCalcInput.value = digits;
-    }
-
-    activeCalcInput.dispatchEvent(new Event("input", { bubbles:true }));
-  }
-
-  function autoGrowTextarea(el){
-    if(!el) return;
-    el.style.height = "calc(54px * var(--ui))";
-    const next = Math.max(el.scrollHeight, 54);
-    el.style.height = next + "px";
-  }
-
-  function normalizeBagText(s){
-    return s.replace(/BAG\s*(\d+)\s*P(?:C|CS)\s*\d+KG/gi, (m,n)=>`BAG ${n}PC`)
-            .replace(/BAG\s*(\d+)\s*P(?:C|CS)/gi, (m,n)=>`BAG ${n}PC`);
-  }
-
-  function removeFakText(s){
-    return s.replace(/(^|,|\s)FAK\s*\d+KG(?=,|$)/gi, '$1')
-            .replace(/,\s*,/g, ', ')
-            .replace(/^\s*,\s*/,'')
-            .replace(/\s{2,}/g,' ')
-            .trim()
-            .replace(/,$/,'');
-  }
-
-  function cleanCmptText(s){
-    let t = (s || '').replace(/\r/g,' ').replace(/\n+/g,' ');
-    t = t.replace(/-INCLUDING/gi, 'INCLUDING');
-    t = normalizeBagText(t);
-    t = removeFakText(t);
-    t = t.replace(/\s+,/g, ',').replace(/,\s+/g, ', ').replace(/\s{2,}/g, ' ').trim();
-    return t || 'NIL';
-  }
-
-  function parseCountList(text, re){
-    let m, total = 0;
-    while((m = re.exec(text))){ total += Number(m[1] || 0); }
-    re.lastIndex = 0;
-    return total;
-  }
-
-  function upsertExtraRow(type, key, val){
-    if(!val) return;
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
-    if(!box) return;
-    let found = null;
-    [...box.querySelectorAll('.extraRow')].forEach(r=>{
-      const sel = r.querySelector('select');
-      if(sel && sel.value === key) found = r;
-    });
-    if(found){
-      const inp = found.querySelector('input');
-      inp.value = String((Number(inp.value||0) + Number(val||0))).padStart(3,'0');
-    }else{
-      box.appendChild(makeExtraRow(type, key, String(val)));
-    }
-  }
-
-  function clearExtras(type){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    const box = root ? root.querySelector(`#${type}-EXTRAS`) : null;
-    if(box) box.innerHTML = '';
-  }
-
-  function applyNoteAuto(type, noteText){
-    const root = sections.querySelector(`.section[data-type="${type}"]`);
-    if(!root) return;
-
-    const text = String(noteText || '').replace(/\u00a0/g, ' ');
-    if(!text.trim()) return;
-
-    const setVal = (selector, value)=>{
-      const el = root.querySelector(selector);
-      if(el){
-        el.value = value;
-        if(el.tagName === 'TEXTAREA') autoGrowTextarea(el);
-      }
-    };
-
-    const lines = text.split(/\r?\n/);
-    const normalizedLines = lines.map(line => line.trim()).filter(Boolean);
-    const headerLine = normalizedLines.find(line => /(?:7C|IT|AK|KN)\s*\d{2,4}/i.test(line) || /(?:HL|B50|9M|B1)[-\s]*[A-Z0-9]+/i.test(line)) || '';
-    const secondLine = normalizedLines.find(line => /^-/.test(line)) || '';
-    const joinedUpper = normalizedLines.join(' ').toUpperCase();
-
-    const carrierFlightMatch = headerLine.match(/\b(7C|IT|AK|KN)\s*([0-9]{2,4})/i);
-    if(carrierFlightMatch){
-      const c = normalizeCarrier(carrierFlightMatch[1]);
-      setVal(`[data-k="${type}-7C"]`, carrierFlightMatch[2]);
-      const carrierEl = root.querySelector(`[data-k="${type}-CARRIER"]`);
-      if(carrierEl){ carrierEl.value = c; carrierEl.dispatchEvent(new Event("change", {bubbles:true})); }
-      const prefix = getRegPrefix(c);
-      const regRe = new RegExp(prefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "[-\\s]*([A-Z0-9]+)", "i");
-      const regMatch = headerLine.match(regRe);
-      if(regMatch){
-        const regEl = root.querySelector(`[data-k="${type}-REG"]`);
-        if(regEl){ regEl.value = normalizeRegSuffix(regMatch[1]); regEl.dispatchEvent(new Event("input", {bubbles:true})); }
-      }
-    }
-
-    const staStdKey = type === "INBOUND" ? "STA" : "STD";
-
-    const compactTMatch = secondLine.match(/^-?[A-Z]{3}\.(\d{1,3})\/(\d{1,3})\/(\d{1,3})/i);
-    if(compactTMatch){
-      const bagCount = compactTMatch[1];
-      const dValCompact = compactTMatch[2];
-      const bbValCompact = compactTMatch[3];
-      setVal(`[data-k="${type}-t"]`, String(Number(bagCount || 0)).padStart(3, '0'));
-      setVal(`[data-k="${type}-d"]`, String(Number(dValCompact || 0)).padStart(2, '0'));
-      setVal(`[data-k="${type}-bb"]`, String(Number(bbValCompact || 0)).padStart(2, '0'));
-    }
-
-    const cmptMap = {1:'',2:'',3:'',4:''};
-    let inSiBlock = false;
-    const siLines = [];
-
-    for(const rawLine of lines){
-      const line = rawLine.trim();
-      if(!line) continue;
-
-      const cptMatch = line.match(/^CPT([1-4])\s*-\s*(.*)$/i);
-      if(cptMatch){
-        cmptMap[cptMatch[1]] = cleanCmptText(cptMatch[2]);
-        inSiBlock = false;
-        continue;
-      }
-
-      if(/^SI\b/i.test(line)){
-        const sameLine = line.replace(/^SI\b\s*/i, '').trim();
-        inSiBlock = true;
-        if(sameLine) siLines.push(sameLine);
-        continue;
-      }
-
-      if(inSiBlock){
-        siLines.push(line);
-      }
-    }
-
-    [1,2,3,4].forEach(i=>{
-      const value = cmptMap[i] || '';
-      const el = root.querySelector(`[data-k="${type}-cmpt${i}"]`);
-      if(el){
-        el.value = value;
-        autoGrowTextarea(el);
-      }
-    });
-
-    const cptText = Object.values(cmptMap).filter(Boolean).join(' ');
-    const siText = siLines.join(' ');
-    const countSource = `${cptText} ${siText}`.trim();
-
-    const tValFromCmpt = parseCountList(cptText, /BAG\s*(\d+)\s*P(?:C|CS)/gi);
-    const tVal = tValFromCmpt || (compactTMatch ? Number(compactTMatch[1] || 0) : 0);
-    const dVal = parseCountList(countSource, /(?:D\/S|\bDS\b)\s*(\d+)\s*P?(?:C|CS)?/gi) || (compactTMatch ? Number(compactTMatch[2] || 0) : 0);
-    const bbVal = parseCountList(countSource, /(?:BBST|\bBB\b)\s*(\d+)/gi) || (compactTMatch ? Number(compactTMatch[3] || 0) : 0);
-
-    setVal(`[data-k="${type}-t"]`, tVal ? String(tVal).padStart(3,'0') : '');
-    setVal(`[data-k="${type}-d"]`, dVal ? String(dVal).padStart(2,'0') : '');
-    setVal(`[data-k="${type}-bb"]`, bbVal ? String(bbVal).padStart(2,'0') : '');
-
-    clearExtras(type);
-    const patterns = [
-      {key:'C', re:/CGO\s*(\d+)\s*P(?:C|CS)?/gi},
-      {key:'C', re:/(?:^|\s)C\/\s*(\d+)\b/gi},
-      {key:'EMS', re:/(?:MAIL|POS|EMS)\s*(\d+)\s*P(?:C|CS)?/gi},
-      {key:'EMS', re:/(?:^|\s)E\/\s*(\d+)\b/gi},
-      {key:'EMS', re:/(?:^|\s)M\/\s*(\d+)\b/gi},
-      {key:'TS', re:/BT\s*BAG\s*(\d+)\s*P(?:C|CS)?/gi},
-      {key:'W', re:/WCHR\s*(\d+)?/gi},
-      {key:'COB', re:/COB\s*(\d+)\s*P?(?:C|CS)?/gi},
-      {key:'GB', re:/G\/B\s*(\d+)?/gi},
-      {key:'TS', re:/(?:\bTS\b|T\/S)\s*(\d+)?/gi},
-      {key:'RUSH', re:/RUSH\s*(\d+)?/gi},
-      {key:'CARSEAT', re:/CARSEAT\s*(\d+)?/gi},
-      {key:'COMAT', re:/COMAT\s*(\d+)?/gi},
-      {key:'LONGFIN', re:/LONGFIN\s*(\d+)?/gi},
-      {key:'CYCLE', re:/CYCLE\s*(\d+)?/gi},
-      {key:'CREW', re:/CREW\s*(\d+)?/gi},
-      {key:'PCB', re:/PCB\s*(\d+)?/gi},
-    ];
-    const totals = {};
-    for(const {key,re} of patterns){
-      let m;
-      while((m = re.exec(countSource || joinedUpper))){
-        const add = Number(m[1] || 1);
-        totals[key] = (totals[key] || 0) + add;
-      }
-      re.lastIndex = 0;
-    }
-
-    Object.entries(totals).forEach(([k,v])=>{
-      if(v) upsertExtraRow(type, k, v);
-    });
-  }
-
-  const CARRIER_REG_PREFIX = { "7C":"HL", "IT":"B50", "AK":"9M", "KN":"B1" };
-
-  function normalizeCarrier(v){
-    const c = String(v || "7C").toUpperCase();
-    return CARRIER_REG_PREFIX[c] ? c : "7C";
-  }
-
-  function normalizeRegSuffix(v){
-    return String(v || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 6);
-  }
-
-  function carrierOptions(selected){
-    const cur = normalizeCarrier(selected);
-    return ["7C","IT","AK","KN"].map(c => `<option value="${c}" ${c===cur ? "selected" : ""}>${c}</option>`).join("");
-  }
-
-  function getRegPrefix(carrier){
-    return CARRIER_REG_PREFIX[normalizeCarrier(carrier)] || "HL";
-  }
-
-  function syncCarrierRegLabels(){
-    ["INBOUND","OUTBOUND"].forEach(type=>{
-      const carrier = sections.querySelector(`[data-k="${type}-CARRIER"]`)?.value || "7C";
-      const lab = sections.querySelector(`[data-reg-label="${type}"]`);
-      if(lab) lab.textContent = getRegPrefix(carrier);
-    });
-  }
-
-  function makeSection(type, memoData){
-    const d = document.createElement("div");
-    d.className = "section";
-    d.dataset.type = type;
-
-    const savedTime = memoData ? (memoData[type+"-TIME"] || "") : "";
-    const local7C = memoData ? (memoData[type+"-7C"] || "") : "";
-    const carrier = memoData ? normalizeCarrier(memoData[type+"-CARRIER"] || "7C") : "7C";
-    const fallbackReg = memoData ? (memoData.sharedHL || "") : "";
-    const inboundReg = memoData ? (memoData["INBOUND-REG"] || fallbackReg) : "";
-    const sharedStartReg = memoData ? (memoData["OUTBOUND-REG"] || inboundReg || fallbackReg) : "";
-    const localReg = type === "INBOUND" ? inboundReg : sharedStartReg;
-    const sharedHASH = memoData ? (memoData.sharedHASH || "") : "";
-    const v = (k)=> memoData ? (memoData[type+"-"+k] || "") : "";
-    const noteV = memoData ? (memoData[type+"-note"] || "") : "";
-    const vtt = memoData ? (memoData[type+"-tt"] || "") : "";
-    const vtb = memoData ? (memoData[type+"-tb"] || "") : "";
-
-    const cmpt1Raw = memoData ? (memoData[type+"-cmpt1"] || "") : "";
-    const cmpt2Raw = memoData ? (memoData[type+"-cmpt2"] || "") : "";
-    const cmpt1Parsed = parseFStoredValue(cmpt1Raw);
-    const cmpt2Parsed = parseFStoredValue(cmpt2Raw);
-
-    const staStdLabel = type === "INBOUND" ? "STA" : "STD";
-    const staStdKey = type === "INBOUND" ? "STA" : "STD";
-
-    d.innerHTML = `
-      <div class="sectionHead">
-        <div class="sectionTitle">${type}</div>
-        <div class="headRight">
-          <div class="staStdWrap">
-            <div class="staStdLab">${staStdLabel}</div>
-            <input class="numBox staStdInput" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-${staStdKey}" value="${v(staStdKey)}">
-          </div>
-          <div class="timeWrap">
-            <button type="button" class="timeBtn" data-timebtn="${type}">TIME</button>
-            <div class="timeVal" id="${type}-TIMESHOWN"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="rowGrid3">
-        <select class="numBox" data-k="${type}-CARRIER" aria-label="AIRLINE">${carrierOptions(carrier)}</select>
-        <input class="numBox" inputmode="numeric" maxlength="4" placeholder="0000" data-k="${type}-7C" value="${local7C}">
-        <div class="lab" data-reg-label="${type}">${getRegPrefix(carrier)}</div>
-        <input class="numBox" maxlength="6" placeholder="REG" data-k="${type}-REG" value="${localReg}">
-        <div class="lab">#</div>
-        <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="SHARED-HASH" value="${sharedHASH}">
-      </div>
-
-      <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 1</div>
-        <div class="cmptWrap">
-          ${type === "OUTBOUND" ? `
-            <div class="cmptFWrap">
-              <div class="cmptFLabel">F</div>
-              <select class="cmptFSelect" data-k="${type}-cmpt1-f">
-                ${[0,1,2,3,4].map(n => `<option value="${n}" ${String(n)===cmpt1Parsed.level ? "selected" : ""}>${n}</option>`).join("")}
-              </select>
-            </div>
-          ` : ""}
-          <textarea class="cmptArea" data-k="${type}-cmpt1" placeholder="TEXT">${type === "OUTBOUND" ? cmpt1Parsed.text : cmpt1Raw}</textarea>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 2</div>
-        <div class="cmptWrap">
-          ${type === "OUTBOUND" ? `
-            <div class="cmptFWrap">
-              <div class="cmptFLabel">F</div>
-              <select class="cmptFSelect" data-k="${type}-cmpt2-f">
-                ${[0,1,2,3,4].map(n => `<option value="${n}" ${String(n)===cmpt2Parsed.level ? "selected" : ""}>${n}</option>`).join("")}
-              </select>
-            </div>
-          ` : ""}
-          <textarea class="cmptArea" data-k="${type}-cmpt2" placeholder="TEXT">${type === "OUTBOUND" ? cmpt2Parsed.text : cmpt2Raw}</textarea>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 3</div>
-        <textarea class="cmptArea" data-k="${type}-cmpt3" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt3'] || '') : ''}</textarea>
-      </div>
-
-      <div class="row">
-        <div class="lab" style="min-width:96px;">CMPT 4</div>
-        <textarea class="cmptArea" data-k="${type}-cmpt4" placeholder="TEXT">${memoData ? (memoData[type+'-cmpt4'] || '') : ''}</textarea>
-      </div>
-
-      <div class="rowGridTDBB">
-        <div class="lab">T</div>
-        <input class="numBox" inputmode="numeric" maxlength="3" placeholder="000" data-k="${type}-t" value="${v("t")}">
-        <div class="lab">D</div>
-        <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-d" value="${v("d")}">
-        <div class="lab">BB</div>
-        <input class="numBox" inputmode="numeric" maxlength="2" placeholder="00" data-k="${type}-bb" value="${v("bb")}">
-      </div>
-
-      ${type === "OUTBOUND" ? `
-      <div class="rowGridTTTB">
-        <div class="lab">T/T</div>
-        <select class="long" data-k="${type}-tt">${optionHtml(TT_OPTIONS, vtt)}</select>
-        <div class="lab">T/B</div>
-        <select class="long" data-k="${type}-tb">${optionHtml(TB_OPTIONS, vtb)}</select>
-      </div>
-
-      <div class="lirCalcRow">
-        <div class="lirBtns">
-          <button type="button" class="lirBtn" data-lir-add="${type}">LIR</button>
-          <button type="button" class="lirBtn" data-lir-view="${type}">VIEW</button>
-        </div>
-        <button type="button" class="calcCircleBtn calcIconBtn" data-calc-toggle="${type}">
-          <span class="calcIcon"></span>
+<section class="card compactTopCard">
+  <div class="topHalfGrid">
+
+    <div class="topHalfBox">
+      <div class="topHalfTitle">MAIN 설정</div>
+
+      <div class="mainCompactRow">
+        <button id="openMainPicker" class="compactActionBtn" style="width:100%">
+          메인 선택
         </button>
       </div>
-      ` : ""}
 
-      <div class="extraBox">
-        <div class="extraHead">
-          <div class="extraTitle">EXTRA</div>
-          <button type="button" class="iconBtn" onclick="addExtraRow('${type}')">+</button>
-        </div>
-        <div id="${type}-EXTRAS"></div>
+      <div class="compactSubText">
+        MAIN : <span id="mainText" class="mainName">미설정</span>
+      </div>
+    </div>
+
+    <div class="topHalfBox">
+      <div class="topHalfTitle">SEARCH / EXCEL</div>
+
+      <div class="searchFileGrid">
+        <button id="openSearch" class="compactActionBtn searchBtn">검색</button>
+
+        <button id="adminUploadBtn" class="fileBtn compactFileBtn" type="button">파일추가</button>
+        <input id="excelFile" type="file" accept=".xls,.xlsx,.xlsm" style="display:none">
       </div>
 
-      <textarea data-k="${type}-note" placeholder="NOTE (${type})">${noteV}</textarea>
+      <div class="compactSubText" id="status">
+        직원 찾기 또는 근무표 추가
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="card">
+  <div class="current">
+    <div class="currentPerson" id="currentPerson">직원 미선택</div>
+    <div style="font-size:11px;color:#b9b9bf">날짜를 누르면 수정</div>
+  </div>
+  <div class="monthBar">
+    <button id="prevMonth">PREV</button>
+    <div class="monthLabel" id="monthLabel">2026.08</div>
+    <button id="nextMonth">NEXT</button>
+  </div>
+  <div class="week"><div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div></div>
+  <div class="calendar" id="calendar"></div>
+</section>
+</div>
+
+<div class="bottom">
+  <div class="bottomInner">
+    <button id="todayBtn">TODAY</button>
+    <button id="goMain" class="mainBtn">MAIN</button>
+    <button id="resetEdit">수정 초기화</button>
+  </div>
+</div>
+
+
+
+
+<div class="modal" id="adminPinModal">
+  <div class="sheet" style="max-width:420px">
+    <div class="handle"></div>
+    <div class="sheetTitle">관리자 확인</div>
+    <input id="adminPinInput" class="editInput" type="password" inputmode="numeric" maxlength="4" placeholder="비밀번호 4자리" autocomplete="off">
+    <div class="compactSubText" id="adminPinMessage" style="text-align:center;margin:4px 0 10px">엑셀 업데이트 권한 확인</div>
+    <div class="sheetActions">
+      <button id="cancelAdminPin">CLOSE</button>
+      <button id="confirmAdminPin" class="active">확인</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="mainPickerModal">
+  <div class="sheet searchSheet">
+    <div class="handle"></div>
+    <div class="sheetTitle">MAIN 선택</div>
+
+    <div class="searchSectionTitle">큰 카테고리</div>
+    <div class="categories searchCategories" id="mainCategories"></div>
+
+    <div class="searchSectionTitle">조 선택</div>
+    <div class="scroll searchUnits" id="mainUnits"></div>
+
+    <div class="searchSectionTitle">성명</div>
+    <div class="scroll persons searchPersons" id="mainPersons"></div>
+
+    <div class="sheetActions">
+      <button id="closeMainPicker">CLOSE</button>
+      <button id="clearMainPicker" class="active">초기화</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="searchModal">
+  <div class="sheet searchSheet">
+    <div class="handle"></div>
+    <div class="sheetTitle">직원 찾기</div>
+
+    <input id="searchNameInput" class="editInput" placeholder="성명을 입력하세요">
+
+    <div class="searchNavSection">
+      <div class="searchSectionTitle">구역 선택</div>
+      <div class="categories searchCategories" id="searchCategories"></div>
+
+      <div class="searchSectionTitle">조 선택</div>
+      <div class="scroll searchUnits" id="searchUnits"></div>
+
+      <div class="searchSectionTitle">인원</div>
+      <div class="scroll persons searchPersons" id="searchPersons"></div>
+    </div>
+
+    <div class="searchSectionTitle">검색 결과</div>
+    <div id="searchResults" class="searchResults">
+      <div class="searchEmpty">이름을 입력하면 검색됩니다.</div>
+    </div>
+
+    <div class="sheetActions">
+      <button id="closeSearch">CLOSE</button>
+      <button id="clearSearch" class="active">검색 지우기</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="editModal">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheetTitle" id="editTitle">근무 수정</div>
+    <input id="editInput" class="editInput" placeholder="예: A7 / P14 / R">
+    <div class="sheetActions">
+      <button id="cancelEdit">CLOSE</button>
+      <button id="saveEdit" class="active">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STRUCTURE={
+  "관리":["관리"],
+  "소산":["소산1","소산2","소산3"],
+  "1그룹":["1조","2조","3조","4조","5조","6조","7조","8조"],
+  "2그룹":["9조","10조","11조","12조","13조","14조","15조","16조"],
+  "3그룹":["17조","18조","19조","20조","21조","22조","23조","24조"]
+};
+
+let state={
+  year:2026,
+  month:8,
+  people:{},
+  schedules:{},
+  blueA53:{},
+  main:null,
+  edits:{}
+};
+
+try{
+  const saved=localStorage.getItem("JAS_DUTY_V1");
+  if(saved) state=Object.assign(state,JSON.parse(saved));
+}catch(e){}
+
+state.blueA53=state.blueA53||{};
+
+let currentCategory="1그룹";
+let currentUnit="1조";
+let currentPerson="";
+let viewDate=new Date(state.year,state.month-1,1);
+let editingDate="";
+
+function persist(){
+  try{
+    localStorage.setItem("JAS_DUTY_V1",JSON.stringify(state));
+    return true;
+  }catch(e){return false}
+}
+function groupOf(unit){
+  if(unit==="관리") return "관리";
+  if(unit.startsWith("소산")) return "소산";
+  const n=parseInt(unit);
+  if(n<=8)return "1그룹";
+  if(n<=16)return "2그룹";
+  return "3그룹";
+}
+function dateKey(y,m,d){
+  return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+}
+function editKey(name,date){return name+"::"+date}
+function displayCode(code){
+  const v=String(code||"").trim().toUpperCase();
+
+  if(v==="R") return "휴무";
+  if(v==="L") return "연차";
+  if(v==="RA43") return "R43";
+  if(v==="RP14") return "R14";
+
+  return v;
+}
+
+function scheduleClass(rawCode, shownCode){
+  const raw=String(rawCode||"").trim().toUpperCase();
+
+  // 1. 휴무
+  if(raw==="R") return "dayOff";
+
+  // 2. 연차
+  if(raw==="L") return "dayLeave";
+
+  // 3. R14 / R43
+  if(raw==="RA43" || raw==="RP14" || shownCode==="R14" || shownCode==="R43")
+    return "dayR";
+
+  // 4. A로 시작하는 근무 (ALL53 포함)
+  if(raw.startsWith("A") || shownCode==="ALL53")
+    return "dayA";
+
+  // 5. P로 시작하는 근무
+  if(raw.startsWith("P"))
+    return "dayP";
+
+  return "dayNormal";
+}
+
+function getCode(name,date){
+  const k=editKey(name,date);
+  if(Object.prototype.hasOwnProperty.call(state.edits,k)) return state.edits[k];
+  return (state.schedules[name]||{})[date]||"";
+}
+function pickFirst(){
+  currentPerson=(state.people[currentUnit]||[])[0]||"";
+}
+function escapeHtml(v){
+  return String(v||"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[s]));
+}
+
+function renderSearchNav(){
+  const catBox=document.getElementById("searchCategories");
+  const unitBox=document.getElementById("searchUnits");
+  const personBox=document.getElementById("searchPersons");
+
+  if(!catBox||!unitBox||!personBox) return;
+
+  catBox.innerHTML="";
+  Object.keys(STRUCTURE).forEach(cat=>{
+    const b=document.createElement("button");
+    b.textContent=cat;
+    b.className=cat===currentCategory?"active":"";
+    b.onclick=()=>{
+      currentCategory=cat;
+      currentUnit=STRUCTURE[cat][0];
+      pickFirst();
+      renderSearchNav();
+    };
+    catBox.appendChild(b);
+  });
+
+  unitBox.innerHTML="";
+  STRUCTURE[currentCategory].forEach(unit=>{
+    const b=document.createElement("button");
+    b.textContent=currentCategory.includes("그룹")?unit.replace("조",""):unit;
+    b.className=unit===currentUnit?"active":"";
+    b.onclick=()=>{
+      currentUnit=unit;
+      pickFirst();
+      renderSearchNav();
+    };
+    unitBox.appendChild(b);
+  });
+
+  personBox.innerHTML="";
+  const list=state.people[currentUnit]||[];
+
+  if(!list.length){
+    const span=document.createElement("div");
+    span.className="searchEmpty";
+    span.textContent="이 구역의 인원이 없습니다.";
+    personBox.appendChild(span);
+    return;
+  }
+
+  if(!list.includes(currentPerson)) currentPerson=list[0];
+
+  list.forEach(name=>{
+    const b=document.createElement("button");
+    b.textContent=name;
+    b.className=name===currentPerson?"active":"";
+    b.onclick=()=>{
+      currentPerson=name;
+      document.getElementById("searchModal").classList.remove("show");
+      renderAll();
+      document.getElementById("status").textContent=`👤 ${currentUnit} · ${currentPerson}`;
+    };
+    personBox.appendChild(b);
+  });
+}
+
+function renderMain(){
+  const mainText=document.getElementById("mainText");
+  mainText.textContent=state.main?`${state.main.unit} · ${state.main.name}`:"미설정";
+}
+function renderCalendar(){
+  const box=document.getElementById("calendar");
+  box.innerHTML="";
+  const y=viewDate.getFullYear(),m=viewDate.getMonth();
+  document.getElementById("monthLabel").textContent=`${y}.${String(m+1).padStart(2,"0")}`;
+  document.getElementById("currentPerson").textContent=currentPerson?`${currentUnit} · ${currentPerson}`:"직원 미선택";
+
+  const first=new Date(y,m,1).getDay();
+  const last=new Date(y,m+1,0).getDate();
+  const now=new Date();
+
+  for(let i=0;i<first;i++){
+    const d=document.createElement("div");
+    d.className="day blank";
+    box.appendChild(d);
+  }
+
+  for(let day=1;day<=last;day++){
+    const date=dateKey(y,m,day);
+    const dow=new Date(y,m,day).getDay();
+    const code=currentPerson?getCode(currentPerson,date):"";
+    const blueA53Key=currentPerson?editKey(currentPerson,date):""; // 비흰색 A53 표시 키
+    const shownCode=(/^A53$/i.test(String(code).trim()) && state.blueA53[blueA53Key]) ? "ALL53" : displayCode(code);
+    const codeClass=scheduleClass(code,shownCode);
+    const d=document.createElement("div");
+    d.className="day "+codeClass+" "+(dow===0?"sun ":"")+(dow===6?"sat ":"");
+    if(now.getFullYear()===y&&now.getMonth()===m&&now.getDate()===day)d.classList.add("today");
+    if(currentPerson&&Object.prototype.hasOwnProperty.call(state.edits,editKey(currentPerson,date)))d.classList.add("edited");
+    d.innerHTML=`<div class="dayNum">${day}</div><div class="code">${escapeHtml(shownCode)}</div>`;
+    if(currentPerson)d.onclick=()=>openEdit(date);
+    box.appendChild(d);
+  }
+}
+function renderAll(){
+  renderMain();
+  renderCalendar();
+  renderSearchNav();
+}
+
+function openEdit(date){
+  if(!currentPerson)return;
+  editingDate=date;
+  document.getElementById("editTitle").textContent=`${currentPerson} · ${date}`;
+  document.getElementById("editInput").value=getCode(currentPerson,date);
+  document.getElementById("editModal").classList.add("show");
+}
+
+
+function getAllPeople(){
+  const all=[];
+  Object.entries(state.people).forEach(([unit,names])=>{
+    names.forEach(name=>{
+      all.push({
+        name,
+        unit,
+        category:groupOf(unit)
+      });
+    });
+  });
+  return all;
+}
+
+function renderSearchResults(query=""){
+  const box=document.getElementById("searchResults");
+  const q=String(query||"").trim().toLowerCase();
+
+  if(!q){
+    box.innerHTML='<div class="searchEmpty">이름을 입력하면 검색됩니다.</div>';
+    return;
+  }
+
+  const matches=getAllPeople().filter(p=>
+    p.name.toLowerCase().includes(q)
+  );
+
+  if(!matches.length){
+    box.innerHTML='<div class="searchEmpty">검색 결과가 없습니다.</div>';
+    return;
+  }
+
+  box.innerHTML="";
+  matches.forEach(p=>{
+    const btn=document.createElement("button");
+    btn.className="searchResultBtn";
+    btn.innerHTML=`
+      <span class="searchResultName">${escapeHtml(p.name)}</span>
+      <span class="searchResultUnit">${escapeHtml(p.unit)}</span>
     `;
+    btn.onclick=()=>{
+      currentCategory=p.category;
+      currentUnit=p.unit;
+      currentPerson=p.name;
+      document.getElementById("searchModal").classList.remove("show");
+      renderAll();
+      document.getElementById("status").textContent=`🔎 ${p.unit} · ${p.name}`;
+    };
+    box.appendChild(btn);
+  });
+}
 
-    const timeBtn = d.querySelector(`[data-timebtn="${type}"]`);
-    const timeShown = d.querySelector(`#${type}-TIMESHOWN`);
-    bindEditableTime(timeShown, savedTime);
+document.getElementById("openSearch").onclick=()=>{
+  if(!getAllPeople().length){
+    document.getElementById("status").textContent="⚠️ 먼저 엑셀 근무표를 추가해주세요.";
+    return;
+  }
+  document.getElementById("searchNameInput").value="";
+  renderSearchResults("");
+  renderSearchNav();
+  document.getElementById("searchModal").classList.add("show");
+  setTimeout(()=>document.getElementById("searchNameInput").focus(),100);
+};
 
-    timeBtn.addEventListener("click", ()=>{
-      timeShown.textContent = nowTime();
+document.getElementById("searchNameInput").addEventListener("input",e=>{
+  renderSearchResults(e.target.value);
+});
+
+document.getElementById("closeSearch").onclick=()=>{
+  document.getElementById("searchModal").classList.remove("show");
+};
+
+document.getElementById("clearSearch").onclick=()=>{
+  document.getElementById("searchNameInput").value="";
+  renderSearchResults("");
+  document.getElementById("searchNameInput").focus();
+};
+
+document.getElementById("searchModal").onclick=e=>{
+  if(e.target.id==="searchModal"){
+    document.getElementById("searchModal").classList.remove("show");
+  }
+};
+
+
+const ADMIN_PIN="4656";
+let firebaseUnsubscribe=null;
+
+function applyRemoteSchedule(remote, year, month){
+  if(!remote){
+    state.year=year;
+    state.month=month;
+    state.people={};
+    state.schedules={};
+    state.blueA53={};
+    persist();
+    renderAll();
+    document.getElementById("status").textContent=`ℹ️ ${year}년 ${month}월 공유 근무표 없음`;
+    return;
+  }
+
+  state.year=Number(remote.year)||year;
+  state.month=Number(remote.month)||month;
+  state.people=remote.people||{};
+  state.schedules=remote.schedules||{};
+  state.blueA53=remote.blueA53||{};
+  persist();
+
+  if(state.main && (state.people[state.main.unit]||[]).includes(state.main.name)){
+    currentCategory=state.main.category;
+    currentUnit=state.main.unit;
+    currentPerson=state.main.name;
+  }else{
+    const firstUnit=Object.keys(state.people)[0]||"관리";
+    currentUnit=firstUnit;
+    currentCategory=groupOf(firstUnit);
+    pickFirst();
+  }
+
+  renderAll();
+  document.getElementById("status").textContent=`☁️ ${state.year}년 ${state.month}월 공유 근무표 동기화 완료`;
+}
+
+function watchFirebaseMonth(year, month){
+  if(!window.JASFirebase?.ready) return;
+
+  if(firebaseUnsubscribe){
+    try{ firebaseUnsubscribe(); }catch(e){}
+    firebaseUnsubscribe=null;
+  }
+
+  firebaseUnsubscribe=window.JASFirebase.watchMonth(
+    year,
+    month,
+    remote=>applyRemoteSchedule(remote, year, month),
+    ()=>document.getElementById("status").textContent="⚠️ Firebase 읽기 권한/연결 확인 필요"
+  );
+}
+
+function startFirebaseWatch(){
+  if(window.JASFirebase?.ready){
+    watchFirebaseMonth(viewDate.getFullYear(), viewDate.getMonth()+1);
+  }
+}
+
+window.addEventListener("jasFirebaseReady", startFirebaseWatch);
+setTimeout(startFirebaseWatch,1000);
+
+async function uploadCurrentScheduleToFirebase(){
+  if(!window.JASFirebase?.ready) throw new Error("Firebase not ready");
+
+  await window.JASFirebase.saveSchedule({
+    year:state.year,
+    month:state.month,
+    people:state.people,
+    schedules:state.schedules,
+    blueA53:state.blueA53||{}
+  });
+}
+
+document.getElementById("adminUploadBtn").onclick=()=>{
+  adminPinInput.value="";
+  adminPinMessage.textContent="엑셀 업데이트 권한 확인";
+  adminPinModal.classList.add("show");
+  setTimeout(()=>adminPinInput.focus(),100);
+};
+
+document.getElementById("cancelAdminPin").onclick=()=>adminPinModal.classList.remove("show");
+
+document.getElementById("confirmAdminPin").onclick=()=>{
+  if(adminPinInput.value.trim()!==ADMIN_PIN){
+    adminPinMessage.textContent="❌ 비밀번호가 맞지 않습니다.";
+    adminPinInput.select();
+    return;
+  }
+
+  adminPinModal.classList.remove("show");
+  excelFile.value="";
+  excelFile.click();
+};
+
+adminPinInput.addEventListener("keydown",e=>{
+  if(e.key==="Enter") confirmAdminPin.click();
+});
+
+adminPinModal.onclick=e=>{
+  if(e.target.id==="adminPinModal"){
+    adminPinModal.classList.remove("show");
+  }
+};
+
+document.getElementById("excelFile").addEventListener("change",async e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  const status=document.getElementById("status");
+
+  try{
+    const wb=XLSX.read(await file.arrayBuffer(),{
+      type:"array",
+      raw:true,
+      cellDates:true,
+      cellStyles:true
     });
+    const sheetName=wb.SheetNames.find(n=>n.includes("스케쥴")||n.includes("스케줄"))||wb.SheetNames[0];
+    const ws=wb.Sheets[sheetName];
+    const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:true});
 
-    timeBtn.addEventListener("dblclick", ()=>{
-      const t = askTime(timeShown.textContent || "");
-      if(t !== null) timeShown.textContent = t;
-    });
+    let year=parseInt(rows[0]?.[4])||state.year||2026;
+    let month=parseInt(rows[0]?.[5])||state.month||8;
+    if(month<1||month>12)month=8;
 
-    const carrierSel = d.querySelector(`[data-k="${type}-CARRIER"]`);
-    const regInput = d.querySelector(`[data-k="${type}-REG"]`);
-    if(carrierSel){
-      carrierSel.addEventListener("change", ()=>{
-        const lab = d.querySelector(`[data-reg-label="${type}"]`);
-        if(lab) lab.textContent = getRegPrefix(carrierSel.value);
-        // INBOUND 변경 시 OUTBOUND가 아직 같은 값이면 기본값도 같이 따라간다.
-        if(type === "INBOUND"){
-          const outCarrier = sections.querySelector('[data-k="OUTBOUND-CARRIER"]');
-          const outReg = sections.querySelector('[data-k="OUTBOUND-REG"]');
-          if(outCarrier && outReg && !outReg.dataset.overridden){
-            outCarrier.value = carrierSel.value;
-            outReg.value = regInput?.value || "";
-            syncCarrierRegLabels();
+    let currentDuty="";
+    const people={};
+    const schedules={};
+    const blueA53={};
+    const a53StyleRecords=[];
+    let personCount=0, scheduleCount=0;
+
+    // 행 번호 고정 없이 표 구조로 자동 인식
+    // B열에 관리/소산1~3/1~24조가 나오면 해당 구역 시작.
+    // B열에 그 외 다른 구역명(신입/병가/육휴/파견/퇴사 등)이 나오면
+    // 이전 조/구역 수집을 즉시 종료한다.
+    const validDuty = v =>
+      v==="관리" ||
+      /^소산[1-3]$/.test(v) ||
+      /^(?:[1-9]|1[0-9]|2[0-4])조$/.test(v);
+
+    let insideMainTable=false;
+
+    for(let r=0;r<rows.length;r++){
+      const duty=String(rows[r]?.[1]??"").trim();
+      const name=String(rows[r]?.[6]??"").trim();
+
+      if(validDuty(duty)){
+        currentDuty=duty;
+        insideMainTable=true;
+      }else if(duty && insideMainTable){
+        // 관리/소산/1~24조가 아닌 새 구역명이 나타나면
+        // 현재 조의 연속 구간이 끝난 것으로 처리
+        currentDuty="";
+        insideMainTable=false;
+      }
+
+      if(!insideMainTable || !currentDuty) continue;
+      if(!name || name==="성명" || name.includes("합계")) continue;
+
+      people[currentDuty]??=[];
+      if(!people[currentDuty].includes(name)){
+        people[currentDuty].push(name);
+        personCount++;
+      }
+
+      schedules[name]??={};
+
+      for(let day=1;day<=31;day++){
+        const value=rows[r]?.[10+(day-1)]; // K열=1일, AO열=31일
+        if(value===undefined||value===null||String(value).trim()==="")continue;
+
+        const date=`${year}-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+        const code=String(value).trim();
+        schedules[name][date]=code;
+
+        // A53는 셀 스타일 ID로 구분한다.
+        // 같은 파일 안에서 A53 셀들의 스타일 번호를 모은 뒤,
+        // 가장 많이 쓰이는 스타일을 "일반 A53"으로 보고
+        // 다른 스타일의 A53는 ALL53 후보로 저장한다.
+        if(/^A53$/i.test(code)){
+          const cellAddress=XLSX.utils.encode_cell({r:r,c:10+(day-1)});
+          const cell=ws[cellAddress];
+
+          let styleId=null;
+
+          // SheetJS 버전에 따라 s가 숫자일 수도 있고 객체일 수도 있음
+          if(cell){
+            if(typeof cell.s==="number"){
+              styleId=cell.s;
+            }else if(cell.s && typeof cell.s==="object"){
+              if(cell.s.numFmtId!==undefined || cell.s.fillId!==undefined || cell.s.fontId!==undefined || cell.s.borderId!==undefined){
+                styleId=JSON.stringify({
+                  numFmtId:cell.s.numFmtId??null,
+                  fillId:cell.s.fillId??null,
+                  fontId:cell.s.fontId??null,
+                  borderId:cell.s.borderId??null,
+                  alignment:cell.s.alignment??null
+                });
+              }else{
+                styleId=JSON.stringify(cell.s);
+              }
+            }
+          }
+
+          if(styleId!==null){
+            a53StyleRecords.push({
+              person:name,
+              date:date,
+              styleId:String(styleId)
+            });
           }
         }
-      });
+
+        scheduleCount++;
+      }
     }
-    if(regInput){
-      regInput.addEventListener("input", ()=>{
-        regInput.value = normalizeRegSuffix(regInput.value);
-        if(type === "OUTBOUND"){
-          regInput.dataset.overridden = "1";
-        }else{
-          const outReg = sections.querySelector('[data-k="OUTBOUND-REG"]');
-          if(outReg && !outReg.dataset.overridden) outReg.value = regInput.value;
+
+    // A53 스타일 분류:
+    // 가장 많이 등장한 스타일 = 일반 A53
+    // 그 외 스타일 = ALL53
+    if(a53StyleRecords.length){
+      const counts={};
+      a53StyleRecords.forEach(x=>{
+        counts[x.styleId]=(counts[x.styleId]||0)+1;
+      });
+
+      let normalStyle=null;
+      let maxCount=-1;
+      Object.entries(counts).forEach(([styleId,count])=>{
+        if(count>maxCount){
+          maxCount=count;
+          normalStyle=styleId;
+        }
+      });
+
+      a53StyleRecords.forEach(x=>{
+        if(x.styleId!==normalStyle){
+          blueA53[editKey(x.person,x.date)]=true;
         }
       });
     }
 
-    const lirAddBtn = d.querySelector(`[data-lir-add="${type}"]`);
-    const lirViewBtn = d.querySelector(`[data-lir-view="${type}"]`);
-    const calcToggleBtn = d.querySelector(`[data-calc-toggle="${type}"]`);
+    state.year=year;
+    state.month=month;
+    state.people=people;
+    state.schedules=schedules;
+    state.blueA53=blueA53;
+    persist();
 
-    if(lirAddBtn){
-      lirAddBtn.addEventListener("click", ()=>{
-        openLirPicker(type);
-      });
+    viewDate=new Date(year,month-1,1);
+
+    if(!(state.people[currentUnit]||[]).length){
+      const firstUnit=Object.keys(people)[0]||"관리";
+      currentUnit=firstUnit;
+      currentCategory=groupOf(firstUnit);
     }
+    pickFirst();
+    renderAll();
 
-    if(lirViewBtn){
-      lirViewBtn.addEventListener("click", ()=>{
-        viewLirPhoto(type);
-      });
-    }
-
-    if(calcToggleBtn){
-      calcToggleBtn.addEventListener("click", ()=>{
-        openCalc();
-      });
-    }
-
-    const extrasBox = d.querySelector(`#${type}-EXTRAS`);
-    const extras = memoData ? (memoData[type+"-EXTRAS"] || []) : [];
-    extras.forEach(ex => extrasBox.appendChild(makeExtraRow(type, ex.key, ex.val)));
-
-    [1,2,3,4].forEach(n=>{
-      const area = d.querySelector(`[data-k="${type}-cmpt${n}"]`);
-      if(area){
-        autoGrowTextarea(area);
-        area.addEventListener("input", ()=> autoGrowTextarea(area));
-      }
-    });
-    const noteArea = d.querySelector(`textarea[data-k="${type}-note"]`);
-    if(noteArea){
-      noteArea.addEventListener("paste", ()=>{
-        setTimeout(()=> applyNoteAuto(type, noteArea.value), 20);
-      });
-      noteArea.addEventListener("change", ()=> applyNoteAuto(type, noteArea.value));
-    }
-
-    return d;
-  }
-
-  function buildSectionsBlank(){
-    sections.innerHTML = "";
-    if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", null));
-    if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", null));
-  }
-
-  function rebuildSectionsFromMemo(memoData){
-    sections.innerHTML = "";
-    if(pickInbound.checked) sections.appendChild(makeSection("INBOUND", memoData));
-    if(pickOutbound.checked) sections.appendChild(makeSection("OUTBOUND", memoData));
-  }
-
-  function newMemo(){
-    editId = null;
-    editingBaseMemo = null;
-    memoDate.value = getViewingDayKey();
-    pickInbound.checked = true;
-    pickOutbound.checked = true;
-    currentLirPhotos = { INBOUND:"", OUTBOUND:"" };
-    buildSectionsBlank();
-    openModal();
-  }
-
-  function openModal(){
-    modal.style.display = "flex";
-    modal.setAttribute("aria-hidden","false");
-    sheet.style.transform = "translateY(0)";
-    currentTranslate = 0;
-    topControls.style.display = "none";
-  }
-
-  function closeModal(){
-    modal.style.display = "none";
-    modal.setAttribute("aria-hidden","true");
-    editId = null;
-    activeLirType = null;
-    closeCalc();
-    if(activeCalcInput) activeCalcInput.classList.remove("focusedCalcTarget");
-    topControls.style.display = "flex";
-    updateEquipBadge();
-  }
-
-  function ensureAtLeastOnePick(changed){
-    if(!pickInbound.checked && !pickOutbound.checked){
-      changed.checked = true;
-      alert("INBOUND OR OUTBOUND SELECT");
-      return false;
-    }
-    return true;
-  }
-
-  pickInbound.addEventListener("change", ()=>{
-    if(!ensureAtLeastOnePick(pickInbound)) return;
-    if(editId){
-      const m = memos.find(x=>x.id===editId);
-      rebuildSectionsFromMemo(m || null);
-    }else{
-      buildSectionsBlank();
-    }
-  });
-
-  pickOutbound.addEventListener("change", ()=>{
-    if(!ensureAtLeastOnePick(pickOutbound)) return;
-    if(editId){
-      const m = memos.find(x=>x.id===editId);
-      rebuildSectionsFromMemo(m || null);
-    }else{
-      buildSectionsBlank();
-    }
-  });
-
-  async function saveMemo(){
-    if(!pickInbound.checked && !pickOutbound.checked){
-      alert("INBOUND OR OUTBOUND SELECT");
-      return;
-    }
-
-    const selectedTeam = getActiveTeamValue();
-    if(selectedTeam === "ALL"){
-      alert("TEAM SELECT");
-      return;
-    }
-
-    const savedAuthor = normalizeAuthorName(authorNameInput?.value || authorName);
-    if(!savedAuthor){
-      alert("NAME INPUT");
-      authorNameInput?.focus();
-      return;
-    }
-    saveAuthorName(savedAuthor);
-
-    const existingMemo = editId ? memos.find(x => x.id === editId) : null;
-    const data = { id: editId ?? Date.now(), hasIn:pickInbound.checked, hasOut:pickOutbound.checked };
-    data.createdAt = existingMemo?.createdAt || data.id;
-    data.updatedAt = Date.now();
-    data.team = selectedTeam;
-    data.author = savedAuthor;
-    data.memoDate = memoDate.value || getViewingDayKey();
-    data.dayKey = data.memoDate;
-
-    data.sharedHASH = pad(document.querySelector('input[data-k="SHARED-HASH"]')?.value || "", 3);
-
-    ["INBOUND","OUTBOUND"].forEach(type=>{
-      const root = sections.querySelector(`.section[data-type="${type}"]`);
-
-      if(!root){
-        data[type+"-7C"] = "";
-        data[type+"-CARRIER"] = existingMemo?.[type+"-CARRIER"] || "7C";
-        data[type+"-REG"] = "";
-        data[type+"-STA"] = "";
-        data[type+"-STD"] = "";
-        data[type+"-t"] = "";
-        data[type+"-d"] = "";
-        data[type+"-bb"] = "";
-        data[type+"-tt"] = "";
-        data[type+"-tb"] = "";
-        data[type+"-cmpt1"] = "";
-        data[type+"-cmpt2"] = "";
-        data[type+"-cmpt3"] = "";
-        data[type+"-cmpt4"] = "";
-        data[type+"-note"] = "";
-        data[type+"-TIME"] = "";
-        data[type+"-EXTRAS"] = [];
-        data[type+"-LIRPHOTO"] = currentLirPhotos[type] || "";
-        return;
-      }
-
-      const gi = (k)=> root.querySelector(`[data-k="${type}-${k}"]`);
-      const note = root.querySelector(`textarea[data-k="${type}-note"]`);
-
-      data[type+"-7C"] = pad(gi("7C")?.value || "", 4);
-      data[type+"-CARRIER"] = normalizeCarrier(gi("CARRIER")?.value || "7C");
-      data[type+"-REG"] = normalizeRegSuffix(gi("REG")?.value || "");
-      data[type+"-STA"] = type==="INBOUND" ? pad(gi("STA")?.value, 4) : "";
-      data[type+"-STD"] = type==="OUTBOUND" ? pad(gi("STD")?.value, 4) : "";
-      data[type+"-t"] = pad(gi("t")?.value, 3);
-      data[type+"-d"] = pad(gi("d")?.value, 2);
-      data[type+"-bb"] = pad(gi("bb")?.value, 2);
-      data[type+"-tt"] = type==="OUTBOUND" ? (gi("tt")?.value || "") : "";
-      data[type+"-tb"] = type==="OUTBOUND" ? (gi("tb")?.value || "") : "";
-
-      data[type+"-cmpt1"] = buildStoredCmptValue(type, 1, root);
-      data[type+"-cmpt2"] = buildStoredCmptValue(type, 2, root);
-      data[type+"-cmpt3"] = buildStoredCmptValue(type, 3, root);
-      data[type+"-cmpt4"] = buildStoredCmptValue(type, 4, root);
-      data[type+"-note"] = note ? (note.value || "") : "";
-
-      const shown = document.getElementById(type+"-TIMESHOWN");
-      data[type+"-TIME"] = shown ? normalizeTimeText(shown.textContent || "") : "";
-
-      const extras = [];
-      const box = root.querySelector(`#${type}-EXTRAS`);
-      if(box){
-        [...box.querySelectorAll(".extraRow")].forEach(r=>{
-          const key = (r.querySelector("select")?.value || "").toUpperCase();
-          const val = pad(r.querySelector("input")?.value || "", 3);
-          if(key && val) extras.push({key, val});
-        });
-      }
-      data[type+"-EXTRAS"] = extras;
-      data[type+"-LIRPHOTO"] = currentLirPhotos[type] || "";
-    });
-
-    // 기존 7C 메모와의 호환용. 새 구조는 방향별 CARRIER/REG를 사용한다.
-    data.sharedHL = data["INBOUND-CARRIER"] === "7C" ? (data["INBOUND-REG"] || "") : (existingMemo?.sharedHL || "");
-
-    dayOffset = calcDayOffsetFromDate(data.memoDate);
-    updateDayLabel();
-
-    // SAVE 누르면 바로 메인 화면으로 복귀
-    closeModal();
-
-    // Firebase 반영이 늦어도 현재 화면에는 즉시 표시되게 로컬 먼저 갱신
-    const oldIndex = memos.findIndex(x => x.id === data.id);
-    if(oldIndex >= 0) memos[oldIndex] = data;
-    else memos.unshift(data);
-    renderList(data.id);
-
+    status.textContent=`⏳ ${personCount}명 확인 · Firebase 공유 중...`;
     try{
-      const mergedSaved = await saveMemoRemote(data, editingBaseMemo);
-      const mergedIndex = memos.findIndex(x => x.id === data.id);
-      if(mergedIndex >= 0) memos[mergedIndex] = { ...mergedSaved, id:Number(mergedSaved.id || data.id) };
-      editingBaseMemo = JSON.parse(JSON.stringify(mergedSaved));
-      renderList(data.id);
-    }catch(error){
-      console.error(error);
-      alert("SAVE FAIL");
+      await uploadCurrentScheduleToFirebase();
+      status.textContent=`✅ ${year}년 ${month}월 전체 공유 완료 · ${personCount}명`;
+      viewDate=new Date(year,month-1,1);
+      watchFirebaseMonth(year,month);
+    }catch(syncErr){
+      console.error(syncErr);
+      status.textContent="⚠️ 엑셀은 읽었지만 Firebase 저장 실패 · Firestore 권한 확인 필요";
     }
+  }catch(err){
+    console.error(err);
+    status.textContent="❌ 엑셀을 읽지 못했습니다.";
   }
+});
 
-  function formatCombinedLine(m){
-    const type = m.hasIn !== false ? "INBOUND" : "OUTBOUND";
-    const carrier = normalizeCarrier(m[type+"-CARRIER"] || "7C");
-    const flight = (m[type+"-7C"] || "").trim();
-    const reg = (m[type+"-REG"] || m.sharedHL || "").trim();
-    const hash = (m.sharedHASH || "").trim();
-    return `${carrier}[${flight}] ${getRegPrefix(carrier)}[${reg}] #[${hash}]`;
-  }
 
-  function formatSplitLine(m, type){
-    const carrier = normalizeCarrier(m[type+"-CARRIER"] || "7C");
-    const flight = (m[type+"-7C"] || "").trim();
-    const reg = (m[type+"-REG"] || m.sharedHL || "").trim();
-    const hash = (m.sharedHASH || "").trim();
 
-    if(type === "INBOUND"){
-      return `${carrier}[${flight}] ${getRegPrefix(carrier)}[${reg}]`;
-    }
-    return `${carrier}[${flight}] ${getRegPrefix(carrier)}[${reg}] #[${hash}]`;
-  }
 
-  function renderList(flashId){
-    memoList.innerHTML = "";
+let mainPickCategory="1그룹";
+let mainPickUnit="1조";
 
-    const viewingDay = getViewingDayKey();
-    const dayMemos = memos
-      .filter(m => (m.dayKey || m.memoDate || todayStr()) === viewingDay)
-      .filter(m => activeTeamFilter === "ALL" ? true : String(m.team || "").toUpperCase() === activeTeamFilter)
-      .sort((a,b)=> Number(a.id) - Number(b.id));
+function renderMainPicker(){
+  const catBox=document.getElementById("mainCategories");
+  const unitBox=document.getElementById("mainUnits");
+  const personBox=document.getElementById("mainPersons");
 
-    if(!dayMemos.length){
-      memoList.innerHTML = `<div class="emptyDay">NO MEMO IN THIS DAY</div>`;
-      return;
-    }
+  if(!catBox||!unitBox||!personBox)return;
 
-    dayMemos.forEach(m=>{
-      const hasIn = m.hasIn !== false;
-      const hasOut = m.hasOut !== false;
-
-      let linesHtml = "";
-
-      if(hasIn && hasOut){
-        linesHtml = `
-          <div class="line"><div class="tagPill">IN</div><div class="textPill">${formatSplitLine(m, "INBOUND")}</div></div>
-          <div class="line"><div class="tagPill">OUT</div><div class="textPill">${formatSplitLine(m, "OUTBOUND")}</div></div>
-        `;
-      }else{
-        const singleTag = hasIn ? "IN" : "OUT";
-        linesHtml = `
-          <div class="line"><div class="tagPill">${singleTag}</div><div class="textPill">${formatCombinedLine(m)}</div></div>
-        `;
-      }
-
-      const card = document.createElement("div");
-      card.className = "memoCard" + (m.id===flashId ? " flash" : "");
-      card.innerHTML = `
-        <div class="memoRow">
-          <input class="selBox" type="checkbox" data-id="${m.id}">
-          <div class="lines" data-open="${m.id}">
-            ${linesHtml}
-          </div>
-        </div>
-        <div class="datePill">${m.memoDate || ""}</div>
-        ${m.team ? `<div class="teamBadge">TEAM ${m.team}</div>` : ``}
-        ${m.author ? `<div class="authorPill">BY ${String(m.author).replace(/[<>&"]/g, s => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[s]))}</div>` : ``}
-      `;
-      memoList.appendChild(card);
-    });
-
-    memoList.querySelectorAll("[data-open]").forEach(el=>{
-      el.addEventListener("click", ()=>{
-        const id = Number(el.getAttribute("data-open"));
-        editMemo(id);
-      });
-    });
-  }
-
-  function editMemo(id){
-    const m = memos.find(x=>x.id===id);
-    if(!m) return;
-
-    editId = id;
-    editingBaseMemo = JSON.parse(JSON.stringify(m));
-    memoDate.value = m.memoDate || getViewingDayKey();
-    pickInbound.checked = m.hasIn !== false;
-    pickOutbound.checked = m.hasOut !== false;
-    currentLirPhotos = {
-      INBOUND: m["INBOUND-LIRPHOTO"] || "",
-      OUTBOUND: m["OUTBOUND-LIRPHOTO"] || ""
+  catBox.innerHTML="";
+  Object.keys(STRUCTURE).forEach(cat=>{
+    const b=document.createElement("button");
+    b.textContent=cat;
+    b.className=cat===mainPickCategory?"active":"";
+    b.onclick=()=>{
+      mainPickCategory=cat;
+      mainPickUnit=STRUCTURE[cat][0];
+      renderMainPicker();
     };
-    rebuildSectionsFromMemo(m);
-
-    document.querySelectorAll('input[data-k="SHARED-HASH"]').forEach(el => el.value = m.sharedHASH || "");
-    syncCarrierRegLabels();
-    if(quickTeamSelect){
-      quickTeamSelect.value = m.team || "ALL";
-    }
-
-    openModal();
-  }
-
-  async function deleteSelected(){
-    const checks = document.querySelectorAll('.selBox:checked');
-    const ids = [...checks].map(c=>Number(c.dataset.id));
-    if(!ids.length){
-      alert("SELECT MEMO");
-      return;
-    }
-    try{
-      await deleteMemosRemote(ids);
-    }catch(error){
-      console.error(error);
-      alert("DELETE FAIL");
-    }
-  }
-
-  function addPhoto(){
-    photoInput.value = "";
-    photoInput.click();
-  }
-
-  function loadImageFromFile(file){
-    return new Promise((resolve, reject)=>{
-      const reader = new FileReader();
-      reader.onload = ()=>{
-        const img = new Image();
-        img.onload = ()=> resolve(img);
-        img.onerror = ()=> reject(new Error("IMAGE LOAD FAIL"));
-        img.src = String(reader.result || "");
-      };
-      reader.onerror = ()=> reject(new Error("FILE READ FAIL"));
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function compressImageToDataUrl(img, maxW = 1600, maxH = 1600, quality = 0.82){
-    const ratio = Math.min(maxW / img.width, maxH / img.height, 1);
-    const w = Math.max(1, Math.round(img.width * ratio));
-    const h = Math.max(1, Math.round(img.height * ratio));
-
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-
-    const ctx = canvas.getContext("2d");
-    if(!ctx) throw new Error("CANVAS FAIL");
-    ctx.drawImage(img, 0, 0, w, h);
-
-    return canvas.toDataURL("image/jpeg", quality);
-  }
-
-  async function makeStablePhotoData(file){
-    const img = await loadImageFromFile(file);
-
-    const tries = [
-      { maxW:1600, maxH:1600, quality:0.82 },
-      { maxW:1600, maxH:1600, quality:0.70 },
-      { maxW:1440, maxH:1440, quality:0.60 },
-      { maxW:1280, maxH:1280, quality:0.52 },
-      { maxW:1080, maxH:1080, quality:0.48 }
-    ];
-
-    for(const t of tries){
-      const dataUrl = compressImageToDataUrl(img, t.maxW, t.maxH, t.quality);
-      if(dataUrl.length < 3500000) return dataUrl;
-    }
-
-    return compressImageToDataUrl(img, 960, 960, 0.42);
-  }
-
-  function syncPhotoFromStorage(forceDraw = false){
-    const savedPhoto = localStorage.getItem(PHOTO_KEY) || "";
-    photo = savedPhoto;
-
-    if(forceDraw || photoLayer.style.display === "flex"){
-      if(photo){
-        photoImg.src = photo;
-      }else{
-        photoImg.removeAttribute("src");
-      }
-    }
-  }
-
-  async function savePhotoFile(file){
-    try{
-      const stableDataUrl = await makeStablePhotoData(file);
-      localStorage.setItem(PHOTO_KEY, stableDataUrl);
-      photo = stableDataUrl;
-      photoImg.src = stableDataUrl;
-      alert("PHOTO SAVED");
-    }catch(err){
-      console.error(err);
-      alert("PHOTO SAVE FAIL");
-    }
-  }
-
-  async function saveLirPhotoFile(file, type){
-    try{
-      const stableDataUrl = await makeStablePhotoData(file);
-      currentLirPhotos[type] = stableDataUrl;
-      alert("LIR PHOTO SAVED");
-    }catch(err){
-      console.error(err);
-      alert("LIR PHOTO SAVE FAIL");
-    }
-  }
-
-  photoInput.onchange = async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f) return;
-    await savePhotoFile(f);
-  };
-
-  lirPhotoInput.onchange = async (e)=>{
-    const f = e.target.files && e.target.files[0];
-    if(!f || !activeLirType) return;
-    await saveLirPhotoFile(f, activeLirType);
-  };
-
-  function openPhoto(){
-    syncPhotoFromStorage(true);
-    if(!photo) return;
-    photoLayer.style.display = "flex";
-  }
-
-  function closePhoto(){
-    photoLayer.style.display = "none";
-  }
-
-  window.addEventListener("pageshow", ()=>{
-    syncPhotoFromStorage(true);
+    catBox.appendChild(b);
   });
 
-  document.addEventListener("visibilitychange", ()=>{
-    if(document.visibilityState === "visible"){
-      syncPhotoFromStorage(true);
-    }
-  });
-
-  function openEquip(){
-    const eq = JSON.parse(localStorage.getItem(EQUIP_KEY) || "{}");
-    tug1.value = pad(eq.tug1,2);
-    tug2.value = pad(eq.tug2,2);
-    belt.value = pad(eq.belt,2);
-    equipModal.style.display = "flex";
-    equipModal.setAttribute("aria-hidden","false");
-  }
-
-  function closeEquip(){
-    equipModal.style.display = "none";
-    equipModal.setAttribute("aria-hidden","true");
-  }
-
-  function saveEquip(){
-    const eq = {
-      tug1: pad(tug1.value,2),
-      tug2: pad(tug2.value,2),
-      belt: pad(belt.value,2)
+  unitBox.innerHTML="";
+  STRUCTURE[mainPickCategory].forEach(unit=>{
+    const b=document.createElement("button");
+    b.textContent=mainPickCategory.includes("그룹")?unit.replace("조",""):unit;
+    b.className=unit===mainPickUnit?"active":"";
+    b.onclick=()=>{
+      mainPickUnit=unit;
+      renderMainPicker();
     };
-    localStorage.setItem(EQUIP_KEY, JSON.stringify(eq));
-    updateEquipBadge();
-    closeEquip();
-  }
-
-  function updateEquipBadge(){
-    const eq = JSON.parse(localStorage.getItem(EQUIP_KEY) || "{}");
-    if(!eq.tug1 && !eq.tug2 && !eq.belt){
-      equipBadge.style.display = "none";
-      return;
-    }
-    const t1 = eq.tug1 || "00";
-    const t2 = eq.tug2 || "00";
-    const b = eq.belt || "00";
-    equipBadge.innerHTML = `
-      <div class="b1">TUG ${t1}/${t2}</div>
-      <div class="b2">BELT ${b}</div>
-    `;
-    equipBadge.style.display = "block";
-  }
-
-  equipModal.addEventListener("click",(e)=>{
-    if(e.target === equipModal) closeEquip();
+    unitBox.appendChild(b);
   });
 
-  calcWrap.addEventListener("click", (e)=>{
-    if(e.target === calcWrap) closeCalc();
-  });
+  personBox.innerHTML="";
+  const names=state.people[mainPickUnit]||[];
 
-  document.querySelectorAll("[data-global-calc]").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      const val = btn.dataset.globalCalc || "";
-
-      if(val === "C"){
-        globalCalcExpr = "";
-        updateGlobalCalcDisplay("0");
-        return;
-      }
-
-      if(val === "⌫"){
-        globalCalcExpr = globalCalcExpr.slice(0, -1);
-        updateGlobalCalcDisplay(globalCalcExpr || "0");
-        return;
-      }
-
-      if(val === "="){
-        globalCalcExpr = safeEval(globalCalcExpr);
-        updateGlobalCalcDisplay(globalCalcExpr);
-        if(globalCalcExpr !== "ERROR"){
-          applyCalcToInput(globalCalcExpr);
-        }else{
-          globalCalcExpr = "";
-        }
-        return;
-      }
-
-      if(globalCalcExpr === "ERROR") globalCalcExpr = "";
-      globalCalcExpr += val;
-      updateGlobalCalcDisplay(globalCalcExpr);
-    });
-  });
-
-  let startY = 0;
-  let currentTranslate = 0;
-  let dragging = false;
-
-  function onStart(y){
-    dragging = true;
-    startY = y;
-    sheet.style.transition = "none";
+  if(!names.length){
+    const empty=document.createElement("div");
+    empty.className="searchEmpty";
+    empty.textContent="이 조의 성명이 없습니다.";
+    personBox.appendChild(empty);
+    return;
   }
 
-  function onMove(y){
-    if(!dragging) return;
-    const dy = Math.max(0, y - startY);
-    currentTranslate = dy;
-    sheet.style.transform = `translateY(${dy}px)`;
-  }
-
-  function onEnd(){
-    if(!dragging) return;
-    dragging = false;
-    sheet.style.transition = "transform .18s ease";
-    if(currentTranslate > 140){
-      closeModal();
-    }else{
-      sheet.style.transform = "translateY(0)";
-      currentTranslate = 0;
-    }
-  }
-
-  dragArea.addEventListener("touchstart", (e)=> onStart(e.touches[0].clientY), {passive:true});
-  dragArea.addEventListener("touchmove",  (e)=> onMove(e.touches[0].clientY),  {passive:true});
-  dragArea.addEventListener("touchend",   ()=> onEnd());
-
-  dragArea.addEventListener("mousedown", (e)=> onStart(e.clientY));
-  window.addEventListener("mousemove", (e)=> onMove(e.clientY));
-  window.addEventListener("mouseup", ()=> onEnd());
-
-
-
-  /* ===== JAGOS SCHEDULE FIREBASE SHARED ===== */
-  const SCH_COLLECTION = "memos"; // 스케줄도 기존 허용된 memos 컬렉션 안에 별도 문서로 저장
-  const SCH_MAIN_KEY = "jas_schedule_main_team_v1";
-  const SCH_TEAMS = [...Array.from({length:24},(_,i)=>`${i+1}조`), "토잉1", "토잉2", "토잉3", "통제"];
-  const SCH_WORK_CODES = ["A3","A4","A53","ALL53","P13","P133","P14","P15","A8","R43","R14","휴무"];
-  const SCH_MEMBER_CODES = ["","연차","A3","A4","A53","ALL53","P13","P133","P14","P15","A8","R43","R14"];
-  const SCH_HOLIDAY_WORK_CODES = ["R43","R14"];
-  const SCH_MAX_MEMBERS = 6;
-  let schData = {};
-  let schMembers = {};
-  let schViewDate = new Date();
-  schViewDate.setDate(1);
-  let schSelectedTeam = localStorage.getItem(SCH_MAIN_KEY) || "1조";
-  let schSelectedDateKey = "";
-  let schUnsubscribe = null;
-
-  function schEl(id){ return document.getElementById(id); }
-  function schPad(n){ return String(n).padStart(2,"0"); }
-  function schYmd(d){ return `${d.getFullYear()}-${schPad(d.getMonth()+1)}-${schPad(d.getDate())}`; }
-  function schEsc(v){ return String(v || "").replace(/[&<>"]/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[s])); }
-  function schGetKey(dateKey, team){ return `${dateKey}__${team}`; }
-  function schGetDay(dateKey, team){
-    const key = schGetKey(dateKey, team);
-    if(!schData[key]) schData[key] = {type:"day", dateKey, team, shift:"", memo:"", leaves:{}, ot:{}};
-    if(!schData[key].leaves) schData[key].leaves = {};
-    if(!schData[key].ot) schData[key].ot = {};
-    return schData[key];
-  }
-  function schGetMembers(team){ if(!schMembers[team]) schMembers[team] = []; return schMembers[team]; }
-  function schGetCodeValue(v){ return (v && typeof v === "object") ? (v.code || "") : (v || ""); }
-  function schIsWorkCode(code){ return SCH_WORK_CODES.includes(code) && code !== "휴무"; }
-  function schParseOt(v){
-    v = String(v || "").replace(/[^0-9]/g, "");
-    if(!v) return 0;
-    v = v.padStart(4,"0").slice(-4);
-    const h = Number(v.slice(0,2)) || 0;
-    const m = Math.min(59, Number(v.slice(2,4)) || 0);
-    return h * 60 + m;
-  }
-  function schFormatOt(min){
-    min = Number(min) || 0;
-    if(!min) return "0000";
-    const h = Math.floor(min / 60);
-    const m = min % 60;
-    return `${String(h).padStart(2,"0")}${String(m).padStart(2,"0")}`;
-  }
-  function schGetOt(data, name){
-    if(data.ot && data.ot[name] !== undefined) return Number(data.ot[name]) || 0;
-    const v = data.leaves && data.leaves[name];
-    return (v && typeof v === "object") ? (Number(v.ot) || 0) : 0;
-  }
-  function schIsHolidayWork(code){ return SCH_HOLIDAY_WORK_CODES.includes(schGetCodeValue(code)); }
-
-  function schInitSelects(){
-    const teamSelect = schEl("schTeamSelect");
-    const mainSelect = schEl("schMainSelect");
-    if(!teamSelect || teamSelect.options.length) return;
-    SCH_TEAMS.forEach(t => {
-      const a = document.createElement("option"); a.value = t; a.textContent = t; teamSelect.appendChild(a);
-      const b = document.createElement("option"); b.value = t; b.textContent = t; mainSelect.appendChild(b);
-    });
-    teamSelect.value = schSelectedTeam;
-    mainSelect.value = schSelectedTeam;
-    teamSelect.addEventListener("change", () => { schSelectedTeam = teamSelect.value; schRenderCalendar(); });
-    mainSelect.addEventListener("change", () => {
-      schSelectedTeam = mainSelect.value;
-      localStorage.setItem(SCH_MAIN_KEY, schSelectedTeam);
-      teamSelect.value = schSelectedTeam;
-      schRenderCalendar();
-    });
-    schEl("schPrevMonthBtn").addEventListener("click",()=>{schViewDate.setMonth(schViewDate.getMonth()-1); schRenderCalendar();});
-    schEl("schNextMonthBtn").addEventListener("click",()=>{schViewDate.setMonth(schViewDate.getMonth()+1); schRenderCalendar();});
-    schEl("schDayCloseBtn").addEventListener("click",()=>schCloseModal("schDayModal"));
-    schEl("schDaySaveBtn").addEventListener("click",schSaveDay);
-    schEl("schMemberBtn").addEventListener("click",schOpenMembers);
-    schEl("schMemberCloseBtn").addEventListener("click",()=>schCloseModal("schMemberModal"));
-    schEl("schMemberSaveBtn").addEventListener("click",schSaveMembers);
-    schEl("schAddMemberBtn").addEventListener("click",()=>schAddMemberRow(""));
-    schEl("schOtViewBtn").addEventListener("click",schOpenOt);
-    schEl("schOtCloseBtn").addEventListener("click",()=>schCloseModal("schOtModal"));
-    schEl("schApplyBulkOtBtn").addEventListener("click",schApplyBulkOt);
-    ["schDayModal","schMemberModal","schOtModal"].forEach(id=>{
-      schEl(id).addEventListener("click", e=>{ if(e.target === schEl(id)) schCloseModal(id); });
-    });
-  }
-
-  function schListen(){
-    if(schUnsubscribe) return;
-    schUnsubscribe = onSnapshot(collection(db, SCH_COLLECTION), snap => {
-      const nextData = {};
-      const nextMembers = {};
-      snap.forEach(d => {
-        const x = d.data() || {};
-        if(x.type === "schedule_members") nextMembers[x.schTeam || x.team] = Array.isArray(x.members) ? x.members.slice(0, SCH_MAX_MEMBERS) : [];
-        if(x.type === "members") nextMembers[x.team] = Array.isArray(x.members) ? x.members.slice(0, SCH_MAX_MEMBERS) : [];
-        if(x.type === "schedule_day" && x.schDateKey && x.schTeam){
-          nextData[schGetKey(x.schDateKey, x.schTeam)] = {
-            ...x,
-            type:"day",
-            dateKey:x.schDateKey,
-            team:x.schTeam
-          };
-        }
-        if(x.type === "day" && x.dateKey && x.team) nextData[schGetKey(x.dateKey, x.team)] = x;
-      });
-      schData = nextData;
-      schMembers = nextMembers;
-      if(schEl("scheduleScreen")?.classList.contains("show")) schRenderCalendar();
-    }, err => console.error("SCHEDULE LOAD ERROR", err));
-  }
-
-  function schRenderCalendar(){
-    schInitSelects();
-    const y = schViewDate.getFullYear();
-    const m = schViewDate.getMonth();
-    schEl("schMonthLabel").textContent = `${y}.${schPad(m+1)}`;
-    schEl("schBadgeTeam").textContent = schSelectedTeam;
-    schEl("schTeamSelect").value = schSelectedTeam;
-    schEl("schMainSelect").value = localStorage.getItem(SCH_MAIN_KEY) || schSelectedTeam;
-    const cal = schEl("schCalendar");
-    cal.innerHTML = "";
-    const first = new Date(y,m,1);
-    const last = new Date(y,m+1,0).getDate();
-    for(let i=0;i<first.getDay();i++) cal.insertAdjacentHTML("beforeend", `<div class="schDay blank"></div>`);
-    const todayKey = schYmd(new Date());
-    for(let d=1; d<=last; d++){
-      const date = new Date(y,m,d);
-      const key = schYmd(date);
-      const data = schData[schGetKey(key, schSelectedTeam)] || {};
-      const members = schGetMembers(schSelectedTeam);
-      const memberText = members.map(n => {
-        const code = schGetCodeValue(data.leaves && data.leaves[n]);
-        return code ? `${n}:${code}` : "";
-      }).filter(Boolean).join(" ");
-      cal.insertAdjacentHTML("beforeend", `
-        <div class="schDay ${key===todayKey?'today':''}" data-date="${key}">
-          <div class="schDayNum">${d}</div>
-          ${data.shift ? `<div class="schCode ${schGetCodeValue(data.shift)==="휴무" ? "off" : ""}">${schEsc(data.shift)}</div>` : ""}
-          ${data.memo ? `<div class="schMemo">${schEsc(data.memo)}</div>` : ""}
-          ${memberText ? `<div class="schSmall">${schEsc(memberText)}</div>` : ""}
-        </div>`);
-    }
-    cal.querySelectorAll(".schDay[data-date]").forEach(el=>el.addEventListener("click",()=>schOpenDay(el.dataset.date)));
-  }
-
-  async function schPersistCurrentDay(shouldClose = false){
-    if(!schSelectedDateKey || !schSelectedTeam) return;
-    const data = schGetDay(schSelectedDateKey, schSelectedTeam);
-    data.shift = schEl("schShiftInput").value.trim().toUpperCase();
-    data.memo = schEl("schMemoInput").value.trim();
-    data.type = "day";
-    data.dateKey = schSelectedDateKey;
-    data.team = schSelectedTeam;
-    data.leaves = data.leaves || {};
-    data.ot = data.ot || {};
-    schEl("schMemberEditList")?.querySelectorAll(".schMemberEdit").forEach(row=>{
-      const name = row.dataset.name;
-      const code = row.querySelector(".schMemberCode").value;
-      const ot = schParseOt(row.querySelector(".schMemberOt").value);
-      if(code) data.leaves[name] = {code, ot};
-      else if(ot) data.leaves[name] = {code:"", ot};
-      else delete data.leaves[name];
-      if(ot) data.ot[name] = ot;
-      else delete data.ot[name];
-    });
-    schData[schGetKey(schSelectedDateKey, schSelectedTeam)] = data;
-    schRenderCalendar();
-    if(shouldClose){
-      schCloseModal("schDayModal");
-      document.getElementById("scheduleScreen")?.scrollTo({top:0, behavior:"smooth"});
-    }
-    const remoteData = {
-      ...data,
-      type:"schedule_day",
-      schDateKey:schSelectedDateKey,
-      schTeam:schSelectedTeam,
-      // 일반 메모 조회(where team/dayKey)에 걸리지 않게 스케줄 전용 필드만 사용
-      team:null,
-      dateKey:null
+  names.forEach(name=>{
+    const b=document.createElement("button");
+    b.textContent=name;
+    b.onclick=()=>{
+      state.main={name,unit:mainPickUnit,category:mainPickCategory};
+      currentCategory=mainPickCategory;
+      currentUnit=mainPickUnit;
+      currentPerson=name;
+      persist();
+      document.getElementById("mainPickerModal").classList.remove("show");
+      renderAll();
+      document.getElementById("status").textContent=`✅ MAIN 설정 : ${mainPickUnit} · ${name}`;
     };
-    try{
-      await setDoc(doc(db, SCH_COLLECTION, `schedule_day_${schSelectedDateKey}_${schSelectedTeam}`), remoteData);
-    }catch(error){
-      console.error("SCHEDULE REMOTE SAVE FAIL", error);
-      // 로컬 화면에는 이미 반영했기 때문에 저장창은 닫고, 권한 문제로 앱이 멈추지 않게 처리
-    }
-  }
-
-  function schOpenDay(dateKey){
-    schSelectedDateKey = dateKey;
-    const data = schGetDay(dateKey, schSelectedTeam);
-    schEl("schDayTitle").textContent = `${dateKey} / ${schSelectedTeam}`;
-    schEl("schShiftInput").value = data.shift || "";
-    schEl("schMemoInput").value = data.memo || "";
-    schEl("schBulkOtInput").value = "";
-    const grid = schEl("schCodeGrid");
-    grid.innerHTML = "";
-    SCH_WORK_CODES.forEach(code=>{
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "schCodeBtn" + (data.shift === code ? " active" : "");
-      btn.textContent = code;
-      btn.addEventListener("click",()=>{
-        schEl("schShiftInput").value = code;
-        grid.querySelectorAll("button").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-
-        // 근무 코드는 누르는 즉시 달력에 반영/저장
-        schPersistCurrentDay(false).catch(err => console.error("SCHEDULE QUICK SAVE FAIL", err));
-      });
-      grid.appendChild(btn);
-    });
-    schRenderMemberEditList(data);
-    schShowModal("schDayModal");
-  }
-
-  function schRenderMemberEditList(data){
-    const wrap = schEl("schMemberEditList");
-    const members = schGetMembers(schSelectedTeam);
-    wrap.innerHTML = members.length ? "" : `<div class="schSmall">조원 추가 버튼에서 이름을 먼저 넣어줘.</div>`;
-    members.forEach(name=>{
-      const saved = data.leaves && data.leaves[name];
-      const code = schGetCodeValue(saved);
-      const ot = schGetOt(data, name);
-      const row = document.createElement("div");
-      row.className = "schMemberEdit";
-      row.dataset.name = name;
-      row.innerHTML = `<div class="name">${schEsc(name)}</div><select class="schMemberCode"></select><input class="schMemberOt" inputmode="numeric" maxlength="4" placeholder="0200" value="${ot ? schFormatOt(ot) : ''}">`;
-      const sel = row.querySelector("select");
-      SCH_MEMBER_CODES.forEach(c=>{ const o=document.createElement("option"); o.value=c; o.textContent=c||"기본"; sel.appendChild(o); });
-      sel.value = code || "";
-      wrap.appendChild(row);
-    });
-  }
-
-  function schApplyBulkOt(){
-    const val = schEl("schBulkOtInput").value;
-    schEl("schMemberEditList").querySelectorAll(".schMemberOt").forEach(inp=>{ inp.value = val; });
-  }
-
-  async function schSaveDay(){
-    try{
-      await schPersistCurrentDay(true);
-    }catch(error){
-      console.error(error);
-      alert("SCHEDULE SAVE FAIL");
-    }
-  }
-
-  function schOpenMembers(){
-    const list = schEl("schMemberList");
-    list.innerHTML = "";
-    schGetMembers(schSelectedTeam).forEach(name=>schAddMemberRow(name));
-    schShowModal("schMemberModal");
-  }
-  function schAddMemberRow(name=""){
-    const list = schEl("schMemberList");
-    if(list.children.length >= SCH_MAX_MEMBERS){ alert("조원은 최대 6명까지 가능해."); return; }
-    const row = document.createElement("div");
-    row.className = "schMemberRow";
-    row.innerHTML = `<input class="schMemberNameInput" maxlength="12" placeholder="조원 이름" value="${schEsc(name)}"><button type="button" class="schDark">삭제</button>`;
-    row.querySelector("button").addEventListener("click",()=>row.remove());
-    list.appendChild(row);
-  }
-  async function schSaveMembers(){
-    const names = [...schEl("schMemberList").querySelectorAll(".schMemberNameInput")].map(i=>i.value.trim()).filter(Boolean).slice(0,SCH_MAX_MEMBERS);
-    schMembers[schSelectedTeam] = names;
-    try{
-      await setDoc(doc(db, SCH_COLLECTION, `schedule_members_${schSelectedTeam}`), {type:"schedule_members", schTeam:schSelectedTeam, members:names});
-    }catch(error){
-      console.error("SCHEDULE MEMBERS REMOTE SAVE FAIL", error);
-    }
-    schCloseModal("schMemberModal");
-    schRenderCalendar();
-  }
-
-  function schOpenOt(){
-    const members = schGetMembers(schSelectedTeam);
-    const totals = Object.fromEntries(members.map(n=>[n,0]));
-    const y = schViewDate.getFullYear();
-    const m = schViewDate.getMonth();
-    const last = new Date(y,m+1,0).getDate();
-    for(let d=1; d<=last; d++){
-      const key = schYmd(new Date(y,m,d));
-      const data = schData[schGetKey(key, schSelectedTeam)];
-      if(!data) continue;
-      members.forEach(name=>{
-        const code = schGetCodeValue(data.leaves && data.leaves[name]);
-        if(["연차"].includes(code)) return;
-        totals[name] += schGetOt(data, name);
-      });
-    }
-    const totalMonthOt = members.reduce((sum, n)=>sum + (totals[n] || 0), 0);
-    schEl("schOtTitle").textContent = `${schSelectedTeam} / ${y}.${schPad(m+1)} 연장시간`;
-    schEl("schOtList").innerHTML = members.length
-      ? members.map(n=>`
-        <div class="schOtPill">
-          <div class="schOtName">${schEsc(n)}</div>
-          <div class="schOtTime"><span>연장시간</span><b>${schFormatOt(totals[n]||0)}</b></div>
-        </div>`).join("")
-      : `<div class="schSmall">조원을 먼저 추가해줘.</div>`;
-    schShowModal("schOtModal");
-  }
-
-  function schShowModal(id){ schEl(id).classList.add("show"); }
-  function schCloseModal(id){ schEl(id).classList.remove("show"); }
-  function openSchedule(){
-    schInitSelects();
-    schListen();
-    schRenderCalendar();
-    schEl("scheduleScreen").classList.add("show");
-    schEl("scheduleScreen").setAttribute("aria-hidden", "false");
-  }
-  function closeSchedule(){
-    schEl("scheduleScreen").classList.remove("show");
-    schEl("scheduleScreen").setAttribute("aria-hidden", "true");
-  }
-
-
-  activeTeamFilter = mainTeam || "ALL";
-  fillTeamOptions(activeTeamFilter);
-  fillMainTeamOptions(mainTeam);
-  if(quickTeamSelect) quickTeamSelect.value = activeTeamFilter;
-  if(mainTeamSelect) mainTeamSelect.value = mainTeam;
-  memoDate.value = getViewingDayKey();
-  updateDayLabel();
-  autoDeleteOldMemos()
-    .catch(error => console.error("AUTO DELETE FAIL", error))
-    .finally(() => listenMemos(activeTeamFilter, getViewingDayKey()));
-  updateEquipBadge();
-  syncPhotoFromStorage(false);
-  updateGlobalCalcDisplay("0");
-
-  Object.assign(window, {
-    addExtraRow,
-    addPhoto,
-    closeCalc,
-    closeEquip,
-    closeModal,
-    closePhoto,
-    deleteCurrentDay,
-    deleteSelected,
-    goToday,
-    moveDay,
-    newMemo,
-    openEquip,
-    openPhoto,
-    openSchedule,
-    closeSchedule,
-    saveEquip,
-    saveMemo
+    personBox.appendChild(b);
   });
+}
 
+document.getElementById("openMainPicker").onclick=()=>{
+  if(!Object.keys(state.people).length){
+    document.getElementById("status").textContent="⚠️ 먼저 엑셀 근무표를 추가해주세요.";
+    return;
+  }
+
+  if(state.main){
+    mainPickCategory=state.main.category;
+    mainPickUnit=state.main.unit;
+  }else{
+    mainPickCategory="1그룹";
+    mainPickUnit="1조";
+  }
+
+  renderMainPicker();
+  document.getElementById("mainPickerModal").classList.add("show");
+};
+
+document.getElementById("closeMainPicker").onclick=()=>{
+  document.getElementById("mainPickerModal").classList.remove("show");
+};
+
+document.getElementById("clearMainPicker").onclick=()=>{
+  mainPickCategory="1그룹";
+  mainPickUnit="1조";
+  renderMainPicker();
+};
+
+document.getElementById("mainPickerModal").onclick=e=>{
+  if(e.target.id==="mainPickerModal"){
+    document.getElementById("mainPickerModal").classList.remove("show");
+  }
+};
+
+document.getElementById("goMain").onclick=()=>{
+  if(!state.main){
+    document.getElementById("status").textContent="⚠️ MAIN이 아직 설정되지 않았습니다.";
+    return;
+  }
+  currentCategory=state.main.category;
+  currentUnit=state.main.unit;
+  currentPerson=state.main.name;
+  renderAll();
+};
+
+document.getElementById("prevMonth").onclick=()=>{
+  viewDate.setMonth(viewDate.getMonth()-1);
+  renderCalendar();
+  watchFirebaseMonth(viewDate.getFullYear(),viewDate.getMonth()+1);
+};
+document.getElementById("nextMonth").onclick=()=>{
+  viewDate.setMonth(viewDate.getMonth()+1);
+  renderCalendar();
+  watchFirebaseMonth(viewDate.getFullYear(),viewDate.getMonth()+1);
+};
+document.getElementById("todayBtn").onclick=()=>{
+  const n=new Date();
+  viewDate=new Date(n.getFullYear(),n.getMonth(),1);
+  renderCalendar();
+  watchFirebaseMonth(viewDate.getFullYear(),viewDate.getMonth()+1);
+};
+
+document.getElementById("cancelEdit").onclick=()=>document.getElementById("editModal").classList.remove("show");
+document.getElementById("editModal").onclick=e=>{
+  if(e.target.id==="editModal")document.getElementById("editModal").classList.remove("show");
+};
+document.getElementById("saveEdit").onclick=()=>{
+  if(!currentPerson||!editingDate)return;
+  state.edits[editKey(currentPerson,editingDate)]=document.getElementById("editInput").value.trim().toUpperCase();
+  persist();
+  document.getElementById("editModal").classList.remove("show");
+  renderCalendar();
+};
+document.getElementById("resetEdit").onclick=()=>{
+  if(!currentPerson)return;
+  if(!confirm(`${currentPerson}의 직접 수정한 근무만 초기화할까요?`))return;
+  Object.keys(state.edits).forEach(k=>{
+    if(k.startsWith(currentPerson+"::"))delete state.edits[k];
+  });
+  persist();renderCalendar();
+};
+
+if(state.main&&(state.people[state.main.unit]||[]).includes(state.main.name)){
+  currentCategory=state.main.category;
+  currentUnit=state.main.unit;
+  currentPerson=state.main.name;
+}else{
+  pickFirst();
+}
+renderAll();
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDto0AprR6IbnTNqNzZ3qt_-piJ_Cbqd_Y",
+  authDomain: "jasmemo-3c59b.firebaseapp.com",
+  projectId: "jasmemo-3c59b",
+  storageBucket: "jasmemo-3c59b.firebasestorage.app",
+  messagingSenderId: "891861551666",
+  appId: "1:891861551666:web:0b96ffcead52c73676ca2b",
+  measurementId: "G-0G4R112WVT"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+function monthDocId(year, month){
+  return `${year}-${String(month).padStart(2,"0")}`;
+}
+
+window.JASFirebase = {
+  ready: true,
+
+  async saveSchedule(payload){
+    const ref = doc(db, "jasDutySchedule", monthDocId(payload.year, payload.month));
+    await setDoc(ref, {...payload, updatedAt: serverTimestamp()});
+  },
+
+  watchMonth(year, month, callback, onError){
+    const ref = doc(db, "jasDutySchedule", monthDocId(year, month));
+    return onSnapshot(ref, snap => {
+      callback(snap.exists() ? snap.data() : null);
+    }, onError);
+  }
+};
+window.dispatchEvent(new Event("jasFirebaseReady"));
 </script>
 
 </body>
